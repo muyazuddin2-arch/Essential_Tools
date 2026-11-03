@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<p class="mu" id="tag"></p>
+<div class="grid" id="grid"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S2={
+en:"Free, safe, ad-free everyday tools in your language.|Pick a tool below. Language, currency and country rules follow your settings above.",
+bn:"দৈনন্দিন কাজের ফ্রি, নিরাপদ ও বিজ্ঞাপনমুক্ত টুল, আপনার ভাষায়।|নিচ থেকে একটা টুল বেছে নিন। ভাষা, মুদ্রা ও দেশের নিয়ম ওপরের সেটিং অনুযায়ী চলবে।",
+hi:"रोज़मर्रा के मुफ़्त, सुरक्षित और विज्ञापन-रहित टूल, आपकी भाषा में।|नीचे से कोई टूल चुनें। भाषा, मुद्रा और देश के नियम ऊपर की सेटिंग के अनुसार चलेंगे।",
+ur:"روزمرہ کے مفت، محفوظ اور اشتہار سے پاک ٹولز، آپ کی زبان میں۔|نیچے سے کوئی ٹول چنیں۔ زبان، کرنسی اور ملک کے قواعد اوپر کی ترتیبات کے مطابق ہوں گے۔",
+ar:"أدوات يومية مجانية وآمنة وخالية من الإعلانات بلغتك.|اختر أداة من الأسفل. تتبع اللغة والعملة وقواعد الدولة الإعدادات أعلاه.",
+fa:"ابزارهای روزمره رایگان، امن و بدون تبلیغ، به زبان شما.|یک ابزار از پایین انتخاب کنید. زبان، ارز و قوانین کشور طبق تنظیمات بالا است.",
+tr:"Günlük hayat için ücretsiz, güvenli ve reklamsız araçlar, kendi dilinizde.|Aşağıdan bir araç seçin. Dil, para birimi ve ülke kuralları yukarıdaki ayarlara uyar.",
+zh:"免费、安全、无广告的日常工具，支持您的语言。|请从下方选择工具。语言、货币和国家规则将遵循上方设置。",
+ja:"無料・安全・広告なしの日常ツールを、あなたの言語で。|下からツールを選んでください。言語・通貨・国のルールは上の設定に従います。",
+ko:"무료, 안전, 광고 없는 생활 도구를 당신의 언어로.|아래에서 도구를 선택하세요. 언어, 통화, 국가별 규칙은 위 설정을 따릅니다.",
+ru:"Бесплатные, безопасные инструменты без рекламы на вашем языке.|Выберите инструмент ниже. Язык, валюта и правила страны зависят от настроек выше.",
+es:"Herramientas cotidianas gratuitas, seguras y sin anuncios, en tu idioma.|Elige una herramienta abajo. El idioma, la moneda y las reglas del país siguen tus ajustes.",
+fr:"Des outils du quotidien gratuits, sûrs et sans publicité, dans votre langue.|Choisissez un outil ci-dessous. La langue, la devise et les règles du pays suivent vos réglages.",
+de:"Kostenlose, sichere und werbefreie Alltagstools in Ihrer Sprache.|Wählen Sie unten ein Tool. Sprache, Währung und Länderregeln folgen Ihren Einstellungen.",
+pt:"Ferramentas do dia a dia gratuitas, seguras e sem anúncios, no seu idioma.|Escolha uma ferramenta abaixo. Idioma, moeda e regras do país seguem suas configurações.",
+it:"Strumenti quotidiani gratuiti, sicuri e senza pubblicità, nella tua lingua.|Scegli uno strumento qui sotto. Lingua, valuta e regole del paese seguono le tue impostazioni.",
+nl:"Gratis, veilige en advertentievrije hulpmiddelen voor elke dag, in uw taal.|Kies hieronder een hulpmiddel. Taal, valuta en landregels volgen uw instellingen.",
+pl:"Darmowe, bezpieczne narzędzia na co dzień, bez reklam, w Twoim języku.|Wybierz narzędzie poniżej. Język, waluta i zasady kraju zależą od ustawień powyżej.",
+uk:"Безкоштовні, безпечні інструменти без реклами вашою мовою.|Оберіть інструмент нижче. Мова, валюта та правила країни залежать від налаштувань вище.",
+id:"Alat sehari-hari gratis, aman, dan bebas iklan dalam bahasa Anda.|Pilih alat di bawah. Bahasa, mata uang, dan aturan negara mengikuti pengaturan di atas.",
+ms:"Alat harian percuma, selamat dan bebas iklan dalam bahasa anda.|Pilih alat di bawah. Bahasa, mata wang dan peraturan negara mengikut tetapan di atas.",
+th:"เครื่องมือใช้งานประจำวัน ฟรี ปลอดภัย ไม่มีโฆษณา ในภาษาของคุณ|เลือกเครื่องมือด้านล่าง ภาษา สกุลเงิน และกฎของประเทศจะเป็นไปตามการตั้งค่าด้านบน",
+vi:"Công cụ hằng ngày miễn phí, an toàn, không quảng cáo, bằng ngôn ngữ của bạn.|Chọn một công cụ bên dưới. Ngôn ngữ, tiền tệ và quy tắc quốc gia theo cài đặt phía trên.",
+ta:"உங்கள் மொழியில் இலவச, பாதுகாப்பான, விளம்பரமில்லாத தினசரி கருவிகள்.|கீழே ஒரு கருவியைத் தேர்ந்தெடுக்கவும். மொழி, நாணயம், நாட்டு விதிகள் மேலுள்ள அமைப்புகளைப் பின்பற்றும்.",
+te:"మీ భాషలో ఉచిత, సురక్షిత, ప్రకటనలు లేని రోజువారీ సాధనాలు.|కింద ఒక సాధనాన్ని ఎంచుకోండి. భాష, కరెన్సీ, దేశ నియమాలు పై సెట్టింగ్‌లను అనుసరిస్తాయి.",
+mr:"तुमच्या भाषेत मोफत, सुरक्षित आणि जाहिरातमुक्त रोजची साधने.|खालून एक साधन निवडा. भाषा, चलन आणि देशाचे नियम वरील सेटिंगनुसार चालतील.",
+ne:"तपाईंको भाषामा निःशुल्क, सुरक्षित र विज्ञापनरहित दैनिक उपकरणहरू।|तल एउटा उपकरण छान्नुहोस्। भाषा, मुद्रा र देशका नियम माथिको सेटिङ अनुसार चल्छन्।",
+si:"ඔබේ භාෂාවෙන් නොමිලේ, ආරක්ෂිත, දැන්වීම් රහිත එදිනෙදා මෙවලම්.|පහතින් මෙවලමක් තෝරන්න. භාෂාව, මුදල් සහ රටේ නීති ඉහත සැකසුම් අනුගමනය කරයි.",
+sw:"Zana za kila siku zisizo na malipo, salama na zisizo na matangazo, kwa lugha yako.|Chagua zana hapa chini. Lugha, sarafu na kanuni za nchi hufuata mipangilio iliyo juu.",
+he:"כלים יומיומיים חינמיים, בטוחים וללא פרסומות בשפה שלכם.|בחרו כלי למטה. השפה, המטבע וכללי המדינה נקבעים לפי ההגדרות למעלה.",
+el:"Δωρεάν, ασφαλή εργαλεία καθημερινής χρήσης χωρίς διαφημίσεις, στη γλώσσα σας.|Επιλέξτε ένα εργαλείο παρακάτω. Γλώσσα, νόμισμα και κανόνες χώρας ακολουθούν τις ρυθμίσεις πάνω.",
+sv:"Gratis, säkra och reklamfria vardagsverktyg på ditt språk.|Välj ett verktyg nedan. Språk, valuta och landsregler följer inställningarna ovan."};
+const $=id=>document.getElementById(id);
+function labels(){
+$("t").textContent="Essential Tools";document.title="Essential Tools";
+$("tag").textContent=ET.t2(0);
+$("grid").innerHTML=ET.tools.map(t=>'<a class="card" href="'+t[0]+'">'+ET.title(t)+'</a>').join("");}
+ET.start({id:"home",file:"index.html",S:{en:"Essential Tools"},S2,labels,guide:()=>ET.t2(1),history:false});
+</script>
+</body>
+</html>

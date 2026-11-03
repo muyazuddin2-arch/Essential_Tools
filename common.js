@@ -4,42 +4,42 @@
 const $=id=>document.getElementById(id);
 /* ===== OWNER SETTINGS: edit here once, it applies to every tool ===== */
 const CONTACT={gmail:"",facebook:""}; // e.g. gmail:"yourname@gmail.com", facebook:"https://facebook.com/yourpage"
-const TOOLS=[["emi.html","EMI Calculator"]]; // new tool: add one line like ["qr.html","QR Code"]
+const TOOLS=[["emi.html",{"en": "EMI Calculator", "bn": "EMI ক্যালকুলেটর", "hi": "EMI कैलकुलेटर", "ur": "EMI کیلکولیٹر", "ar": "حاسبة القسط الشهري", "fa": "ماشین‌حساب اقساط", "tr": "Taksit Hesaplayıcı", "zh": "贷款月供计算器", "ja": "ローン返済シミュレーター", "ko": "대출 이자 계산기", "ru": "Кредитный калькулятор", "es": "Calculadora de cuotas", "fr": "Calculateur de mensualités", "de": "Ratenrechner", "pt": "Calculadora de parcelas", "it": "Calcolatore rate", "nl": "Aflossingsrekenmachine", "pl": "Kalkulator rat", "uk": "Кредитний калькулятор", "id": "Kalkulator Cicilan", "ms": "Kalkulator Ansuran", "th": "เครื่องคำนวณผ่อนชำระ", "vi": "Máy tính khoản vay", "ta": "EMI கணிப்பான்", "te": "EMI కాలిక్యులేటర్", "mr": "EMI कॅल्क्युलेटर", "ne": "EMI क्यालकुलेटर", "si": "EMI ගණකය", "sw": "Kikokotoo cha Malipo ya Mkopo", "he": "מחשבון החזר הלוואה", "el": "Αριθμομηχανή δόσεων", "sv": "Låneberäknare"}]]; // new tool: add one line ["file.html",{en:"Name",bn:"নাম",...}] with its title in all 32 languages
 const TL={en:"Tools",bn:"টুলস",hi:"टूल्स",ur:"ٹولز",ar:"الأدوات",fa:"ابزارها",tr:"Araçlar",zh:"工具",ja:"ツール",ko:"도구",ru:"Инструменты",es:"Herramientas",fr:"Outils",de:"Werkzeuge",pt:"Ferramentas",it:"Strumenti",nl:"Hulpmiddelen",pl:"Narzędzia",uk:"Інструменти",id:"Alat",ms:"Alat",th:"เครื่องมือ",vi:"Công cụ",ta:"கருவிகள்",te:"సాధనాలు",mr:"साधने",ne:"उपकरणहरू",si:"මෙවලම්",sw:"Zana",he:"כלים",el:"Εργαλεία",sv:"Verktyg"};
 
 const CS={
-en:"Currency|History|Clear history|Erased when you leave this page.|User guide|Use my location|Location unavailable. Using International settings.",
-bn:"মুদ্রা|ইতিহাস|ইতিহাস মুছুন|এই পেজ ছেড়ে গেলে মুছে যাবে।|ব্যবহারের নির্দেশিকা|আমার লোকেশন ব্যবহার করুন|লোকেশন পাওয়া যায়নি। আন্তর্জাতিক সেটিং ব্যবহার হচ্ছে।",
-hi:"मुद्रा|इतिहास|इतिहास साफ़ करें|इस पेज से बाहर जाने पर मिट जाएगा।|उपयोग गाइड|मेरा स्थान उपयोग करें|स्थान उपलब्ध नहीं। अंतरराष्ट्रीय सेटिंग उपयोग हो रही है।",
-ur:"کرنسی|ہسٹری|ہسٹری صاف کریں|اس صفحے سے نکلنے پر مٹ جائے گی۔|استعمال کی رہنمائی|میرا مقام استعمال کریں|مقام دستیاب نہیں۔ بین الاقوامی ترتیبات استعمال ہو رہی ہیں۔",
-ar:"العملة|السجل|مسح السجل|يُحذف عند مغادرة هذه الصفحة.|دليل الاستخدام|استخدم موقعي|الموقع غير متاح. تُستخدم الإعدادات الدولية.",
-fa:"ارز|تاریخچه|پاک کردن تاریخچه|با ترک این صفحه پاک می‌شود.|راهنمای استفاده|استفاده از موقعیت من|موقعیت در دسترس نیست. تنظیمات بین‌المللی استفاده می‌شود.",
-tr:"Para birimi|Geçmiş|Geçmişi temizle|Bu sayfadan ayrılınca silinir.|Kullanım kılavuzu|Konumumu kullan|Konum alınamadı. Uluslararası ayarlar kullanılıyor.",
-zh:"货币|历史记录|清除历史|离开此页面后将被清除。|使用指南|使用我的位置|无法获取位置，使用国际通用设置。",
-ja:"通貨|履歴|履歴を消去|このページを離れると削除されます。|使い方ガイド|現在地を使う|位置情報を取得できません。国際標準の設定を使用します。",
-ko:"통화|기록|기록 지우기|이 페이지를 떠나면 삭제됩니다.|사용 안내|내 위치 사용|위치를 사용할 수 없습니다. 국제 기본 설정을 사용합니다.",
-ru:"Валюта|История|Очистить историю|Удаляется при выходе со страницы.|Руководство|Использовать моё местоположение|Местоположение недоступно. Используются международные настройки.",
-es:"Moneda|Historial|Borrar historial|Se borra al salir de esta página.|Guía de uso|Usar mi ubicación|Ubicación no disponible. Se usa la configuración internacional.",
-fr:"Devise|Historique|Effacer l’historique|Effacé quand vous quittez cette page.|Guide d’utilisation|Utiliser ma position|Position indisponible. Paramètres internationaux utilisés.",
-de:"Währung|Verlauf|Verlauf löschen|Wird beim Verlassen der Seite gelöscht.|Anleitung|Meinen Standort verwenden|Standort nicht verfügbar. Internationale Einstellungen werden verwendet.",
-pt:"Moeda|Histórico|Limpar histórico|Apagado ao sair desta página.|Guia de uso|Usar minha localização|Localização indisponível. Usando configurações internacionais.",
-it:"Valuta|Cronologia|Cancella cronologia|Viene cancellata quando lasci la pagina.|Guida all’uso|Usa la mia posizione|Posizione non disponibile. Uso le impostazioni internazionali.",
-nl:"Valuta|Geschiedenis|Geschiedenis wissen|Wordt gewist als u deze pagina verlaat.|Gebruiksaanwijzing|Mijn locatie gebruiken|Locatie niet beschikbaar. Internationale instellingen worden gebruikt.",
-pl:"Waluta|Historia|Wyczyść historię|Usuwane po opuszczeniu strony.|Instrukcja|Użyj mojej lokalizacji|Lokalizacja niedostępna. Używane są ustawienia międzynarodowe.",
-uk:"Валюта|Історія|Очистити історію|Видаляється після виходу зі сторінки.|Інструкція|Використати моє місцезнаходження|Місцезнаходження недоступне. Використовуються міжнародні налаштування.",
-id:"Mata uang|Riwayat|Hapus riwayat|Dihapus saat Anda meninggalkan halaman ini.|Panduan penggunaan|Gunakan lokasi saya|Lokasi tidak tersedia. Menggunakan pengaturan internasional.",
-ms:"Mata wang|Sejarah|Padam sejarah|Dipadam apabila anda meninggalkan halaman ini.|Panduan pengguna|Guna lokasi saya|Lokasi tidak tersedia. Menggunakan tetapan antarabangsa.",
-th:"สกุลเงิน|ประวัติ|ล้างประวัติ|จะถูกลบเมื่อคุณออกจากหน้านี้|คู่มือการใช้งาน|ใช้ตำแหน่งของฉัน|ไม่สามารถใช้ตำแหน่งได้ ใช้การตั้งค่าสากลแทน",
-vi:"Tiền tệ|Lịch sử|Xóa lịch sử|Sẽ bị xóa khi bạn rời trang này.|Hướng dẫn sử dụng|Dùng vị trí của tôi|Không có vị trí. Đang dùng cài đặt quốc tế.",
-ta:"நாணயம்|வரலாறு|வரலாற்றை அழி|இந்தப் பக்கத்தை விட்டு வெளியேறினால் அழிக்கப்படும்.|பயன்பாட்டு வழிகாட்டி|என் இருப்பிடத்தைப் பயன்படுத்து|இருப்பிடம் கிடைக்கவில்லை. சர்வதேச அமைப்புகள் பயன்படுத்தப்படுகின்றன.",
-te:"కరెన్సీ|చరిత్ర|చరిత్రను తొలగించు|ఈ పేజీని వదిలితే తొలగించబడుతుంది.|వినియోగ మార్గదర్శి|నా స్థానాన్ని ఉపయోగించు|స్థానం అందుబాటులో లేదు. అంతర్జాతీయ సెట్టింగ్‌లు వాడుతున్నాం.",
-mr:"चलन|इतिहास|इतिहास पुसा|हे पान सोडल्यावर पुसला जाईल.|वापर मार्गदर्शक|माझे स्थान वापरा|स्थान उपलब्ध नाही. आंतरराष्ट्रीय सेटिंग वापरत आहे.",
-ne:"मुद्रा|इतिहास|इतिहास मेट्नुहोस्|यो पेज छोडेपछि मेटिन्छ।|प्रयोग निर्देशिका|मेरो स्थान प्रयोग गर्नुहोस्|स्थान उपलब्ध छैन। अन्तर्राष्ट्रिय सेटिङ प्रयोग भइरहेको छ।",
-si:"මුදල්|ඉතිහාසය|ඉතිහාසය මකන්න|මෙම පිටුවෙන් ඉවත් වූ විට මැකේ.|භාවිත මාර්ගෝපදේශය|මගේ ස්ථානය භාවිතා කරන්න|ස්ථානය ලබාගත නොහැක. ජාත්‍යන්තර සැකසුම් භාවිතා වේ.",
-sw:"Sarafu|Historia|Futa historia|Hufutwa ukiondoka kwenye ukurasa huu.|Mwongozo wa matumizi|Tumia eneo langu|Eneo halipatikani. Mipangilio ya kimataifa inatumika.",
-he:"מטבע|היסטוריה|נקה היסטוריה|יימחק עם עזיבת הדף.|מדריך שימוש|השתמש במיקום שלי|המיקום אינו זמין. נעשה שימוש בהגדרות בינלאומיות.",
-el:"Νόμισμα|Ιστορικό|Εκκαθάριση ιστορικού|Διαγράφεται όταν φύγετε από τη σελίδα.|Οδηγός χρήσης|Χρήση της τοποθεσίας μου|Η τοποθεσία δεν είναι διαθέσιμη. Χρησιμοποιούνται διεθνείς ρυθμίσεις.",
-sv:"Valuta|Historik|Rensa historik|Raderas när du lämnar sidan.|Användarguide|Använd min plats|Plats ej tillgänglig. Internationella inställningar används."};
+en:"Currency|History|Clear history|Erased when you leave this page.|User guide|Use my location|Location unavailable. Using International settings.|Country",
+bn:"মুদ্রা|ইতিহাস|ইতিহাস মুছুন|এই পেজ ছেড়ে গেলে মুছে যাবে।|ব্যবহারের নির্দেশিকা|আমার লোকেশন ব্যবহার করুন|লোকেশন পাওয়া যায়নি। আন্তর্জাতিক সেটিং ব্যবহার হচ্ছে।|দেশ",
+hi:"मुद्रा|इतिहास|इतिहास साफ़ करें|इस पेज से बाहर जाने पर मिट जाएगा।|उपयोग गाइड|मेरा स्थान उपयोग करें|स्थान उपलब्ध नहीं। अंतरराष्ट्रीय सेटिंग उपयोग हो रही है।|देश",
+ur:"کرنسی|ہسٹری|ہسٹری صاف کریں|اس صفحے سے نکلنے پر مٹ جائے گی۔|استعمال کی رہنمائی|میرا مقام استعمال کریں|مقام دستیاب نہیں۔ بین الاقوامی ترتیبات استعمال ہو رہی ہیں۔|ملک",
+ar:"العملة|السجل|مسح السجل|يُحذف عند مغادرة هذه الصفحة.|دليل الاستخدام|استخدم موقعي|الموقع غير متاح. تُستخدم الإعدادات الدولية.|الدولة",
+fa:"ارز|تاریخچه|پاک کردن تاریخچه|با ترک این صفحه پاک می‌شود.|راهنمای استفاده|استفاده از موقعیت من|موقعیت در دسترس نیست. تنظیمات بین‌المللی استفاده می‌شود.|کشور",
+tr:"Para birimi|Geçmiş|Geçmişi temizle|Bu sayfadan ayrılınca silinir.|Kullanım kılavuzu|Konumumu kullan|Konum alınamadı. Uluslararası ayarlar kullanılıyor.|Ülke",
+zh:"货币|历史记录|清除历史|离开此页面后将被清除。|使用指南|使用我的位置|无法获取位置，使用国际通用设置。|国家/地区",
+ja:"通貨|履歴|履歴を消去|このページを離れると削除されます。|使い方ガイド|現在地を使う|位置情報を取得できません。国際標準の設定を使用します。|国",
+ko:"통화|기록|기록 지우기|이 페이지를 떠나면 삭제됩니다.|사용 안내|내 위치 사용|위치를 사용할 수 없습니다. 국제 기본 설정을 사용합니다.|국가",
+ru:"Валюта|История|Очистить историю|Удаляется при выходе со страницы.|Руководство|Использовать моё местоположение|Местоположение недоступно. Используются международные настройки.|Страна",
+es:"Moneda|Historial|Borrar historial|Se borra al salir de esta página.|Guía de uso|Usar mi ubicación|Ubicación no disponible. Se usa la configuración internacional.|País",
+fr:"Devise|Historique|Effacer l’historique|Effacé quand vous quittez cette page.|Guide d’utilisation|Utiliser ma position|Position indisponible. Paramètres internationaux utilisés.|Pays",
+de:"Währung|Verlauf|Verlauf löschen|Wird beim Verlassen der Seite gelöscht.|Anleitung|Meinen Standort verwenden|Standort nicht verfügbar. Internationale Einstellungen werden verwendet.|Land",
+pt:"Moeda|Histórico|Limpar histórico|Apagado ao sair desta página.|Guia de uso|Usar minha localização|Localização indisponível. Usando configurações internacionais.|País",
+it:"Valuta|Cronologia|Cancella cronologia|Viene cancellata quando lasci la pagina.|Guida all’uso|Usa la mia posizione|Posizione non disponibile. Uso le impostazioni internazionali.|Paese",
+nl:"Valuta|Geschiedenis|Geschiedenis wissen|Wordt gewist als u deze pagina verlaat.|Gebruiksaanwijzing|Mijn locatie gebruiken|Locatie niet beschikbaar. Internationale instellingen worden gebruikt.|Land",
+pl:"Waluta|Historia|Wyczyść historię|Usuwane po opuszczeniu strony.|Instrukcja|Użyj mojej lokalizacji|Lokalizacja niedostępna. Używane są ustawienia międzynarodowe.|Kraj",
+uk:"Валюта|Історія|Очистити історію|Видаляється після виходу зі сторінки.|Інструкція|Використати моє місцезнаходження|Місцезнаходження недоступне. Використовуються міжнародні налаштування.|Країна",
+id:"Mata uang|Riwayat|Hapus riwayat|Dihapus saat Anda meninggalkan halaman ini.|Panduan penggunaan|Gunakan lokasi saya|Lokasi tidak tersedia. Menggunakan pengaturan internasional.|Negara",
+ms:"Mata wang|Sejarah|Padam sejarah|Dipadam apabila anda meninggalkan halaman ini.|Panduan pengguna|Guna lokasi saya|Lokasi tidak tersedia. Menggunakan tetapan antarabangsa.|Negara",
+th:"สกุลเงิน|ประวัติ|ล้างประวัติ|จะถูกลบเมื่อคุณออกจากหน้านี้|คู่มือการใช้งาน|ใช้ตำแหน่งของฉัน|ไม่สามารถใช้ตำแหน่งได้ ใช้การตั้งค่าสากลแทน|ประเทศ",
+vi:"Tiền tệ|Lịch sử|Xóa lịch sử|Sẽ bị xóa khi bạn rời trang này.|Hướng dẫn sử dụng|Dùng vị trí của tôi|Không có vị trí. Đang dùng cài đặt quốc tế.|Quốc gia",
+ta:"நாணயம்|வரலாறு|வரலாற்றை அழி|இந்தப் பக்கத்தை விட்டு வெளியேறினால் அழிக்கப்படும்.|பயன்பாட்டு வழிகாட்டி|என் இருப்பிடத்தைப் பயன்படுத்து|இருப்பிடம் கிடைக்கவில்லை. சர்வதேச அமைப்புகள் பயன்படுத்தப்படுகின்றன.|நாடு",
+te:"కరెన్సీ|చరిత్ర|చరిత్రను తొలగించు|ఈ పేజీని వదిలితే తొలగించబడుతుంది.|వినియోగ మార్గదర్శి|నా స్థానాన్ని ఉపయోగించు|స్థానం అందుబాటులో లేదు. అంతర్జాతీయ సెట్టింగ్‌లు వాడుతున్నాం.|దేశం",
+mr:"चलन|इतिहास|इतिहास पुसा|हे पान सोडल्यावर पुसला जाईल.|वापर मार्गदर्शक|माझे स्थान वापरा|स्थान उपलब्ध नाही. आंतरराष्ट्रीय सेटिंग वापरत आहे.|देश",
+ne:"मुद्रा|इतिहास|इतिहास मेट्नुहोस्|यो पेज छोडेपछि मेटिन्छ।|प्रयोग निर्देशिका|मेरो स्थान प्रयोग गर्नुहोस्|स्थान उपलब्ध छैन। अन्तर्राष्ट्रिय सेटिङ प्रयोग भइरहेको छ।|देश",
+si:"මුදල්|ඉතිහාසය|ඉතිහාසය මකන්න|මෙම පිටුවෙන් ඉවත් වූ විට මැකේ.|භාවිත මාර්ගෝපදේශය|මගේ ස්ථානය භාවිතා කරන්න|ස්ථානය ලබාගත නොහැක. ජාත්‍යන්තර සැකසුම් භාවිතා වේ.|රට",
+sw:"Sarafu|Historia|Futa historia|Hufutwa ukiondoka kwenye ukurasa huu.|Mwongozo wa matumizi|Tumia eneo langu|Eneo halipatikani. Mipangilio ya kimataifa inatumika.|Nchi",
+he:"מטבע|היסטוריה|נקה היסטוריה|יימחק עם עזיבת הדף.|מדריך שימוש|השתמש במיקום שלי|המיקום אינו זמין. נעשה שימוש בהגדרות בינלאומיות.|מדינה",
+el:"Νόμισμα|Ιστορικό|Εκκαθάριση ιστορικού|Διαγράφεται όταν φύγετε από τη σελίδα.|Οδηγός χρήσης|Χρήση της τοποθεσίας μου|Η τοποθεσία δεν είναι διαθέσιμη. Χρησιμοποιούνται διεθνείς ρυθμίσεις.|Χώρα",
+sv:"Valuta|Historik|Rensa historik|Raderas när du lämnar sidan.|Användarguide|Använd min plats|Plats ej tillgänglig. Internationella inställningar används.|Land"};
 
 const CUR=["USD","EUR","GBP","JPY","CNY","INR","BDT","PKR","NPR","LKR","SAR","AED","TRY","RUB","KRW","IDR","MYR","THB","VND","BRL","MXN","PLN","UAH","SEK","ILS","IRR","EGP","KES","ZAR","AUD","CAD","SGD","CHF","NGN","KZT"];
 /* country: code, language, currency, anchor points [lat, lon, radius km] used to match a location offline */
@@ -99,7 +99,7 @@ function loadH(){try{hist=JSON.parse(sessionStorage.getItem(hk())||"[]")}catch(e
 function listH(){$("et-hs").textContent=cs(1)+" ("+hist.length+")";const u=$("et-hl");u.innerHTML="";hist.forEach(h=>{const li=document.createElement("li");li.textContent=h;u.appendChild(li)})}
 function log(text){clearTimeout(ht);ht=setTimeout(()=>{if(hist[0]===text)return;hist.unshift(text);hist=hist.slice(0,50);try{sessionStorage.setItem(hk(),JSON.stringify(hist))}catch(e){}listH()},1500)}
 function build(){
-$("et-top").innerHTML='<header><span class="brand">'+MARK+'Essential Tools</span><div class="tools"><button id="et-tb" aria-expanded="false" aria-controls="et-menu"></button><div class="menu" id="et-menu" hidden></div></div><select id="et-lang"></select></header>'+
+$("et-top").innerHTML='<header><a class="brand" href="index.html">'+MARK+'Essential Tools</a><div class="tools"><button id="et-tb" aria-expanded="false" aria-controls="et-menu"></button><div class="menu" id="et-menu" hidden></div></div><select id="et-lang"></select></header>'+
 '<div class="set"><div><label for="et-cty" id="et-lc"></label><select id="et-cty"></select></div><div><label for="et-cur" id="et-lu"></label><select id="et-cur"></select></div></div>'+
 '<button class="loc" id="et-loc"></button><p class="mu" id="et-st" role="status"></p>'+
 '<details><summary id="et-gs"></summary><p id="et-gt"></p></details>';
@@ -119,18 +119,18 @@ document.documentElement.lang=st.lang;document.documentElement.dir=RTL.includes(
 $("et-lang").innerHTML=Object.keys(CS).map(c=>'<option value="'+c+'">'+dn(c,"language",c)+'</option>').join("");$("et-lang").value=st.lang;
 $("et-cty").innerHTML=CTRY.map(c=>'<option value="'+c[0]+'">'+(c[0]==="INT"?dn("001","region"):dn(c[0],"region"))+'</option>').join("");$("et-cty").value=st.country;
 $("et-cur").innerHTML=CUR.map(c=>'<option value="'+c+'">'+c+" – "+dn(c,"currency")+'</option>').join("");$("et-cur").value=st.cur;
-$("et-lc").textContent=tool.ctry();$("et-lu").textContent=cs(0);$("et-loc").textContent="📍 "+cs(5);
+$("et-lc").textContent=cs(7);$("et-lu").textContent=cs(0);$("et-loc").textContent="📍 "+cs(5);
 $("et-tb").textContent=(TL[st.lang]||TL.en)+" ▾";
-$("et-menu").innerHTML=TOOLS.map(t=>'<a href="'+t[0]+'"'+(t[0]===tool.file?" aria-current=page":"")+">"+(t[0]===tool.file?tt(tool.S,0):t[1])+"</a>").join("");
+$("et-menu").innerHTML=TOOLS.map(t=>'<a href="'+t[0]+'"'+(t[0]===tool.file?" aria-current=page":"")+">"+(t[1][st.lang]||t[1].en)+"</a>").join("");
 $("et-gs").textContent=cs(4);$("et-gt").textContent=tool.guide();
-$("et-warn").textContent="⚠ "+tool.warn();
-$("et-hn").textContent=cs(3);$("et-hc").textContent=cs(2);listH();
+$("et-warn").hidden=!tool.warn;if(tool.warn)$("et-warn").textContent="⚠ "+tool.warn();
+$("et-h").hidden=tool.history===false;$("et-hn").textContent=cs(3);$("et-hc").textContent=cs(2);listH();
 const k=[];if(CONTACT.gmail){const a1=document.createElement("a");a1.href="mailto:"+CONTACT.gmail;a1.textContent="Gmail";k.push(a1)}
 if(CONTACT.facebook){const a2=document.createElement("a");a2.href=CONTACT.facebook;a2.rel="noopener";a2.textContent="Facebook";k.push(a2)}
 $("et-ct").replaceChildren(...k);
 tool.labels();
 if(a&&$(a))$(a).focus()}
-window.ET={state:st,money,log,
+window.ET={state:st,money,log,tools:TOOLS,title:t=>t[1][st.lang]||t[1].en,
 t:k=>tt(tool.S,k),t2:k=>tt(tool.S2,k),
 start(cfg){tool=cfg;build();loadH();render();autoLocate()}};
 })();
