@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EMI Calculator | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.res{margin-top:20px;padding:18px;background:var(--sf);border:1px solid var(--ln);border-radius:12px}
+.big{font-size:2.2rem;font-weight:700;color:var(--ac);line-height:1.2;overflow-wrap:anywhere}
+.bar{display:flex;height:12px;border-radius:6px;overflow:hidden;margin:14px 0;background:var(--ln)}
+.bar i{display:block;background:var(--ac)}.bar b{display:block;background:var(--am)}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:4px 0}
+.kv span:first-child{color:var(--mu)}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="amt" id="l0"></label>
+<input id="amt" type="number" inputmode="decimal" min="0" step="any" value="1000000">
+<label for="rate" id="l1"></label>
+<input id="rate" type="number" inputmode="decimal" min="0" step="any" value="9">
+<label for="term" id="l2"></label>
+<div class="row"><input id="term" type="number" inputmode="decimal" min="1" step="any" value="5"><select id="unit"></select></div>
+<label for="mth" id="l4"></label>
+<select id="mth"></select>
+<p class="mu" id="note"></p>
+<section class="res" aria-live="polite">
+<div class="mu" id="r0"></div>
+<div class="big" id="emi"></div>
+<div class="bar" id="bar"><i></i><b></b></div>
+<div class="kv"><span id="r1"></span><span id="ti"></span></div>
+<div class="kv"><span id="r2"></span><span id="tp"></span></div>
+</section>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"EMI Calculator|Loan amount|Interest rate (% per year)|Loan term|Country|Method|Reducing balance (equal EMI)|Equal principal|Flat rate|Monthly payment|Total interest|Total payment|Estimate only. Confirm with your lender.",
+bn:"EMI ক্যালকুলেটর|ঋণের পরিমাণ|সুদের হার (বার্ষিক %)|ঋণের মেয়াদ|দেশ|পদ্ধতি|হ্রাসমান স্থিতি (সমান কিস্তি)|সমান আসল|ফ্ল্যাট রেট|মাসিক কিস্তি|মোট সুদ|মোট পরিশোধ|এটি আনুমানিক হিসাব। ঋণদাতার সাথে নিশ্চিত করুন।",
+hi:"EMI कैलकुलेटर|ऋण राशि|ब्याज दर (% वार्षिक)|ऋण अवधि|देश|विधि|घटती शेष राशि (समान EMI)|समान मूलधन|फ्लैट रेट|मासिक किस्त|कुल ब्याज|कुल भुगतान|यह केवल अनुमान है। अपने ऋणदाता से पुष्टि करें।",
+ur:"EMI کیلکولیٹر|قرض کی رقم|شرح سود (سالانہ %)|قرض کی مدت|ملک|طریقہ|گھٹتا بیلنس (برابر قسط)|برابر اصل رقم|فلیٹ ریٹ|ماہانہ قسط|کل سود|کل ادائیگی|یہ صرف اندازہ ہے۔ اپنے قرض دہندہ سے تصدیق کریں۔",
+ar:"حاسبة القسط الشهري|مبلغ القرض|معدل الفائدة (% سنويًا)|مدة القرض|الدولة|الطريقة|الرصيد المتناقص (قسط ثابت)|أصل متساوٍ|فائدة ثابتة|القسط الشهري|إجمالي الفائدة|إجمالي السداد|تقدير تقريبي فقط. تأكد من الجهة المقرضة.",
+fa:"ماشین‌حساب اقساط|مبلغ وام|نرخ سود (٪ سالانه)|مدت وام|کشور|روش|مانده کاهشی (قسط برابر)|اصل برابر|نرخ ثابت|قسط ماهانه|کل سود|کل پرداختی|فقط برآورد است. با وام‌دهنده تأیید کنید.",
+tr:"Taksit Hesaplayıcı|Kredi tutarı|Faiz oranı (yıllık %)|Vade|Ülke|Yöntem|Azalan bakiye (eşit taksit)|Eşit anapara|Sabit faiz|Aylık taksit|Toplam faiz|Toplam ödeme|Yalnızca tahmindir. Kredi verenle doğrulayın.",
+zh:"贷款月供计算器|贷款金额|年利率（%）|贷款期限|国家/地区|还款方式|等额本息|等额本金|固定利率（单利）|月供|总利息|还款总额|仅为估算，请向贷款机构确认。",
+ja:"ローン返済シミュレーター|借入額|年利（%）|返済期間|国|返済方式|元利均等返済|元金均等返済|単利方式|毎月の返済額|利息総額|返済総額|概算です。貸し手にご確認ください。",
+ko:"대출 이자 계산기|대출 금액|연 이율(%)|대출 기간|국가|상환 방식|원리금균등상환|원금균등상환|단리 방식|월 상환액|총 이자|총 상환액|추정치입니다. 대출 기관에 확인하세요.",
+ru:"Кредитный калькулятор|Сумма кредита|Процентная ставка (% годовых)|Срок кредита|Страна|Метод|Аннуитетный платёж|Дифференцированный платёж|Фиксированная ставка|Ежемесячный платёж|Общая сумма процентов|Общая выплата|Только оценка. Уточните у кредитора.",
+es:"Calculadora de cuotas|Importe del préstamo|Tipo de interés (% anual)|Plazo|País|Método|Saldo decreciente (cuota fija)|Amortización constante|Interés plano|Cuota mensual|Interés total|Pago total|Solo una estimación. Confirme con su prestamista.",
+fr:"Calculateur de mensualités|Montant du prêt|Taux d’intérêt (% par an)|Durée du prêt|Pays|Méthode|Capital restant dû (mensualité fixe)|Amortissement constant|Taux forfaitaire|Mensualité|Intérêts totaux|Total remboursé|Estimation uniquement. Confirmez auprès de votre prêteur.",
+de:"Ratenrechner|Darlehensbetrag|Zinssatz (% pro Jahr)|Laufzeit|Land|Methode|Annuität (gleiche Rate)|Ratentilgung|Pauschalzins|Monatliche Rate|Gesamtzinsen|Gesamtzahlung|Nur eine Schätzung. Bitte beim Kreditgeber bestätigen.",
+pt:"Calculadora de parcelas|Valor do empréstimo|Taxa de juros (% ao ano)|Prazo|País|Método|Saldo devedor (parcela fixa)|Amortização constante|Juros simples|Parcela mensal|Juros totais|Total a pagar|Apenas uma estimativa. Confirme com seu credor.",
+it:"Calcolatore rate|Importo del prestito|Tasso di interesse (% annuo)|Durata|Paese|Metodo|Ammortamento francese (rata costante)|Quota capitale costante|Interesse semplice|Rata mensile|Interessi totali|Totale da pagare|Solo una stima. Confermi con il finanziatore.",
+nl:"Aflossingsrekenmachine|Leenbedrag|Rentepercentage (% per jaar)|Looptijd|Land|Methode|Annuïteit (vast bedrag)|Lineair|Vaste rente|Maandbedrag|Totale rente|Totaal te betalen|Slechts een schatting. Bevestig bij uw kredietverstrekker.",
+pl:"Kalkulator rat|Kwota kredytu|Oprocentowanie (% rocznie)|Okres kredytowania|Kraj|Metoda|Raty równe|Raty malejące|Oprocentowanie płaskie|Rata miesięczna|Łączne odsetki|Łączna spłata|To tylko szacunek. Potwierdź u kredytodawcy.",
+uk:"Кредитний калькулятор|Сума кредиту|Відсоткова ставка (% річних)|Строк кредиту|Країна|Метод|Ануїтетний платіж|Диференційований платіж|Фіксована ставка|Щомісячний платіж|Загальні відсотки|Загальна виплата|Лише оцінка. Уточніть у кредитора.",
+id:"Kalkulator Cicilan|Jumlah pinjaman|Suku bunga (% per tahun)|Jangka waktu|Negara|Metode|Anuitas (cicilan tetap)|Pokok tetap|Bunga flat|Cicilan bulanan|Total bunga|Total pembayaran|Hanya perkiraan. Konfirmasikan dengan pemberi pinjaman.",
+ms:"Kalkulator Ansuran|Jumlah pinjaman|Kadar faedah (% setahun)|Tempoh pinjaman|Negara|Kaedah|Baki berkurangan (ansuran tetap)|Pokok sama|Kadar rata|Ansuran bulanan|Jumlah faedah|Jumlah bayaran|Anggaran sahaja. Sahkan dengan pemberi pinjaman.",
+th:"เครื่องคำนวณผ่อนชำระ|จำนวนเงินกู้|อัตราดอกเบี้ย (% ต่อปี)|ระยะเวลากู้|ประเทศ|วิธีคำนวณ|ดอกเบี้ยลดต้นลดดอก (ผ่อนเท่ากัน)|เงินต้นเท่ากัน|ดอกเบี้ยคงที่ (Flat)|ค่างวดต่อเดือน|ดอกเบี้ยรวม|ยอดชำระรวม|เป็นเพียงการประมาณ โปรดยืนยันกับผู้ให้กู้",
+vi:"Máy tính khoản vay|Số tiền vay|Lãi suất (% mỗi năm)|Thời hạn vay|Quốc gia|Phương pháp|Dư nợ giảm dần (trả đều)|Gốc đều|Lãi suất phẳng|Số tiền trả hàng tháng|Tổng tiền lãi|Tổng số tiền trả|Chỉ là ước tính. Hãy xác nhận với bên cho vay.",
+ta:"EMI கணிப்பான்|கடன் தொகை|வட்டி விகிதம் (ஆண்டுக்கு %)|கடன் காலம்|நாடு|முறை|குறையும் இருப்பு (சமமான EMI)|சமமான அசல்|நிலையான வட்டி|மாதாந்திர தவணை|மொத்த வட்டி|மொத்த செலுத்தல்|இது மதிப்பீடு மட்டுமே. கடன் வழங்குநரிடம் உறுதிசெய்யவும்.",
+te:"EMI కాలిక్యులేటర్|రుణ మొత్తం|వడ్డీ రేటు (సంవత్సరానికి %)|రుణ కాలవ్యవధి|దేశం|పద్ధతి|తగ్గే బ్యాలెన్స్ (సమాన EMI)|సమాన అసలు|ఫ్లాట్ రేటు|నెలవారీ వాయిదా|మొత్తం వడ్డీ|మొత్తం చెల్లింపు|ఇది అంచనా మాత్రమే. రుణదాతతో నిర్ధారించుకోండి.",
+mr:"EMI कॅल्क्युलेटर|कर्जाची रक्कम|व्याजदर (वार्षिक %)|कर्जाचा कालावधी|देश|पद्धत|कमी होणारी शिल्लक (समान EMI)|समान मुद्दल|फ्लॅट दर|मासिक हप्ता|एकूण व्याज|एकूण परतफेड|हा फक्त अंदाज आहे. कर्जदात्याकडे खात्री करा.",
+ne:"EMI क्यालकुलेटर|ऋण रकम|ब्याज दर (वार्षिक %)|ऋण अवधि|देश|विधि|घट्दो मौज्दात (समान EMI)|समान साँवा|फ्ल्याट दर|मासिक किस्ता|कुल ब्याज|कुल भुक्तानी|यो अनुमान मात्र हो। ऋणदातासँग पुष्टि गर्नुहोस्।",
+si:"EMI ගණකය|ණය මුදල|පොලී අනුපාතය (වසරකට %)|ණය කාලය|රට|ක්‍රමය|අඩුවන ශේෂය (සමාන වාරික)|සමාන මුල් මුදල|ස්ථාවර පොලිය|මාසික වාරිකය|මුළු පොලිය|මුළු ගෙවීම|මෙය ඇස්තමේන්තුවක් පමණි. ණය දෙන්නා සමඟ තහවුරු කරගන්න.",
+sw:"Kikokotoo cha Malipo ya Mkopo|Kiasi cha mkopo|Kiwango cha riba (% kwa mwaka)|Muda wa mkopo|Nchi|Njia|Salio linalopungua (malipo sawa)|Mtaji sawa|Riba ya kudumu|Malipo ya kila mwezi|Jumla ya riba|Jumla ya malipo|Makadirio tu. Thibitisha na mkopeshaji wako.",
+he:"מחשבון החזר הלוואה|סכום ההלוואה|שיעור ריבית (% לשנה)|תקופת ההלוואה|מדינה|שיטה|לוח שפיצר (החזר קבוע)|קרן שווה|ריבית שטוחה|החזר חודשי|סך הריבית|סך התשלום|הערכה בלבד. אשרו מול המלווה.",
+el:"Αριθμομηχανή δόσεων|Ποσό δανείου|Επιτόκιο (% ετησίως)|Διάρκεια δανείου|Χώρα|Μέθοδος|Φθίνον υπόλοιπο (σταθερή δόση)|Ίσο κεφάλαιο|Σταθερό επιτόκιο|Μηνιαία δόση|Συνολικοί τόκοι|Συνολική πληρωμή|Μόνο εκτίμηση. Επιβεβαιώστε με τον δανειστή σας.",
+sv:"Låneberäknare|Lånebelopp|Ränta (% per år)|Låneperiod|Land|Metod|Annuitet (lika betalning)|Rak amortering|Fast ränta (flat)|Månadsbetalning|Total ränta|Total betalning|Endast en uppskattning. Bekräfta med långivaren."};
+
+const S2={
+en:"Enter amount, yearly rate and term. Results update instantly.|Common here|Semi-annual compounding",
+bn:"পরিমাণ, বার্ষিক সুদের হার ও মেয়াদ লিখুন। ফলাফল সঙ্গে সঙ্গে বদলাবে।|এখানে প্রচলিত|আধা-বার্ষিক চক্রবৃদ্ধি",
+hi:"राशि, वार्षिक ब्याज दर और अवधि लिखें। परिणाम तुरंत बदलते हैं।|यहाँ प्रचलित|अर्ध-वार्षिक चक्रवृद्धि",
+ur:"رقم، سالانہ شرح سود اور مدت درج کریں۔ نتیجہ فوراً بدلتا ہے۔|یہاں رائج|ششماہی مرکب سود",
+ar:"أدخل المبلغ والفائدة السنوية والمدة. تتحدث النتائج فورًا.|الشائع هنا|فائدة مركبة نصف سنوية",
+fa:"مبلغ، نرخ سود سالانه و مدت را وارد کنید. نتیجه فوراً به‌روز می‌شود.|رایج در اینجا|سود مرکب شش‌ماهه",
+tr:"Tutarı, yıllık faizi ve vadeyi girin. Sonuçlar anında güncellenir.|Burada yaygın|Altı aylık bileşik faiz",
+zh:"输入金额、年利率和期限，结果即时更新。|本地常见|半年复利",
+ja:"金額・年利・期間を入力すると、結果がすぐに更新されます。|この国で一般的|半年複利",
+ko:"금액, 연 이율, 기간을 입력하세요. 결과가 즉시 갱신됩니다.|이 지역에서 일반적|반기 복리",
+ru:"Введите сумму, годовую ставку и срок. Результат обновляется сразу.|Распространено здесь|Полугодовая капитализация",
+es:"Introduzca importe, tipo anual y plazo. El resultado se actualiza al instante.|Habitual aquí|Capitalización semestral",
+fr:"Saisissez le montant, le taux annuel et la durée. Le résultat se met à jour instantanément.|Courant ici|Capitalisation semestrielle",
+de:"Betrag, Jahreszins und Laufzeit eingeben. Das Ergebnis aktualisiert sich sofort.|Hier üblich|Halbjährliche Verzinsung",
+pt:"Informe valor, taxa anual e prazo. O resultado atualiza na hora.|Comum aqui|Capitalização semestral",
+it:"Inserisci importo, tasso annuo e durata. Il risultato si aggiorna subito.|Comune qui|Capitalizzazione semestrale",
+nl:"Vul bedrag, jaarrente en looptijd in. Het resultaat wordt direct bijgewerkt.|Hier gebruikelijk|Halfjaarlijkse rente-op-rente",
+pl:"Wpisz kwotę, roczne oprocentowanie i okres. Wynik zmienia się od razu.|Typowe tutaj|Kapitalizacja półroczna",
+uk:"Введіть суму, річну ставку та строк. Результат оновлюється одразу.|Поширено тут|Піврічна капіталізація",
+id:"Masukkan jumlah, bunga tahunan, dan jangka waktu. Hasil diperbarui langsung.|Umum di sini|Pemajemukan semesteran",
+ms:"Masukkan jumlah, kadar tahunan dan tempoh. Hasil dikemas kini serta-merta.|Lazim di sini|Pengkompaunan separuh tahunan",
+th:"ใส่จำนวนเงิน ดอกเบี้ยต่อปี และระยะเวลา ผลลัพธ์อัปเดตทันที|พบบ่อยที่นี่|ทบต้นราย 6 เดือน",
+vi:"Nhập số tiền, lãi suất năm và kỳ hạn. Kết quả cập nhật ngay.|Phổ biến tại đây|Ghép lãi nửa năm",
+ta:"தொகை, ஆண்டு வட்டி, காலம் உள்ளிடுங்கள். முடிவு உடனே மாறும்.|இங்கு பொதுவானது|அரையாண்டு கூட்டு வட்டி",
+te:"మొత్తం, వార్షిక వడ్డీ, కాలవ్యవధి నమోదు చేయండి. ఫలితం వెంటనే మారుతుంది.|ఇక్కడ సాధారణం|అర్ధ వార్షిక చక్రవడ్డీ",
+mr:"रक्कम, वार्षिक व्याजदर आणि कालावधी लिहा. निकाल लगेच बदलतो.|येथे प्रचलित|सहामाही चक्रवाढ",
+ne:"रकम, वार्षिक ब्याज दर र अवधि लेख्नुहोस्। नतिजा तुरुन्तै बदलिन्छ।|यहाँ प्रचलित|अर्ध-वार्षिक चक्रवृद्धि",
+si:"මුදල, වාර්ෂික පොලී අනුපාතය සහ කාලය ඇතුළත් කරන්න. ප්‍රතිඵල වහාම යාවත්කාලීන වේ.|මෙහි සාමාන්‍ය|අර්ධ වාර්ෂික සංයුක්ත පොලිය",
+sw:"Weka kiasi, riba ya mwaka na muda. Matokeo husasishwa mara moja.|Kawaida hapa|Riba mseto ya nusu mwaka",
+he:"הזינו סכום, ריבית שנתית ותקופה. התוצאה מתעדכנת מיד.|נפוץ כאן|ריבית דריבית חצי-שנתית",
+el:"Εισάγετε ποσό, ετήσιο επιτόκιο και διάρκεια. Το αποτέλεσμα ενημερώνεται άμεσα.|Συνηθισμένο εδώ|Εξαμηνιαίος ανατοκισμός",
+sv:"Ange belopp, årsränta och löptid. Resultatet uppdateras direkt.|Vanligt här|Halvårsvis ränteberäkning"};
+
+/* common methods by country: c = common methods, s = semi-annual compounding. Countries not listed use the standard reducing-balance formula. */
+const R={BD:{c:["r","f"]},IN:{c:["r","f"]},US:{c:["r"]},GB:{c:["r"]},CA:{c:["r"],s:1},AU:{c:["r"]},DE:{c:["r"]},JP:{c:["r","e"]},CN:{c:["r","e"]},RU:{c:["r","e"]},SA:{c:["f","r"]},MY:{c:["f","r"]}};
+const $=id=>document.getElementById(id),T=k=>ET.t(k),T2=k=>ET.t2(k),L=()=>document.documentElement.lang;
+const unitName=u=>{try{return new Intl.NumberFormat(L(),{style:"unit",unit:u,unitDisplay:"long"}).formatToParts(2).find(p=>p.type==="unit").value}catch(e){return u==="year"?"years":"months"}};
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l0").textContent=T(1);$("l1").textContent=T(2);$("l2").textContent=T(3);$("l4").textContent=T(5);
+$("r0").textContent=T(9);$("r1").textContent=T(10);$("r2").textContent=T(11);
+const uv=$("unit").value||"year";$("unit").innerHTML='<option value="year">'+unitName("year")+'</option><option value="month">'+unitName("month")+'</option>';$("unit").value=uv;
+const mv=$("mth").value||"r";$("mth").innerHTML='<option value="r">'+T(6)+'</option><option value="e">'+T(7)+'</option><option value="f">'+T(8)+'</option>';$("mth").value=mv;
+const r=R[ET.state.country];
+$("note").textContent=r?T2(1)+": "+r.c.map(k=>T({r:6,e:7,f:8}[k])).join(", ")+(r.s?" · "+T2(2):""):"";
+update()}
+function update(){
+const money=ET.money,m=$("mth").value,semi=(R[ET.state.country]||{}).s;
+const P=parseFloat($("amt").value),r=parseFloat($("rate").value),tv=parseFloat($("term").value);
+const n=Math.round($("unit").value==="year"?tv*12:tv);
+const bar=$("bar").children;
+if(!(P>0)||!(r>=0)||!(n>0)||n>1200){$("emi").textContent="—";$("ti").textContent="—";$("tp").textContent="—";bar[0].style.width="0";bar[1].style.width="0";return}
+const i=semi?Math.pow(1+r/200,1/6)-1:r/1200;
+let first,last,ti;
+if(m==="r"){first=last=i===0?P/n:P*i*Math.pow(1+i,n)/(Math.pow(1+i,n)-1);ti=first*n-P}
+else if(m==="e"){first=P/n+P*i;last=P/n+(P/n)*i;ti=i*P*(n+1)/2}
+else{ti=P*r/100*(n/12);first=last=(P+ti)/n}
+const tp=P+ti;
+const e=Math.abs(first-last)<0.005?money(first):money(first)+" – "+money(last);
+$("emi").textContent=e;$("ti").textContent=money(ti);$("tp").textContent=money(tp);
+bar[0].style.width=(P/tp*100)+"%";bar[1].style.width=(ti/tp*100)+"%";
+ET.log(money(P)+" · "+r+"% · "+tv+" "+$("unit").selectedOptions[0].text+" → "+e)}
+["amt","rate","term","unit","mth"].forEach(id=>$(id).addEventListener("input",update));
+ET.start({id:"emi",file:"emi.html",S,S2,labels,ctry:()=>T(4),warn:()=>T(12),guide:()=>T2(0)});
+</script>
+</body>
+</html>
