@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>QR Code Generator | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>
+textarea{width:100%;font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px 10px}
+#pv{background:#fff;padding:8px;border-radius:12px;display:inline-block;max-width:100%;line-height:0;border:1px solid var(--ln)}
+#pv svg{width:min(320px,100%);height:auto}
+#out{margin-top:16px}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{display:inline-block;padding:8px 14px;border:1px solid var(--ac);border-radius:8px;color:var(--ac);text-decoration:none;font-weight:600}
+#fin{font-weight:600}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="ty" id="l0"></label>
+<select id="ty"></select>
+<label for="ta" id="lta"></label><textarea id="ta" rows="3"></textarea>
+<label for="a" id="la"></label><input id="a" autocomplete="off">
+<label for="b" id="lb"></label><input id="b" autocomplete="off">
+<p class="mu" id="fin"></p>
+<p class="mu" id="err" role="alert"></p>
+<div id="out" hidden><div id="pv"></div><div class="btns"><a class="btn" id="dp" download="qr-code.png"></a><a class="btn" id="ds" download="qr-code.svg"></a></div></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"QR Code Generator|Type|Text or link|Network name|Password|Phone number|Message|Email address|Download PNG|Download SVG|Too long for a QR code.|Scan the QR code with your phone before printing or sharing.",
+bn:"QR কোড জেনারেটর|ধরন|লেখা বা লিংক|নেটওয়ার্কের নাম|পাসওয়ার্ড|ফোন নম্বর|বার্তা|ইমেইল ঠিকানা|PNG ডাউনলোড|SVG ডাউনলোড|QR কোডের জন্য অনেক বড়।|ছাপা বা শেয়ার করার আগে ফোন দিয়ে QR কোড স্ক্যান করে দেখুন।",
+hi:"QR कोड जनरेटर|प्रकार|टेक्स्ट या लिंक|नेटवर्क का नाम|पासवर्ड|फ़ोन नंबर|संदेश|ईमेल पता|PNG डाउनलोड|SVG डाउनलोड|QR कोड के लिए बहुत लंबा।|प्रिंट या शेयर करने से पहले फ़ोन से QR कोड स्कैन करके जाँच लें।",
+ur:"QR کوڈ جنریٹر|قسم|متن یا لنک|نیٹ ورک کا نام|پاس ورڈ|فون نمبر|پیغام|ای میل پتہ|PNG ڈاؤن لوڈ|SVG ڈاؤن لوڈ|QR کوڈ کے لیے بہت لمبا ہے۔|پرنٹ یا شیئر کرنے سے پہلے فون سے QR کوڈ اسکین کر کے جانچ لیں۔",
+ar:"منشئ رمز QR|النوع|نص أو رابط|اسم الشبكة|كلمة المرور|رقم الهاتف|الرسالة|البريد الإلكتروني|تنزيل PNG|تنزيل SVG|طويل جدًا لرمز QR.|امسح رمز QR بهاتفك قبل الطباعة أو المشاركة.",
+fa:"ساخت کد QR|نوع|متن یا پیوند|نام شبکه|گذرواژه|شماره تلفن|پیام|نشانی ایمیل|دانلود PNG|دانلود SVG|برای کد QR بیش از حد طولانی است.|پیش از چاپ یا اشتراک‌گذاری، کد QR را با گوشی اسکن کنید.",
+tr:"QR Kod Oluşturucu|Tür|Metin veya bağlantı|Ağ adı|Parola|Telefon numarası|Mesaj|E-posta adresi|PNG indir|SVG indir|QR kod için çok uzun.|Yazdırmadan veya paylaşmadan önce QR kodu telefonunuzla tarayın.",
+zh:"二维码生成器|类型|文字或链接|网络名称|密码|电话号码|消息|电子邮件地址|下载 PNG|下载 SVG|内容过长，无法生成二维码。|打印或分享前，请用手机扫描二维码确认。",
+ja:"QRコード作成|種類|テキストまたはリンク|ネットワーク名|パスワード|電話番号|メッセージ|メールアドレス|PNGをダウンロード|SVGをダウンロード|QRコードにするには長すぎます。|印刷や共有の前に、スマートフォンでQRコードを読み取って確認してください。",
+ko:"QR 코드 생성기|유형|텍스트 또는 링크|네트워크 이름|비밀번호|전화번호|메시지|이메일 주소|PNG 다운로드|SVG 다운로드|QR 코드로 만들기에는 너무 깁니다.|인쇄하거나 공유하기 전에 휴대폰으로 QR 코드를 스캔해 확인하세요.",
+ru:"Генератор QR-кодов|Тип|Текст или ссылка|Название сети|Пароль|Номер телефона|Сообщение|Адрес эл. почты|Скачать PNG|Скачать SVG|Слишком длинно для QR-кода.|Перед печатью или отправкой отсканируйте QR-код телефоном.",
+es:"Generador de códigos QR|Tipo|Texto o enlace|Nombre de la red|Contraseña|Número de teléfono|Mensaje|Correo electrónico|Descargar PNG|Descargar SVG|Demasiado largo para un código QR.|Escanea el código QR con tu móvil antes de imprimirlo o compartirlo.",
+fr:"Générateur de QR code|Type|Texte ou lien|Nom du réseau|Mot de passe|Numéro de téléphone|Message|Adresse e-mail|Télécharger PNG|Télécharger SVG|Trop long pour un QR code.|Scannez le QR code avec votre téléphone avant de l’imprimer ou de le partager.",
+de:"QR-Code-Generator|Typ|Text oder Link|Netzwerkname|Passwort|Telefonnummer|Nachricht|E-Mail-Adresse|PNG herunterladen|SVG herunterladen|Zu lang für einen QR-Code.|Scannen Sie den QR-Code vor dem Drucken oder Teilen mit Ihrem Handy.",
+pt:"Gerador de QR Code|Tipo|Texto ou link|Nome da rede|Senha|Número de telefone|Mensagem|E-mail|Baixar PNG|Baixar SVG|Longo demais para um QR Code.|Escaneie o QR Code com o celular antes de imprimir ou compartilhar.",
+it:"Generatore di codici QR|Tipo|Testo o link|Nome della rete|Password|Numero di telefono|Messaggio|Indirizzo e-mail|Scarica PNG|Scarica SVG|Troppo lungo per un codice QR.|Scansiona il codice QR con il telefono prima di stamparlo o condividerlo.",
+nl:"QR-codegenerator|Type|Tekst of link|Netwerknaam|Wachtwoord|Telefoonnummer|Bericht|E-mailadres|PNG downloaden|SVG downloaden|Te lang voor een QR-code.|Scan de QR-code met uw telefoon voordat u hem print of deelt.",
+pl:"Generator kodów QR|Typ|Tekst lub link|Nazwa sieci|Hasło|Numer telefonu|Wiadomość|Adres e-mail|Pobierz PNG|Pobierz SVG|Za długie na kod QR.|Przed wydrukiem lub udostępnieniem zeskanuj kod QR telefonem.",
+uk:"Генератор QR-кодів|Тип|Текст або посилання|Назва мережі|Пароль|Номер телефону|Повідомлення|Адреса ел. пошти|Завантажити PNG|Завантажити SVG|Задовге для QR-коду.|Перед друком чи поширенням відскануйте QR-код телефоном.",
+id:"Pembuat Kode QR|Jenis|Teks atau tautan|Nama jaringan|Kata sandi|Nomor telepon|Pesan|Alamat email|Unduh PNG|Unduh SVG|Terlalu panjang untuk kode QR.|Pindai kode QR dengan ponsel sebelum mencetak atau membagikan.",
+ms:"Penjana Kod QR|Jenis|Teks atau pautan|Nama rangkaian|Kata laluan|Nombor telefon|Mesej|Alamat e-mel|Muat turun PNG|Muat turun SVG|Terlalu panjang untuk kod QR.|Imbas kod QR dengan telefon sebelum mencetak atau berkongsi.",
+th:"ตัวสร้างคิวอาร์โค้ด|ประเภท|ข้อความหรือลิงก์|ชื่อเครือข่าย|รหัสผ่าน|หมายเลขโทรศัพท์|ข้อความ|ที่อยู่อีเมล|ดาวน์โหลด PNG|ดาวน์โหลด SVG|ยาวเกินไปสำหรับคิวอาร์โค้ด|ใช้โทรศัพท์สแกนคิวอาร์โค้ดก่อนพิมพ์หรือแชร์",
+vi:"Trình tạo mã QR|Loại|Văn bản hoặc liên kết|Tên mạng|Mật khẩu|Số điện thoại|Tin nhắn|Địa chỉ email|Tải PNG|Tải SVG|Quá dài cho mã QR.|Hãy quét mã QR bằng điện thoại trước khi in hoặc chia sẻ.",
+ta:"QR குறியீடு உருவாக்கி|வகை|உரை அல்லது இணைப்பு|நெட்வொர்க் பெயர்|கடவுச்சொல்|தொலைபேசி எண்|செய்தி|மின்னஞ்சல் முகவரி|PNG பதிவிறக்கு|SVG பதிவிறக்கு|QR குறியீட்டிற்கு மிக நீளமானது.|அச்சிடுவதற்கு அல்லது பகிர்வதற்கு முன் தொலைபேசியால் QR குறியீட்டை ஸ்கேன் செய்யவும்.",
+te:"QR కోడ్ జనరేటర్|రకం|టెక్స్ట్ లేదా లింక్|నెట్‌వర్క్ పేరు|పాస్‌వర్డ్|ఫోన్ నంబర్|సందేశం|ఇమెయిల్ చిరునామా|PNG డౌన్‌లోడ్|SVG డౌన్‌లోడ్|QR కోడ్‌కు చాలా పొడవుగా ఉంది.|ప్రింట్ చేసే ముందు లేదా షేర్ చేసే ముందు ఫోన్‌తో QR కోడ్‌ను స్కాన్ చేయండి.",
+mr:"QR कोड जनरेटर|प्रकार|मजकूर किंवा लिंक|नेटवर्कचे नाव|पासवर्ड|फोन नंबर|संदेश|ईमेल पत्ता|PNG डाउनलोड|SVG डाउनलोड|QR कोडसाठी खूप मोठे आहे.|छापण्यापूर्वी किंवा शेअर करण्यापूर्वी फोनने QR कोड स्कॅन करून पाहा.",
+ne:"QR कोड जेनेरेटर|प्रकार|पाठ वा लिङ्क|नेटवर्कको नाम|पासवर्ड|फोन नम्बर|सन्देश|इमेल ठेगाना|PNG डाउनलोड|SVG डाउनलोड|QR कोडका लागि धेरै लामो।|छाप्न वा सेयर गर्नु अघि फोनले QR कोड स्क्यान गरेर हेर्नुहोस्।",
+si:"QR කේත උත්පාදකය|වර්ගය|පෙළ හෝ සබැඳිය|ජාල නම|මුරපදය|දුරකථන අංකය|පණිවිඩය|විද්‍යුත් තැපැල් ලිපිනය|PNG බාගන්න|SVG බාගන්න|QR කේතයකට දිග වැඩියි.|මුද්‍රණයට හෝ බෙදාගැනීමට පෙර දුරකථනයෙන් QR කේතය ස්කෑන් කර බලන්න.",
+sw:"Kitengeneza Msimbo wa QR|Aina|Maandishi au kiungo|Jina la mtandao|Nenosiri|Namba ya simu|Ujumbe|Anwani ya barua pepe|Pakua PNG|Pakua SVG|Ni ndefu mno kwa msimbo wa QR.|Changanua msimbo wa QR kwa simu yako kabla ya kuchapisha au kushiriki.",
+he:"מחולל קוד QR|סוג|טקסט או קישור|שם הרשת|סיסמה|מספר טלפון|הודעה|כתובת אימייל|הורד PNG|הורד SVG|ארוך מדי עבור קוד QR.|סרקו את קוד ה-QR בטלפון לפני הדפסה או שיתוף.",
+el:"Δημιουργός κωδικών QR|Τύπος|Κείμενο ή σύνδεσμος|Όνομα δικτύου|Κωδικός πρόσβασης|Αριθμός τηλεφώνου|Μήνυμα|Διεύθυνση email|Λήψη PNG|Λήψη SVG|Πολύ μεγάλο για κωδικό QR.|Σαρώστε τον κωδικό QR με το κινητό σας πριν τον εκτυπώσετε ή τον μοιραστείτε.",
+sv:"QR-kodsgenerator|Typ|Text eller länk|Nätverksnamn|Lösenord|Telefonnummer|Meddelande|E-postadress|Ladda ned PNG|Ladda ned SVG|För långt för en QR-kod.|Skanna QR-koden med mobilen innan du skriver ut eller delar den."};
+const S2={
+en:"Pick a type and fill in the details; the QR code appears at once. Everything is made in your browser and nothing is uploaded.",
+bn:"একটা ধরন বেছে তথ্য লিখুন, QR কোড সঙ্গে সঙ্গে তৈরি হবে। সবকিছু আপনার ব্রাউজারেই হয়, কিছুই আপলোড হয় না।",
+hi:"प्रकार चुनें और जानकारी भरें; QR कोड तुरंत बन जाता है। सब कुछ आपके ब्राउज़र में होता है, कुछ अपलोड नहीं होता।",
+ur:"قسم چنیں اور تفصیل بھریں؛ QR کوڈ فوراً بن جاتا ہے۔ سب کچھ آپ کے براؤزر میں ہوتا ہے، کچھ اپ لوڈ نہیں ہوتا۔",
+ar:"اختر النوع وأدخل التفاصيل فيظهر رمز QR فورًا. كل شيء يتم في متصفحك ولا يُرفع أي شيء.",
+fa:"نوع را انتخاب و اطلاعات را وارد کنید؛ کد QR بلافاصله ساخته می‌شود. همه‌چیز در مرورگر شما انجام می‌شود و چیزی آپلود نمی‌شود.",
+tr:"Bir tür seçip bilgileri girin; QR kod hemen oluşur. Her şey tarayıcınızda yapılır, hiçbir şey yüklenmez.",
+zh:"选择类型并填写信息，二维码立即生成。一切都在浏览器中完成，不会上传任何内容。",
+ja:"種類を選んで情報を入力すると、QRコードがすぐに作成されます。すべてブラウザ内で処理され、何もアップロードされません。",
+ko:"유형을 고르고 정보를 입력하면 QR 코드가 바로 생성됩니다. 모든 작업은 브라우저에서 이루어지며 아무것도 업로드되지 않습니다.",
+ru:"Выберите тип и заполните данные, QR-код появится сразу. Всё происходит в вашем браузере, ничего не загружается.",
+es:"Elige un tipo y completa los datos; el código QR aparece al instante. Todo se hace en tu navegador y no se sube nada.",
+fr:"Choisissez un type et remplissez les informations ; le QR code apparaît aussitôt. Tout se fait dans votre navigateur, rien n’est envoyé.",
+de:"Typ wählen und Angaben ausfüllen; der QR-Code erscheint sofort. Alles passiert in Ihrem Browser, nichts wird hochgeladen.",
+pt:"Escolha um tipo e preencha os dados; o QR Code aparece na hora. Tudo é feito no seu navegador e nada é enviado.",
+it:"Scegli un tipo e compila i dati; il codice QR appare subito. Tutto avviene nel tuo browser e nulla viene caricato.",
+nl:"Kies een type en vul de gegevens in; de QR-code verschijnt direct. Alles gebeurt in uw browser, er wordt niets geüpload.",
+pl:"Wybierz typ i uzupełnij dane; kod QR pojawi się od razu. Wszystko dzieje się w przeglądarce, nic nie jest wysyłane.",
+uk:"Оберіть тип і заповніть дані, QR-код з’явиться одразу. Усе відбувається у вашому браузері, нічого не завантажується.",
+id:"Pilih jenis dan isi data; kode QR langsung muncul. Semua diproses di browser Anda dan tidak ada yang diunggah.",
+ms:"Pilih jenis dan isi butiran; kod QR muncul serta-merta. Semuanya dilakukan dalam pelayar anda dan tiada apa dimuat naik.",
+th:"เลือกประเภทและกรอกรายละเอียด คิวอาร์โค้ดจะปรากฏทันที ทุกอย่างทำในเบราว์เซอร์ของคุณ ไม่มีการอัปโหลดใดๆ",
+vi:"Chọn loại và điền thông tin; mã QR xuất hiện ngay. Mọi thứ được xử lý trong trình duyệt của bạn, không tải lên gì cả.",
+ta:"வகையைத் தேர்ந்தெடுத்து விவரங்களை நிரப்பவும்; QR குறியீடு உடனே தோன்றும். எல்லாம் உங்கள் உலாவியிலேயே நடக்கும், எதுவும் பதிவேற்றப்படாது.",
+te:"రకాన్ని ఎంచుకుని వివరాలు నింపండి; QR కోడ్ వెంటనే వస్తుంది. అంతా మీ బ్రౌజర్‌లోనే జరుగుతుంది, ఏదీ అప్‌లోడ్ కాదు.",
+mr:"प्रकार निवडा आणि माहिती भरा; QR कोड लगेच तयार होतो. सर्व काही तुमच्या ब्राउझरमध्येच होते, काहीही अपलोड होत नाही.",
+ne:"प्रकार छानेर विवरण भर्नुहोस्; QR कोड तुरुन्तै बन्छ। सबै कुरा तपाईंको ब्राउजरमै हुन्छ, केही अपलोड हुँदैन।",
+si:"වර්ගයක් තෝරා තොරතුරු පුරවන්න; QR කේතය වහාම පෙනේ. සියල්ල ඔබේ බ්‍රවුසරයේම සිදු වේ, කිසිවක් උඩුගත නොවේ.",
+sw:"Chagua aina na ujaze maelezo; msimbo wa QR huonekana mara moja. Kila kitu hufanyika kwenye kivinjari chako, hakuna kinachopakiwa.",
+he:"בחרו סוג ומלאו פרטים; קוד ה-QR מופיע מיד. הכול מתבצע בדפדפן שלכם ושום דבר לא מועלה.",
+el:"Επιλέξτε τύπο και συμπληρώστε τα στοιχεία· ο κωδικός QR εμφανίζεται αμέσως. Όλα γίνονται στον browser σας και δεν ανεβαίνει τίποτα.",
+sv:"Välj typ och fyll i uppgifterna; QR-koden visas direkt. Allt sker i din webbläsare och inget laddas upp."};
+/*QR*/
+function qrEncode(bytes){
+const ECC=[10,16,26,18,24,16,18,22,22,26],NB=[1,1,1,2,2,4,4,4,5,5];
+const raw=v=>{const a=v>1?Math.floor(v/7)+2:0;return(16*v+128)*v+64-(v>1?(25*a-10)*a-55:0)-(v>6?36:0)};
+const dcw=v=>Math.floor(raw(v)/8)-ECC[v-1]*NB[v-1];
+let ver=0;for(let v=1;v<=10;v++)if(4+(v<10?8:16)+8*bytes.length<=dcw(v)*8){ver=v;break}
+if(!ver)return null;
+const bits=[],put=(x,n)=>{for(let i=n-1;i>=0;i--)bits.push((x>>>i)&1)};
+put(4,4);put(bytes.length,ver<10?8:16);bytes.forEach(b=>put(b,8));
+const cap=dcw(ver)*8;put(0,Math.min(4,cap-bits.length));
+while(bits.length%8)bits.push(0);
+for(let p=0xEC;bits.length<cap;p^=0xFD)put(p,8);
+const data=[];for(let i=0;i<bits.length;i+=8){let b=0;for(let j=0;j<8;j++)b=b<<1|bits[i+j];data.push(b)}
+const mul=(x,y)=>{let z=0;for(let i=7;i>=0;i--){z=(z<<1)^((z>>>7)*0x11D);z^=((y>>>i)&1)*x}return z};
+const nb=NB[ver-1],el=ECC[ver-1],rc=Math.floor(raw(ver)/8),ns=nb-rc%nb,sl=Math.floor(rc/nb);
+const div=Array(el).fill(0);div[el-1]=1;
+for(let i=0,root=1;i<el;i++){for(let j=0;j<el;j++){div[j]=mul(div[j],root);if(j+1<el)div[j]^=div[j+1]}root=mul(root,2)}
+const blocks=[];
+for(let i=0,k=0;i<nb;i++){const len=sl-el+(i<ns?0:1),d=data.slice(k,k+len);k+=len;
+const r=div.map(()=>0);d.forEach(b=>{const f=b^r.shift();r.push(0);div.forEach((c,x)=>r[x]^=mul(c,f))});
+if(i<ns)d.push(0);blocks.push(d.concat(r))}
+const all=[];for(let i=0;i<blocks[0].length;i++)blocks.forEach((b,j)=>{if(i!==sl-el||j>=ns)all.push(b[i])});
+const n=ver*4+17,M=[...Array(n)].map(()=>Array(n).fill(0)),F=[...Array(n)].map(()=>Array(n).fill(0));
+const sf=(x,y,v)=>{if(x>=0&&x<n&&y>=0&&y<n){M[y][x]=v?1:0;F[y][x]=1}};
+for(let i=0;i<n;i++){sf(6,i,i%2===0);sf(i,6,i%2===0)}
+const fp=(x,y)=>{for(let dy=-4;dy<=4;dy++)for(let dx=-4;dx<=4;dx++){const d=Math.max(Math.abs(dx),Math.abs(dy));sf(x+dx,y+dy,d!==2&&d!==4)}};
+fp(3,3);fp(n-4,3);fp(3,n-4);
+if(ver>1){const na=Math.floor(ver/7)+2,step=Math.ceil((ver*4+4)/(na*2-2))*2,pos=[6];
+for(let p=n-7;pos.length<na;p-=step)pos.splice(1,0,p);
+pos.forEach((px,i)=>pos.forEach((py,j)=>{if(!((i===0&&j===0)||(i===0&&j===na-1)||(i===na-1&&j===0)))for(let dy=-2;dy<=2;dy++)for(let dx=-2;dx<=2;dx++)sf(px+dx,py+dy,Math.max(Math.abs(dx),Math.abs(dy))!==1)}))}
+const fmt=m=>{let r=m;for(let i=0;i<10;i++)r=(r<<1)^((r>>>9)*0x537);const b=(m<<10|r)^0x5412,g=i=>((b>>>i)&1)===1;
+for(let i=0;i<=5;i++)sf(8,i,g(i));sf(8,7,g(6));sf(8,8,g(7));sf(7,8,g(8));for(let i=9;i<15;i++)sf(14-i,8,g(i));
+for(let i=0;i<8;i++)sf(n-1-i,8,g(i));for(let i=8;i<15;i++)sf(8,n-15+i,g(i));sf(8,n-8,true)};
+fmt(0);
+if(ver>=7){let r=ver;for(let i=0;i<12;i++)r=(r<<1)^((r>>>11)*0x1F25);const b=ver<<12|r;
+for(let i=0;i<18;i++){const c=((b>>>i)&1)===1,a=n-11+i%3,q=Math.floor(i/3);sf(a,q,c);sf(q,a,c)}}
+let k=0;const tot=all.length*8;
+for(let right=n-1;right>=1;right-=2){if(right===6)right=5;for(let v=0;v<n;v++)for(let j=0;j<2;j++){const x=right-j,up=((right+1)&2)===0,y=up?n-1-v:v;if(!F[y][x]&&k<tot){M[y][x]=(all[k>>>3]>>>(7-(k&7)))&1;k++}}}
+const MK=[(x,y)=>(x+y)%2===0,(x,y)=>y%2===0,(x,y)=>x%3===0,(x,y)=>(x+y)%3===0,(x,y)=>(Math.floor(x/3)+Math.floor(y/2))%2===0,(x,y)=>x*y%2+x*y%3===0,(x,y)=>(x*y%2+x*y%3)%2===0,(x,y)=>((x+y)%2+x*y%3)%2===0];
+const pen=()=>{let p=0;for(let t=0;t<2;t++)for(let i=0;i<n;i++){let run=1;for(let j=1;j<n;j++){const a=t?M[j][i]:M[i][j],b=t?M[j-1][i]:M[i][j-1];if(a===b){run++;if(run===5)p+=3;else if(run>5)p++}else run=1}}
+for(let y=0;y<n-1;y++)for(let x=0;x<n-1;x++){const c=M[y][x];if(c===M[y][x+1]&&c===M[y+1][x]&&c===M[y+1][x+1])p+=3}
+let d=0;M.forEach(r=>r.forEach(v=>d+=v));return p+Math.floor(Math.abs(d*20-n*n*10)/(n*n))*10};
+const base=M.map(r=>r.slice());let best=null,bp=1e9;
+for(let m=0;m<8;m++){for(let y=0;y<n;y++)for(let x=0;x<n;x++)M[y][x]=base[y][x]^((!F[y][x]&&MK[m](x,y))?1:0);fmt(m);const p=pen();if(p<bp){bp=p;best=M.map(r=>r.slice())}}
+return best}
+/*END*/
+
+/* phone country calling codes (the country chosen above sets the default code) */
+const CC={BD:880,IN:91,PK:92,NP:977,LK:94,US:1,CA:1,GB:44,IE:353,AU:61,DE:49,AT:43,CH:41,FR:33,ES:34,IT:39,NL:31,GR:30,PL:48,UA:380,SE:46,RU:7,KZ:7,TR:90,IL:972,IR:98,SA:966,AE:971,EG:20,JP:81,KR:82,CN:86,TH:66,VN:84,MY:60,SG:65,ID:62,BR:55,MX:52,ZA:27,KE:254,NG:234};
+const F={x:[["ta",2]],w:[["a",3],["b",4]],p:[["a",5]],a:[["a",5],["b",6]],e:[["a",7],["b",6]]};
+const $=id=>document.getElementById(id),T=k=>ET.t(k),U={};
+function phone(v){
+let s=v.replace(/[\s\-().]/g,"");if(!s)return null;
+if(s[0]==="+")s=s.slice(1);else if(s.slice(0,2)==="00")s=s.slice(2);
+else{const c=CC[ET.state.country];s=s.replace(/\D/g,"");
+if(c){const cr=ET.state.country;if(cr==="RU"||cr==="KZ")s=s.replace(/^8/,"");else if(cr!=="IT")s=s.replace(/^0/,"");s=c+s}}
+s=s.replace(/\D/g,"");return s.length>=7&&s.length<=15?s:null}
+const esc=s=>s.replace(/([\\;,:"])/g,"\\$1");
+function payload(){
+const ty=$("ty").value,a=$("a").value.trim(),b=$("b").value.trim(),x=$("ta").value;$("fin").textContent="";
+if(ty==="x")return x.trim()?{d:x,h:T(2)+": "+x.trim().slice(0,50)}:null;
+if(ty==="w")return a?{d:"WIFI:T:"+(b?"WPA":"nopass")+";S:"+esc(a)+";"+(b?"P:"+esc(b)+";":"")+";",h:"Wi-Fi: "+a}:null;
+if(ty==="e")return /^\S+@\S+\.\S+$/.test(a)?{d:"mailto:"+a+(b?"?body="+encodeURIComponent(b):""),h:T(7)+": "+a}:null;
+const n=phone(a);if(!n)return null;$("fin").textContent="+"+n;
+return ty==="p"?{d:"tel:+"+n,h:T(5)+": +"+n}:{d:"https://wa.me/"+n+(b?"?text="+encodeURIComponent(b):""),h:"WhatsApp: +"+n}}
+function draw(M){
+const n=M.length,N=n+8;let d="";
+for(let y=0;y<n;y++){let x=0;while(x<n){if(M[y][x]){let l=1;while(x+l<n&&M[y][x+l])l++;d+="M"+(x+4)+" "+(y+4)+"h"+l+"v1h-"+l+"z";x+=l}else x++}}
+const svg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 '+N+" "+N+'" shape-rendering="crispEdges"><rect width="'+N+'" height="'+N+'" fill="#fff"/><path d="'+d+'" fill="#000"/></svg>';
+$("pv").innerHTML=svg;
+if(U.s)URL.revokeObjectURL(U.s);U.s=URL.createObjectURL(new Blob([svg],{type:"image/svg+xml"}));$("ds").href=U.s;
+const c=document.createElement("canvas"),s=12;c.width=c.height=N*s;const g=c.getContext("2d");
+g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);g.fillStyle="#000";
+for(let y=0;y<n;y++)for(let x=0;x<n;x++)if(M[y][x])g.fillRect((x+4)*s,(y+4)*s,s,s);
+c.toBlob(b=>{if(U.p)URL.revokeObjectURL(U.p);U.p=URL.createObjectURL(b);$("dp").href=U.p},"image/png")}
+function update(){
+const ty=$("ty").value;
+["ta","a","b"].forEach(id=>{$(id).hidden=true;$("l"+id).hidden=true});
+F[ty].forEach(f=>{$(f[0]).hidden=false;$("l"+f[0]).hidden=false;$("l"+f[0]).textContent=T(f[1])});
+$("a").placeholder=(ty==="p"||ty==="a")?"+"+(CC[ET.state.country]||"")+" …":"";$("err").textContent="";$("out").hidden=true;
+const p=payload();if(!p)return;
+const m=qrEncode([...new TextEncoder().encode(p.d)]);
+if(!m){$("err").textContent=T(10);return}
+draw(m);$("out").hidden=false;ET.log(p.h)}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l0").textContent=T(1);$("dp").textContent=T(8);$("ds").textContent=T(9);
+const v=$("ty").value||"x";
+$("ty").innerHTML='<option value="x">'+T(2)+'</option><option value="w">Wi-Fi</option><option value="p">'+T(5)+'</option><option value="a">WhatsApp</option><option value="e">'+T(7)+'</option>';
+$("ty").value=v;update()}
+["ty","ta","a","b"].forEach(id=>$(id).addEventListener("input",update));
+ET.start({id:"qr",file:"qr.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(11),currency:false});
+</script>
+</body>
+</html>

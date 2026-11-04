@@ -35,3 +35,4 @@ a.brand{color:var(--tx);text-decoration:none}
 .grid{display:grid;gap:10px;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));margin:16px 0}
 .card{display:block;padding:16px;border:1px solid var(--ln);border-radius:12px;background:var(--sf);color:var(--tx);text-decoration:none;font-weight:600}
 .card:hover,.card:focus-visible{border-color:var(--ac);background:var(--hi)}
+[hidden]{display:none!important}
