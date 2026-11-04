@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Image Compressor | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.drop{border:2px dashed var(--ln);border-radius:12px;padding:22px;text-align:center;background:var(--sf)}
+.drop.on{border-color:var(--ac);background:var(--hi)}
+input[type=range]{padding:0}
+.item{display:flex;gap:12px;align-items:center;padding:10px;border:1px solid var(--ln);border-radius:10px;background:var(--sf);margin-top:10px}
+.item img{width:72px;height:72px;object-fit:cover;border-radius:8px;flex:none}
+.item>div{min-width:0;overflow-wrap:anywhere}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<div class="drop" id="drop"><button type="button" id="pick"></button><input id="f" type="file" accept="image/*" multiple hidden></div>
+<label for="q" id="l2"></label><input id="q" type="range" min="1" max="100" value="75"><div class="mu" id="qv"></div>
+<label for="fm" id="l3"></label><select id="fm"></select>
+<label for="mw" id="l4"></label><input id="mw" type="number" inputmode="numeric" min="1" step="1">
+<label for="tg" id="l5"></label><input id="tg" type="number" inputmode="decimal" min="1" step="any">
+<p class="mu" id="err" role="alert"></p>
+<p class="mu" id="msg" role="status"></p>
+<div id="list"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"Image Compressor|Choose images or drop them here|Quality|Format|Maximum width (px, optional)|Target size (KB, optional)|Download|Saved|Not an image file.|Could not reach the target size. This is the smallest possible.|Compression loses some detail. Keep your original and check the result before uploading.",
+bn:"ইমেজ কম্প্রেসার|ছবি বেছে নিন বা এখানে ছেড়ে দিন|মান|ফরম্যাট|সর্বোচ্চ প্রস্থ (পিক্সেল, ঐচ্ছিক)|লক্ষ্য সাইজ (KB, ঐচ্ছিক)|ডাউনলোড|সাশ্রয়|এটি ছবির ফাইল নয়।|লক্ষ্য সাইজে পৌঁছানো যায়নি। এটাই সবচেয়ে ছোট সম্ভব।|কম্প্রেস করলে কিছু বিবরণ হারায়। আসল ছবি রেখে দিন এবং আপলোডের আগে ফল দেখে নিন।",
+hi:"इमेज कंप्रेसर|तस्वीरें चुनें या यहाँ छोड़ें|गुणवत्ता|फ़ॉर्मेट|अधिकतम चौड़ाई (पिक्सेल, वैकल्पिक)|लक्षित आकार (KB, वैकल्पिक)|डाउनलोड|बचत|यह इमेज फ़ाइल नहीं है।|लक्षित आकार तक नहीं पहुँचा जा सका। यह सबसे छोटा संभव है।|कंप्रेस करने पर कुछ विवरण खो जाता है। मूल फ़ाइल रखें और अपलोड से पहले नतीजा जाँच लें।",
+ur:"امیج کمپریسر|تصاویر چنیں یا یہاں چھوڑیں|معیار|فارمیٹ|زیادہ سے زیادہ چوڑائی (پکسل، اختیاری)|مطلوبہ سائز (KB، اختیاری)|ڈاؤن لوڈ|بچت|یہ تصویری فائل نہیں ہے۔|مطلوبہ سائز تک نہیں پہنچ سکے۔ یہ سب سے چھوٹا ممکن ہے۔|کمپریس کرنے سے کچھ تفصیل ضائع ہوتی ہے۔ اصل فائل رکھیں اور اپ لوڈ سے پہلے نتیجہ جانچ لیں۔",
+ar:"ضاغط الصور|اختر الصور أو أفلتها هنا|الجودة|الصيغة|أقصى عرض (بكسل، اختياري)|الحجم المستهدف (KB، اختياري)|تنزيل|التوفير|هذا ليس ملف صورة.|تعذّر بلوغ الحجم المستهدف. هذا أصغر حجم ممكن.|الضغط يفقد بعض التفاصيل. احتفظ بالأصل وتحقق من النتيجة قبل الرفع.",
+fa:"فشرده‌ساز تصویر|تصاویر را انتخاب کنید یا اینجا رها کنید|کیفیت|قالب|حداکثر عرض (پیکسل، اختیاری)|حجم هدف (KB، اختیاری)|دانلود|صرفه‌جویی|این فایل تصویر نیست.|رسیدن به حجم هدف ممکن نشد. این کوچک‌ترین حجم ممکن است.|فشرده‌سازی مقداری جزئیات را از بین می‌برد. نسخه اصلی را نگه دارید و پیش از بارگذاری نتیجه را بررسی کنید.",
+tr:"Görsel Sıkıştırıcı|Görselleri seçin veya buraya bırakın|Kalite|Biçim|En büyük genişlik (piksel, isteğe bağlı)|Hedef boyut (KB, isteğe bağlı)|İndir|Tasarruf|Bu bir görsel dosyası değil.|Hedef boyuta ulaşılamadı. Bu mümkün olan en küçük boyut.|Sıkıştırma bazı ayrıntıları kaybettirir. Orijinali saklayın ve yüklemeden önce sonucu kontrol edin.",
+zh:"图片压缩器|选择图片或拖到此处|质量|格式|最大宽度（像素，可选）|目标大小（KB，可选）|下载|节省|这不是图片文件。|无法达到目标大小，这已是最小体积。|压缩会损失部分细节。请保留原图，并在上传前检查结果。",
+ja:"画像圧縮|画像を選択、またはここにドロップ|品質|形式|最大幅（ピクセル、任意）|目標サイズ（KB、任意）|ダウンロード|削減|画像ファイルではありません。|目標サイズに届きませんでした。これが最小です。|圧縮すると細部が失われます。元の画像を保管し、アップロード前に結果を確認してください。",
+ko:"이미지 압축기|이미지를 선택하거나 여기에 놓으세요|품질|형식|최대 너비(픽셀, 선택)|목표 크기(KB, 선택)|다운로드|절감|이미지 파일이 아닙니다.|목표 크기에 도달하지 못했습니다. 이것이 가능한 최소 크기입니다.|압축하면 일부 세부 정보가 사라집니다. 원본을 보관하고 업로드 전에 결과를 확인하세요.",
+ru:"Сжатие изображений|Выберите изображения или перетащите их сюда|Качество|Формат|Максимальная ширина (пикс., необязательно)|Целевой размер (КБ, необязательно)|Скачать|Экономия|Это не файл изображения.|Не удалось достичь целевого размера. Это минимально возможный.|Сжатие теряет часть деталей. Сохраните оригинал и проверьте результат перед загрузкой.",
+es:"Compresor de imágenes|Elige imágenes o suéltalas aquí|Calidad|Formato|Ancho máximo (px, opcional)|Tamaño objetivo (KB, opcional)|Descargar|Ahorro|No es un archivo de imagen.|No se alcanzó el tamaño objetivo. Es el más pequeño posible.|La compresión pierde algo de detalle. Conserva el original y revisa el resultado antes de subirlo.",
+fr:"Compresseur d’images|Choisissez des images ou déposez-les ici|Qualité|Format|Largeur maximale (px, facultatif)|Taille cible (Ko, facultatif)|Télécharger|Gain|Ce n’est pas un fichier image.|Taille cible non atteinte. C’est le minimum possible.|La compression fait perdre des détails. Gardez l’original et vérifiez le résultat avant l’envoi.",
+de:"Bildkomprimierer|Bilder auswählen oder hierher ziehen|Qualität|Format|Maximale Breite (px, optional)|Zielgröße (KB, optional)|Herunterladen|Ersparnis|Keine Bilddatei.|Zielgröße nicht erreicht. Kleiner geht es nicht.|Komprimierung verliert Details. Behalten Sie das Original und prüfen Sie das Ergebnis vor dem Hochladen.",
+pt:"Compressor de imagens|Escolha imagens ou solte-as aqui|Qualidade|Formato|Largura máxima (px, opcional)|Tamanho alvo (KB, opcional)|Baixar|Economia|Não é um arquivo de imagem.|Não foi possível atingir o tamanho alvo. Este é o menor possível.|A compressão perde alguns detalhes. Guarde o original e confira o resultado antes de enviar.",
+it:"Compressore di immagini|Scegli le immagini o trascinale qui|Qualità|Formato|Larghezza massima (px, facoltativa)|Dimensione obiettivo (KB, facoltativa)|Scarica|Risparmio|Non è un file immagine.|Dimensione obiettivo non raggiunta. È la più piccola possibile.|La compressione perde dei dettagli. Conserva l’originale e controlla il risultato prima di caricarlo.",
+nl:"Afbeeldingscompressor|Kies afbeeldingen of sleep ze hierheen|Kwaliteit|Indeling|Maximale breedte (px, optioneel)|Doelgrootte (KB, optioneel)|Downloaden|Bespaard|Geen afbeeldingsbestand.|Doelgrootte niet bereikt. Dit is de kleinste mogelijke.|Compressie verliest wat detail. Bewaar het origineel en controleer het resultaat voor het uploaden.",
+pl:"Kompresor obrazów|Wybierz obrazy lub upuść je tutaj|Jakość|Format|Maksymalna szerokość (px, opcjonalnie)|Docelowy rozmiar (KB, opcjonalnie)|Pobierz|Oszczędność|To nie jest plik obrazu.|Nie osiągnięto docelowego rozmiaru. To najmniejszy możliwy.|Kompresja traci część szczegółów. Zachowaj oryginał i sprawdź wynik przed wysłaniem.",
+uk:"Стиснення зображень|Виберіть зображення або перетягніть їх сюди|Якість|Формат|Максимальна ширина (пікс., необов’язково)|Цільовий розмір (КБ, необов’язково)|Завантажити|Економія|Це не файл зображення.|Не вдалося досягти цільового розміру. Це найменший можливий.|Стиснення втрачає частину деталей. Збережіть оригінал і перевірте результат перед завантаженням.",
+id:"Pengompres Gambar|Pilih gambar atau letakkan di sini|Kualitas|Format|Lebar maksimum (px, opsional)|Ukuran target (KB, opsional)|Unduh|Hemat|Bukan file gambar.|Ukuran target tidak tercapai. Ini yang terkecil.|Kompresi menghilangkan sebagian detail. Simpan aslinya dan periksa hasilnya sebelum mengunggah.",
+ms:"Pemampat Imej|Pilih imej atau lepaskan di sini|Kualiti|Format|Lebar maksimum (px, pilihan)|Saiz sasaran (KB, pilihan)|Muat turun|Jimat|Bukan fail imej.|Saiz sasaran tidak tercapai. Ini yang terkecil.|Pemampatan menghilangkan sedikit butiran. Simpan asal dan semak hasil sebelum memuat naik.",
+th:"ตัวบีบอัดรูปภาพ|เลือกรูปภาพหรือวางที่นี่|คุณภาพ|รูปแบบ|ความกว้างสูงสุด (พิกเซล, ไม่บังคับ)|ขนาดเป้าหมาย (KB, ไม่บังคับ)|ดาวน์โหลด|ประหยัด|ไม่ใช่ไฟล์รูปภาพ|ไม่สามารถถึงขนาดเป้าหมายได้ นี่คือขนาดเล็กที่สุดแล้ว|การบีบอัดทำให้สูญเสียรายละเอียดบางส่วน เก็บต้นฉบับไว้และตรวจผลก่อนอัปโหลด",
+vi:"Trình nén ảnh|Chọn ảnh hoặc thả vào đây|Chất lượng|Định dạng|Chiều rộng tối đa (px, tùy chọn)|Kích thước mục tiêu (KB, tùy chọn)|Tải xuống|Tiết kiệm|Không phải tệp ảnh.|Không đạt kích thước mục tiêu. Đây là mức nhỏ nhất có thể.|Nén sẽ mất một số chi tiết. Hãy giữ bản gốc và kiểm tra kết quả trước khi tải lên.",
+ta:"பட அமுக்கி|படங்களைத் தேர்ந்தெடுக்கவும் அல்லது இங்கே விடவும்|தரம்|வடிவம்|அதிகபட்ச அகலம் (px, விருப்பம்)|இலக்கு அளவு (KB, விருப்பம்)|பதிவிறக்கு|சேமிப்பு|இது பட கோப்பு அல்ல.|இலக்கு அளவை அடைய முடியவில்லை. இதுவே சிறிய அளவு.|அமுக்குவதால் சில விவரங்கள் இழக்கப்படும். அசலை வைத்திருந்து பதிவேற்றும் முன் முடிவைச் சரிபார்க்கவும்.",
+te:"ఇమేజ్ కంప్రెసర్|చిత్రాలను ఎంచుకోండి లేదా ఇక్కడ వదలండి|నాణ్యత|ఫార్మాట్|గరిష్ట వెడల్పు (px, ఐచ్ఛికం)|లక్ష్య పరిమాణం (KB, ఐచ్ఛికం)|డౌన్‌లోడ్|ఆదా|ఇది ఇమేజ్ ఫైల్ కాదు.|లక్ష్య పరిమాణాన్ని చేరుకోలేకపోయాం. ఇదే అతి చిన్నది.|కంప్రెస్ చేస్తే కొంత వివరం పోతుంది. అసలును ఉంచుకుని అప్‌లోడ్ ముందు ఫలితాన్ని చూడండి.",
+mr:"इमेज कॉम्प्रेसर|प्रतिमा निवडा किंवा येथे टाका|गुणवत्ता|फॉरमॅट|कमाल रुंदी (px, ऐच्छिक)|लक्ष्य आकार (KB, ऐच्छिक)|डाउनलोड|बचत|ही प्रतिमा फाइल नाही.|लक्ष्य आकार गाठता आला नाही. हा शक्य तितका लहान आहे.|कॉम्प्रेस केल्यावर काही तपशील जातो. मूळ प्रत ठेवा आणि अपलोडपूर्वी निकाल तपासा.",
+ne:"इमेज कम्प्रेसर|तस्बिर छान्नुहोस् वा यहाँ छोड्नुहोस्|गुणस्तर|ढाँचा|अधिकतम चौडाइ (px, ऐच्छिक)|लक्षित आकार (KB, ऐच्छिक)|डाउनलोड|बचत|यो तस्बिर फाइल होइन।|लक्षित आकार पुग्न सकिएन। यो सम्भव भएसम्मको सबैभन्दा सानो हो।|कम्प्रेस गर्दा केही विवरण हराउँछ। मूल प्रति राख्नुहोस् र अपलोड अघि नतिजा जाँच्नुहोस्।",
+si:"රූප සම්පීඩකය|රූප තෝරන්න හෝ මෙහි දමන්න|ගුණාත්මකභාවය|ආකෘතිය|උපරිම පළල (px, විකල්ප)|ඉලක්ක ප්‍රමාණය (KB, විකල්ප)|බාගන්න|ඉතිරිය|මෙය රූප ගොනුවක් නොවේ.|ඉලක්ක ප්‍රමාණයට ළඟා විය නොහැකි විය. මෙය කුඩාම ප්‍රමාණයයි.|සම්පීඩනයෙන් සමහර විස්තර නැති වේ. මුල් පිටපත තබාගෙන උඩුගත කිරීමට පෙර ප්‍රතිඵලය පරීක්ෂා කරන්න.",
+sw:"Kibana Picha|Chagua picha au zidondoshe hapa|Ubora|Umbizo|Upana wa juu (px, hiari)|Ukubwa lengwa (KB, hiari)|Pakua|Akiba|Si faili la picha.|Ukubwa lengwa haujafikiwa. Huu ndio mdogo zaidi.|Ubanaji hupoteza baadhi ya maelezo. Hifadhi asili na uhakiki matokeo kabla ya kupakia.",
+he:"מדחס תמונות|בחרו תמונות או גררו לכאן|איכות|פורמט|רוחב מרבי (פיקסלים, אופציונלי)|גודל יעד (KB, אופציונלי)|הורדה|חיסכון|זה אינו קובץ תמונה.|לא ניתן להגיע לגודל היעד. זה הגודל הקטן ביותר האפשרי.|דחיסה מאבדת חלק מהפרטים. שמרו את המקור ובדקו את התוצאה לפני ההעלאה.",
+el:"Συμπιεστής εικόνων|Επιλέξτε εικόνες ή αφήστε τις εδώ|Ποιότητα|Μορφή|Μέγιστο πλάτος (px, προαιρετικό)|Στόχος μεγέθους (KB, προαιρετικό)|Λήψη|Εξοικονόμηση|Δεν είναι αρχείο εικόνας.|Δεν επιτεύχθηκε το μέγεθος-στόχος. Αυτό είναι το μικρότερο δυνατό.|Η συμπίεση χάνει λίγες λεπτομέρειες. Κρατήστε το πρωτότυπο και ελέγξτε το αποτέλεσμα πριν το ανεβάσετε.",
+sv:"Bildkomprimerare|Välj bilder eller släpp dem här|Kvalitet|Format|Maxbredd (px, valfritt)|Målstorlek (KB, valfritt)|Ladda ned|Besparing|Inte en bildfil.|Målstorleken nåddes inte. Detta är minsta möjliga.|Komprimering förlorar en del detaljer. Behåll originalet och kontrollera resultatet innan du laddar upp."};
+const S2={
+en:"Choose images, set the quality, then download. Everything happens in your browser and no image is uploaded.",
+bn:"ছবি বেছে মান ঠিক করুন, তারপর ডাউনলোড করুন। সবকিছু আপনার ব্রাউজারেই হয়, কোনো ছবি আপলোড হয় না।",
+hi:"तस्वीरें चुनें, गुणवत्ता तय करें, फिर डाउनलोड करें। सब कुछ आपके ब्राउज़र में होता है, कोई तस्वीर अपलोड नहीं होती।",
+ur:"تصاویر چنیں، معیار طے کریں، پھر ڈاؤن لوڈ کریں۔ سب کچھ آپ کے براؤزر میں ہوتا ہے، کوئی تصویر اپ لوڈ نہیں ہوتی۔",
+ar:"اختر الصور وحدد الجودة ثم نزّل. كل شيء يتم في متصفحك ولا تُرفع أي صورة.",
+fa:"تصاویر را انتخاب کنید، کیفیت را تنظیم کنید و دانلود کنید. همه‌چیز در مرورگر شما انجام می‌شود و هیچ تصویری آپلود نمی‌شود.",
+tr:"Görselleri seçin, kaliteyi ayarlayın, sonra indirin. Her şey tarayıcınızda olur, hiçbir görsel yüklenmez.",
+zh:"选择图片、设置质量，然后下载。一切都在浏览器中完成，不会上传任何图片。",
+ja:"画像を選び、品質を設定してダウンロードします。すべてブラウザ内で処理され、画像はアップロードされません。",
+ko:"이미지를 선택하고 품질을 정한 뒤 다운로드하세요. 모든 작업은 브라우저에서 이루어지며 이미지는 업로드되지 않습니다.",
+ru:"Выберите изображения, задайте качество и скачайте. Всё происходит в вашем браузере, изображения не загружаются.",
+es:"Elige imágenes, ajusta la calidad y descarga. Todo ocurre en tu navegador y no se sube ninguna imagen.",
+fr:"Choisissez des images, réglez la qualité puis téléchargez. Tout se passe dans votre navigateur, aucune image n’est envoyée.",
+de:"Bilder wählen, Qualität einstellen, herunterladen. Alles passiert in Ihrem Browser, kein Bild wird hochgeladen.",
+pt:"Escolha imagens, ajuste a qualidade e baixe. Tudo acontece no seu navegador e nenhuma imagem é enviada.",
+it:"Scegli le immagini, imposta la qualità e scarica. Tutto avviene nel tuo browser e nessuna immagine viene caricata.",
+nl:"Kies afbeeldingen, stel de kwaliteit in en download. Alles gebeurt in uw browser, er wordt geen afbeelding geüpload.",
+pl:"Wybierz obrazy, ustaw jakość i pobierz. Wszystko dzieje się w przeglądarce, żaden obraz nie jest wysyłany.",
+uk:"Виберіть зображення, задайте якість і завантажте. Усе відбувається у вашому браузері, зображення не передаються.",
+id:"Pilih gambar, atur kualitas, lalu unduh. Semua diproses di browser Anda dan tidak ada gambar yang diunggah.",
+ms:"Pilih imej, tetapkan kualiti, kemudian muat turun. Semuanya dilakukan dalam pelayar anda dan tiada imej dimuat naik.",
+th:"เลือกรูปภาพ ตั้งค่าคุณภาพ แล้วดาวน์โหลด ทุกอย่างทำในเบราว์เซอร์ของคุณ ไม่มีการอัปโหลดรูปภาพ",
+vi:"Chọn ảnh, đặt chất lượng rồi tải xuống. Mọi thứ diễn ra trong trình duyệt của bạn, không ảnh nào được tải lên.",
+ta:"படங்களைத் தேர்ந்து தரத்தை அமைத்து பதிவிறக்கவும். எல்லாம் உங்கள் உலாவியிலேயே நடக்கும், எந்தப் படமும் பதிவேற்றப்படாது.",
+te:"చిత్రాలను ఎంచుకుని నాణ్యత సెట్ చేసి డౌన్‌లోడ్ చేయండి. అంతా మీ బ్రౌజర్‌లోనే జరుగుతుంది, ఏ చిత్రం అప్‌లోడ్ కాదు.",
+mr:"प्रतिमा निवडा, गुणवत्ता ठरवा आणि डाउनलोड करा. सर्व काही तुमच्या ब्राउझरमध्येच होते, कोणतीही प्रतिमा अपलोड होत नाही.",
+ne:"तस्बिर छानेर गुणस्तर मिलाउनुहोस् र डाउनलोड गर्नुहोस्। सबै कुरा तपाईंको ब्राउजरमै हुन्छ, कुनै तस्बिर अपलोड हुँदैन।",
+si:"රූප තෝරා ගුණාත්මකභාවය සකසා බාගන්න. සියල්ල ඔබේ බ්‍රවුසරයේම සිදු වේ, කිසිදු රූපයක් උඩුගත නොවේ.",
+sw:"Chagua picha, weka ubora, kisha pakua. Kila kitu hufanyika kwenye kivinjari chako, hakuna picha inayopakiwa.",
+he:"בחרו תמונות, הגדירו איכות והורידו. הכול מתבצע בדפדפן שלכם ושום תמונה לא מועלית.",
+el:"Επιλέξτε εικόνες, ορίστε ποιότητα και κατεβάστε. Όλα γίνονται στον browser σας και καμία εικόνα δεν ανεβαίνει.",
+sv:"Välj bilder, ställ in kvalitet och ladda ned. Allt sker i din webbläsare och ingen bild laddas upp."};
+
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+let files=[],res=[],tok=0,tm=null;
+const sizeTxt=b=>{const m=b>=1048576,v=m?b/1048576:b/1024;try{return new Intl.NumberFormat(ET.state.lang,{style:"unit",unit:m?"megabyte":"kilobyte",maximumFractionDigits:1}).format(v)}catch(e){return v.toFixed(1)+(m?" MB":" KB")}};
+const pctTxt=p=>{try{return new Intl.NumberFormat(ET.state.lang,{style:"percent",maximumFractionDigits:0}).format(p)}catch(e){return Math.round(p*100)+"%"}};
+/*FIT*/
+async function fit(enc,w,h,lim){
+let sc=1;
+for(;;){const W=Math.max(1,Math.round(w*sc)),H=Math.max(1,Math.round(h*sc));
+let best=await enc(W,H,.05);
+if(best.size<=lim){let lo=.05,hi=.95;for(let i=0;i<6;i++){const m=(lo+hi)/2,b=await enc(W,H,m);if(b.size<=lim){best=b;lo=m}else hi=m}return{blob:best,W,H,ok:true}}
+if(W<=64||H<=64)return{blob:best,W,H,ok:false};
+sc*=.75}}
+/*ENDFIT*/
+async function load(f){try{return await createImageBitmap(f)}catch(e){return new Promise((ok,no)=>{const i=new Image(),u=URL.createObjectURL(f);i.onload=()=>{URL.revokeObjectURL(u);ok(i)};i.onerror=no;i.src=u})}}
+async function compress(f,fmt,q,mw,tg){
+const bm=await load(f);let w=bm.naturalWidth||bm.width,h=bm.naturalHeight||bm.height;
+if(mw>0&&w>mw){h=Math.round(h*mw/w);w=mw}
+const enc=(W,H,qq)=>{const c=document.createElement("canvas");c.width=W;c.height=H;const g=c.getContext("2d");
+if(fmt==="image/jpeg"){g.fillStyle="#fff";g.fillRect(0,0,W,H)}g.drawImage(bm,0,0,W,H);return new Promise(r=>c.toBlob(r,fmt,qq))};
+let blob,ok=true;
+if(tg>0){const r=await fit(enc,w,h,tg*1024);blob=r.blob;ok=r.ok}else blob=await enc(w,h,q/100);
+if(bm.close)bm.close();
+return{name:f.name,orig:f.size,size:blob.size,url:URL.createObjectURL(blob),out:f.name.replace(/\.[^.]+$/,"")+"-compressed."+(fmt==="image/webp"?"webp":"jpg"),ok}}
+async function go(){
+const my=++tok;res.forEach(r=>URL.revokeObjectURL(r.url));res=[];$("err").textContent="";
+const fmt=$("fm").value,q=+$("q").value,mw=parseInt($("mw").value)||0,tg=parseFloat($("tg").value)||0;
+$("q").disabled=tg>0;$("qv").textContent=pctTxt(q/100);
+for(const f of files){
+if(!f.type.startsWith("image/")){$("err").textContent=f.name+": "+T(8);continue}
+try{const r=await compress(f,fmt,q,mw,tg);if(my!==tok){URL.revokeObjectURL(r.url);return}res.push(r)}catch(e){$("err").textContent=f.name+": "+T(8)}}
+if(my!==tok)return;
+renderList();res.forEach(r=>ET.logNow(r.name+": "+sizeTxt(r.orig)+" → "+sizeTxt(r.size)+" ("+pctTxt(1-r.size/r.orig)+")"))}
+function renderList(){
+const L=$("list");L.replaceChildren();
+res.forEach(r=>{const d=document.createElement("div");d.className="item";
+const im=document.createElement("img");im.src=r.url;im.alt="";d.appendChild(im);
+const b=document.createElement("div"),n=document.createElement("strong"),s=document.createElement("div"),p=document.createElement("div"),a=document.createElement("a");
+n.textContent=r.name;s.textContent=sizeTxt(r.orig)+" → "+sizeTxt(r.size);p.textContent=T(7)+": "+pctTxt(1-r.size/r.orig);
+a.className="btn";a.href=r.url;a.download=r.out;a.textContent=T(6);
+[n,s,p,a].forEach(e=>b.appendChild(e));d.appendChild(b);L.appendChild(d)});
+$("msg").textContent=res.some(r=>!r.ok)?T(9):""}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("pick").textContent=T(1);$("l2").textContent=T(2);$("l3").textContent=T(3);$("l4").textContent=T(4);$("l5").textContent=T(5);
+const v=$("fm").value||"image/jpeg";
+let w="";try{if(document.createElement("canvas").toDataURL("image/webp").indexOf("data:image/webp")===0)w='<option value="image/webp">WebP</option>'}catch(e){}
+$("fm").innerHTML='<option value="image/jpeg">JPEG</option>'+w;$("fm").value=v;
+$("qv").textContent=pctTxt(+$("q").value/100);renderList()}
+const later=()=>{clearTimeout(tm);tm=setTimeout(go,400)};
+["q","fm","mw","tg"].forEach(id=>$(id).addEventListener("input",later));
+$("pick").onclick=()=>$("f").click();
+$("f").addEventListener("change",e=>{files=[...e.target.files];go()});
+const dz=$("drop");
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("on")});
+dz.addEventListener("dragleave",()=>dz.classList.remove("on"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("on");files=[...e.dataTransfer.files];go()});
+ET.start({id:"img",file:"img.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(10),currency:false});
+</script>
+</body>
+</html>
