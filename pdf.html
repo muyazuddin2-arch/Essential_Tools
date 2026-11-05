@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PDF Merge &amp; Split | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>
+.seg{display:flex;gap:6px;margin:12px 0}
+.seg button[aria-pressed=true]{background:var(--ac);color:var(--bg);border-color:var(--ac);font-weight:600}
+.drop{border:2px dashed var(--ln);border-radius:12px;padding:22px;text-align:center;background:var(--sf)}
+.drop.on{border-color:var(--ac);background:var(--hi)}
+.item{display:flex;gap:8px;align-items:center;padding:8px 10px;border:1px solid var(--ln);border-radius:10px;background:var(--sf);margin-top:8px}
+.item .nm{flex:1;min-width:0;overflow-wrap:anywhere}
+.btns{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+button:disabled{opacity:.5;cursor:not-allowed}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<div class="seg"><button type="button" id="m1" aria-pressed="true"></button><button type="button" id="m2" aria-pressed="false"></button></div>
+<div class="drop" id="drop"><button type="button" id="pick"></button><input id="f" type="file" accept="application/pdf,.pdf" multiple hidden></div>
+<div id="list"></div>
+<div id="sp" hidden><label for="rg" id="lr"></label><input id="rg" placeholder="1-3, 5, 8-10" autocomplete="off"></div>
+<div class="btns"><button type="button" class="btn" id="go"></button><button type="button" class="btn" id="one" hidden></button></div>
+<p class="mu" id="err" role="alert"></p>
+<p class="mu" id="busy" role="status"></p>
+<div id="res"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="pdf-lib.min.js"></script>
+<script src="common.js"></script>
+<script>
+const S={
+en:"PDF Merge & Split|Merge|Split|Choose PDF files or drop them here|Page ranges, e.g. 1-3, 5, 8-10|One file per page|Download|Pages|Invalid page range.|This file cannot be processed. It may be protected or damaged.|Check the new PDF before deleting your originals. Password-protected PDFs cannot be processed.",
+bn:"PDF মার্জ ও স্প্লিট|মার্জ|স্প্লিট|PDF ফাইল বেছে নিন বা এখানে ছেড়ে দিন|পৃষ্ঠার পরিসর, যেমন ১-৩, ৫, ৮-১০|প্রতি পৃষ্ঠায় একটি ফাইল|ডাউনলোড|পৃষ্ঠা|পৃষ্ঠার পরিসর ঠিক নয়।|এই ফাইল প্রক্রিয়া করা যায়নি। এটি সুরক্ষিত বা নষ্ট হতে পারে।|আসল ফাইল মুছার আগে নতুন PDF দেখে নিন। পাসওয়ার্ড দেওয়া PDF প্রক্রিয়া করা যায় না।",
+hi:"PDF मर्ज और स्प्लिट|मर्ज|स्प्लिट|PDF फ़ाइलें चुनें या यहाँ छोड़ें|पेज रेंज, जैसे 1-3, 5, 8-10|प्रति पेज एक फ़ाइल|डाउनलोड|पेज|पेज रेंज गलत है।|इस फ़ाइल को प्रोसेस नहीं किया जा सका। यह सुरक्षित या खराब हो सकती है।|मूल फ़ाइलें हटाने से पहले नई PDF जाँच लें। पासवर्ड वाली PDF प्रोसेस नहीं हो सकतीं।",
+ur:"PDF مرج اور اسپلٹ|مرج|اسپلٹ|PDF فائلیں چنیں یا یہاں چھوڑیں|صفحات کی رینج، مثلاً 1-3, 5, 8-10|ہر صفحے کی ایک فائل|ڈاؤن لوڈ|صفحات|صفحات کی رینج درست نہیں۔|اس فائل پر کارروائی نہیں ہو سکی۔ یہ محفوظ یا خراب ہو سکتی ہے۔|اصل فائلیں حذف کرنے سے پہلے نئی PDF جانچ لیں۔ پاس ورڈ والی PDF پر کارروائی نہیں ہو سکتی۔",
+ar:"دمج وتقسيم PDF|دمج|تقسيم|اختر ملفات PDF أو أفلتها هنا|نطاقات الصفحات، مثل 1-3, 5, 8-10|ملف لكل صفحة|تنزيل|الصفحات|نطاق الصفحات غير صالح.|تعذّرت معالجة هذا الملف. قد يكون محميًا أو تالفًا.|تحقق من ملف PDF الجديد قبل حذف الأصول. لا يمكن معالجة ملفات PDF المحمية بكلمة مرور.",
+fa:"ادغام و تقسیم PDF|ادغام|تقسیم|فایل‌های PDF را انتخاب کنید یا اینجا رها کنید|محدوده صفحات، مثلاً 1-3, 5, 8-10|یک فایل برای هر صفحه|دانلود|صفحه‌ها|محدوده صفحه نامعتبر است.|این فایل قابل پردازش نیست. ممکن است محافظت‌شده یا خراب باشد.|پیش از حذف فایل‌های اصلی، PDF جدید را بررسی کنید. PDFهای دارای گذرواژه پردازش نمی‌شوند.",
+tr:"PDF Birleştir ve Böl|Birleştir|Böl|PDF dosyalarını seçin veya buraya bırakın|Sayfa aralıkları, örn. 1-3, 5, 8-10|Sayfa başına bir dosya|İndir|Sayfa|Geçersiz sayfa aralığı.|Bu dosya işlenemedi. Korumalı veya bozuk olabilir.|Orijinalleri silmeden önce yeni PDF’yi kontrol edin. Parolalı PDF’ler işlenemez.",
+zh:"PDF 合并与拆分|合并|拆分|选择 PDF 文件或拖到此处|页码范围，例如 1-3, 5, 8-10|每页一个文件|下载|页数|页码范围无效。|无法处理此文件，可能已加密或损坏。|删除原文件前请检查新 PDF。无法处理有密码保护的 PDF。",
+ja:"PDF結合・分割|結合|分割|PDFファイルを選択、またはここにドロップ|ページ範囲（例：1-3, 5, 8-10）|1ページごとに1ファイル|ダウンロード|ページ数|ページ範囲が正しくありません。|このファイルは処理できません。保護または破損している可能性があります。|元のファイルを削除する前に新しいPDFを確認してください。パスワード保護されたPDFは処理できません。",
+ko:"PDF 병합 및 분할|병합|분할|PDF 파일을 선택하거나 여기에 놓으세요|페이지 범위 (예: 1-3, 5, 8-10)|페이지마다 파일 하나|다운로드|페이지|잘못된 페이지 범위입니다.|이 파일을 처리할 수 없습니다. 보호되었거나 손상되었을 수 있습니다.|원본을 삭제하기 전에 새 PDF를 확인하세요. 비밀번호가 설정된 PDF는 처리할 수 없습니다.",
+ru:"Объединение и разделение PDF|Объединить|Разделить|Выберите PDF-файлы или перетащите их сюда|Диапазоны страниц, например 1-3, 5, 8-10|Один файл на страницу|Скачать|Страниц|Неверный диапазон страниц.|Не удалось обработать файл. Возможно, он защищён или повреждён.|Проверьте новый PDF, прежде чем удалять оригиналы. PDF с паролем обработать нельзя.",
+es:"Unir y dividir PDF|Unir|Dividir|Elige archivos PDF o suéltalos aquí|Rangos de páginas, p. ej. 1-3, 5, 8-10|Un archivo por página|Descargar|Páginas|Rango de páginas no válido.|No se puede procesar este archivo. Puede estar protegido o dañado.|Revisa el nuevo PDF antes de borrar los originales. Los PDF con contraseña no se pueden procesar.",
+fr:"Fusionner et diviser des PDF|Fusionner|Diviser|Choisissez des PDF ou déposez-les ici|Plages de pages, p. ex. 1-3, 5, 8-10|Un fichier par page|Télécharger|Pages|Plage de pages invalide.|Ce fichier ne peut pas être traité. Il est peut-être protégé ou endommagé.|Vérifiez le nouveau PDF avant de supprimer vos originaux. Les PDF protégés par mot de passe ne sont pas pris en charge.",
+de:"PDF zusammenfügen und teilen|Zusammenfügen|Teilen|PDF-Dateien wählen oder hierher ziehen|Seitenbereiche, z. B. 1-3, 5, 8-10|Eine Datei pro Seite|Herunterladen|Seiten|Ungültiger Seitenbereich.|Diese Datei kann nicht verarbeitet werden. Sie ist möglicherweise geschützt oder beschädigt.|Prüfen Sie das neue PDF, bevor Sie die Originale löschen. Passwortgeschützte PDFs können nicht verarbeitet werden.",
+pt:"Juntar e dividir PDF|Juntar|Dividir|Escolha arquivos PDF ou solte-os aqui|Intervalos de páginas, ex.: 1-3, 5, 8-10|Um arquivo por página|Baixar|Páginas|Intervalo de páginas inválido.|Não foi possível processar este arquivo. Ele pode estar protegido ou danificado.|Confira o novo PDF antes de apagar os originais. PDFs com senha não podem ser processados.",
+it:"Unisci e dividi PDF|Unisci|Dividi|Scegli i file PDF o trascinali qui|Intervalli di pagine, es. 1-3, 5, 8-10|Un file per pagina|Scarica|Pagine|Intervallo di pagine non valido.|Impossibile elaborare questo file. Potrebbe essere protetto o danneggiato.|Controlla il nuovo PDF prima di eliminare gli originali. I PDF protetti da password non possono essere elaborati.",
+nl:"PDF samenvoegen en splitsen|Samenvoegen|Splitsen|Kies pdf-bestanden of sleep ze hierheen|Paginabereiken, bijv. 1-3, 5, 8-10|Eén bestand per pagina|Downloaden|Pagina’s|Ongeldig paginabereik.|Dit bestand kan niet worden verwerkt. Het is mogelijk beveiligd of beschadigd.|Controleer de nieuwe pdf voordat u de originelen verwijdert. Pdf’s met wachtwoord kunnen niet worden verwerkt.",
+pl:"Łączenie i dzielenie PDF|Połącz|Podziel|Wybierz pliki PDF lub upuść je tutaj|Zakresy stron, np. 1-3, 5, 8-10|Jeden plik na stronę|Pobierz|Stron|Nieprawidłowy zakres stron.|Nie można przetworzyć tego pliku. Może być chroniony lub uszkodzony.|Sprawdź nowy PDF, zanim usuniesz oryginały. Plików PDF chronionych hasłem nie można przetworzyć.",
+uk:"Об’єднання та поділ PDF|Об’єднати|Поділити|Виберіть PDF-файли або перетягніть їх сюди|Діапазони сторінок, напр. 1-3, 5, 8-10|Один файл на сторінку|Завантажити|Сторінок|Неправильний діапазон сторінок.|Не вдалося обробити файл. Він може бути захищений або пошкоджений.|Перевірте новий PDF, перш ніж видаляти оригінали. PDF із паролем обробити неможливо.",
+id:"Gabung & Pisah PDF|Gabung|Pisah|Pilih file PDF atau letakkan di sini|Rentang halaman, mis. 1-3, 5, 8-10|Satu file per halaman|Unduh|Halaman|Rentang halaman tidak valid.|File ini tidak dapat diproses. Mungkin terlindungi atau rusak.|Periksa PDF baru sebelum menghapus file asli. PDF yang dilindungi kata sandi tidak dapat diproses.",
+ms:"Gabung & Pisah PDF|Gabung|Pisah|Pilih fail PDF atau lepaskan di sini|Julat halaman, cth. 1-3, 5, 8-10|Satu fail setiap halaman|Muat turun|Halaman|Julat halaman tidak sah.|Fail ini tidak dapat diproses. Ia mungkin dilindungi atau rosak.|Semak PDF baharu sebelum memadam fail asal. PDF berkata laluan tidak dapat diproses.",
+th:"รวมและแยก PDF|รวม|แยก|เลือกไฟล์ PDF หรือวางที่นี่|ช่วงหน้า เช่น 1-3, 5, 8-10|หนึ่งไฟล์ต่อหน้า|ดาวน์โหลด|หน้า|ช่วงหน้าไม่ถูกต้อง|ไม่สามารถประมวลผลไฟล์นี้ อาจถูกป้องกันหรือเสียหาย|ตรวจสอบ PDF ใหม่ก่อนลบไฟล์ต้นฉบับ PDF ที่มีรหัสผ่านไม่สามารถประมวลผลได้",
+vi:"Gộp & tách PDF|Gộp|Tách|Chọn tệp PDF hoặc thả vào đây|Phạm vi trang, ví dụ 1-3, 5, 8-10|Mỗi trang một tệp|Tải xuống|Trang|Phạm vi trang không hợp lệ.|Không thể xử lý tệp này. Có thể tệp bị bảo vệ hoặc hỏng.|Hãy kiểm tra PDF mới trước khi xóa bản gốc. PDF có mật khẩu không thể xử lý.",
+ta:"PDF இணைத்தல் & பிரித்தல்|இணை|பிரி|PDF கோப்புகளைத் தேர்ந்தெடுக்கவும் அல்லது இங்கே விடவும்|பக்க வரம்புகள், எ.கா. 1-3, 5, 8-10|ஒரு பக்கத்திற்கு ஒரு கோப்பு|பதிவிறக்கு|பக்கங்கள்|பக்க வரம்பு தவறானது.|இந்தக் கோப்பைச் செயலாக்க முடியவில்லை. இது பாதுகாக்கப்பட்டதாக அல்லது சேதமடைந்ததாக இருக்கலாம்.|அசல் கோப்புகளை நீக்கும் முன் புதிய PDF-ஐச் சரிபார்க்கவும். கடவுச்சொல் உள்ள PDF-களைச் செயலாக்க முடியாது.",
+te:"PDF విలీనం & విభజన|విలీనం|విభజన|PDF ఫైళ్లను ఎంచుకోండి లేదా ఇక్కడ వదలండి|పేజీ పరిధులు, ఉదా. 1-3, 5, 8-10|ప్రతి పేజీకి ఒక ఫైల్|డౌన్‌లోడ్|పేజీలు|పేజీ పరిధి చెల్లదు.|ఈ ఫైల్‌ను ప్రాసెస్ చేయలేకపోయాం. ఇది రక్షితమైనది లేదా దెబ్బతిన్నది కావచ్చు.|అసలు ఫైళ్లను తొలగించే ముందు కొత్త PDF‌ను చూడండి. పాస్‌వర్డ్ ఉన్న PDF‌లను ప్రాసెస్ చేయలేము.",
+mr:"PDF मर्ज आणि स्प्लिट|मर्ज|स्प्लिट|PDF फाइल्स निवडा किंवा येथे टाका|पृष्ठ श्रेणी, उदा. 1-3, 5, 8-10|प्रत्येक पृष्ठाची एक फाइल|डाउनलोड|पृष्ठे|पृष्ठ श्रेणी चुकीची आहे.|ही फाइल प्रक्रिया करता आली नाही. ती संरक्षित किंवा खराब असू शकते.|मूळ फाइल्स हटवण्यापूर्वी नवीन PDF तपासा. पासवर्ड असलेल्या PDF वर प्रक्रिया करता येत नाही.",
+ne:"PDF मर्ज र स्प्लिट|मर्ज|स्प्लिट|PDF फाइल छान्नुहोस् वा यहाँ छोड्नुहोस्|पृष्ठ दायरा, जस्तै 1-3, 5, 8-10|प्रत्येक पृष्ठको एउटा फाइल|डाउनलोड|पृष्ठ|पृष्ठ दायरा मिलेन।|यो फाइल प्रशोधन गर्न सकिएन। यो सुरक्षित वा बिग्रिएको हुन सक्छ।|मूल फाइल मेट्नु अघि नयाँ PDF जाँच्नुहोस्। पासवर्ड भएका PDF प्रशोधन गर्न सकिँदैन।",
+si:"PDF ඒකාබද්ධ කිරීම සහ බෙදීම|ඒකාබද්ධ කරන්න|බෙදන්න|PDF ගොනු තෝරන්න හෝ මෙහි දමන්න|පිටු පරාස, උදා. 1-3, 5, 8-10|පිටුවකට එක් ගොනුවක්|බාගන්න|පිටු|පිටු පරාසය වලංගු නොවේ.|මෙම ගොනුව සැකසිය නොහැක. එය ආරක්ෂිත හෝ හානි වී තිබිය හැක.|මුල් ගොනු මැකීමට පෙර නව PDF පරීක්ෂා කරන්න. මුරපද සහිත PDF සැකසිය නොහැක.",
+sw:"Unganisha na Gawanya PDF|Unganisha|Gawanya|Chagua faili za PDF au zidondoshe hapa|Safu za kurasa, mf. 1-3, 5, 8-10|Faili moja kwa kila ukurasa|Pakua|Kurasa|Safu ya kurasa si sahihi.|Faili hili haliwezi kuchakatwa. Huenda limelindwa au limeharibika.|Hakiki PDF mpya kabla ya kufuta za asili. PDF zenye nenosiri haziwezi kuchakatwa.",
+he:"מיזוג ופיצול PDF|מזג|פצל|בחרו קובצי PDF או גררו לכאן|טווחי עמודים, למשל 1-3, 5, 8-10|קובץ אחד לכל עמוד|הורדה|עמודים|טווח עמודים לא תקין.|לא ניתן לעבד את הקובץ. ייתכן שהוא מוגן או פגום.|בדקו את ה-PDF החדש לפני מחיקת המקורות. לא ניתן לעבד קובצי PDF מוגנים בסיסמה.",
+el:"Συγχώνευση και διαχωρισμός PDF|Συγχώνευση|Διαχωρισμός|Επιλέξτε αρχεία PDF ή αφήστε τα εδώ|Εύρη σελίδων, π.χ. 1-3, 5, 8-10|Ένα αρχείο ανά σελίδα|Λήψη|Σελίδες|Μη έγκυρο εύρος σελίδων.|Το αρχείο δεν μπορεί να επεξεργαστεί. Ίσως είναι προστατευμένο ή κατεστραμμένο.|Ελέγξτε το νέο PDF πριν διαγράψετε τα πρωτότυπα. Τα PDF με κωδικό δεν μπορούν να επεξεργαστούν.",
+sv:"Slå ihop och dela PDF|Slå ihop|Dela|Välj PDF-filer eller släpp dem här|Sidintervall, t.ex. 1-3, 5, 8-10|En fil per sida|Ladda ned|Sidor|Ogiltigt sidintervall.|Filen kan inte bearbetas. Den kan vara skyddad eller skadad.|Kontrollera den nya PDF-filen innan du raderar originalen. Lösenordsskyddade PDF-filer kan inte bearbetas."};
+const S2={
+en:"Merge: add PDFs, arrange the order, then press Merge. Split: add one PDF, enter page ranges (each range becomes its own file) or choose one file per page. Everything happens in your browser and no file is uploaded.",
+bn:"মার্জ: PDF যোগ করুন, ক্রম সাজান, তারপর মার্জ চাপুন। স্প্লিট: একটি PDF যোগ করুন, পৃষ্ঠার পরিসর লিখুন (প্রতিটি পরিসর আলাদা ফাইল হবে) বা প্রতি পৃষ্ঠায় একটি ফাইল বেছে নিন। সবকিছু আপনার ব্রাউজারেই হয়, কোনো ফাইল আপলোড হয় না।",
+hi:"मर्ज: PDF जोड़ें, क्रम तय करें, फिर मर्ज दबाएँ। स्प्लिट: एक PDF जोड़ें, पेज रेंज लिखें (हर रेंज अलग फ़ाइल बनेगी) या प्रति पेज एक फ़ाइल चुनें। सब कुछ आपके ब्राउज़र में होता है, कोई फ़ाइल अपलोड नहीं होती।",
+ur:"مرج: PDF شامل کریں، ترتیب طے کریں، پھر مرج دبائیں۔ اسپلٹ: ایک PDF شامل کریں، صفحات کی رینج لکھیں (ہر رینج الگ فائل بنے گی) یا ہر صفحے کی ایک فائل چنیں۔ سب کچھ آپ کے براؤزر میں ہوتا ہے، کوئی فائل اپ لوڈ نہیں ہوتی۔",
+ar:"الدمج: أضف ملفات PDF ورتّبها ثم اضغط دمج. التقسيم: أضف ملف PDF واحدًا وأدخل نطاقات الصفحات (كل نطاق يصبح ملفًا) أو اختر ملفًا لكل صفحة. كل شيء يتم في متصفحك ولا يُرفع أي ملف.",
+fa:"ادغام: PDFها را اضافه و مرتب کنید و ادغام را بزنید. تقسیم: یک PDF اضافه کنید، محدوده صفحات را بنویسید (هر محدوده یک فایل می‌شود) یا یک فایل برای هر صفحه بخواهید. همه‌چیز در مرورگر شما انجام می‌شود و فایلی آپلود نمی‌شود.",
+tr:"Birleştir: PDF’leri ekleyin, sırayı düzenleyin ve Birleştir’e basın. Böl: tek bir PDF ekleyin, sayfa aralıklarını yazın (her aralık ayrı dosya olur) veya sayfa başına bir dosya seçin. Her şey tarayıcınızda olur, hiçbir dosya yüklenmez.",
+zh:"合并：添加 PDF，调整顺序后点击合并。拆分：添加一个 PDF，输入页码范围（每个范围生成一个文件）或选择每页一个文件。一切都在浏览器中完成，不会上传任何文件。",
+ja:"結合：PDFを追加し、順序を並べ替えて「結合」を押します。分割：PDFを1つ追加し、ページ範囲を入力（範囲ごとに別ファイル）するか、1ページごとに分けます。すべてブラウザ内で処理され、ファイルはアップロードされません。",
+ko:"병합: PDF를 추가하고 순서를 정한 뒤 병합을 누르세요. 분할: PDF 하나를 추가하고 페이지 범위를 입력하거나(범위마다 별도 파일) 페이지마다 파일 하나를 선택하세요. 모든 작업은 브라우저에서 이루어지며 파일은 업로드되지 않습니다.",
+ru:"Объединение: добавьте PDF, расставьте порядок и нажмите «Объединить». Разделение: добавьте один PDF, введите диапазоны страниц (каждый станет файлом) или выберите «один файл на страницу». Всё происходит в вашем браузере, файлы не загружаются.",
+es:"Unir: añade PDF, ordénalos y pulsa Unir. Dividir: añade un PDF, escribe rangos de páginas (cada rango será un archivo) o elige un archivo por página. Todo ocurre en tu navegador y no se sube ningún archivo.",
+fr:"Fusionner : ajoutez des PDF, réordonnez-les, puis appuyez sur Fusionner. Diviser : ajoutez un PDF, saisissez des plages de pages (chaque plage devient un fichier) ou choisissez un fichier par page. Tout se passe dans votre navigateur, aucun fichier n’est envoyé.",
+de:"Zusammenfügen: PDFs hinzufügen, Reihenfolge festlegen, dann auf Zusammenfügen klicken. Teilen: ein PDF hinzufügen, Seitenbereiche eingeben (jeder Bereich wird eine Datei) oder eine Datei pro Seite wählen. Alles passiert in Ihrem Browser, nichts wird hochgeladen.",
+pt:"Juntar: adicione PDFs, organize a ordem e toque em Juntar. Dividir: adicione um PDF, digite intervalos de páginas (cada intervalo vira um arquivo) ou escolha um arquivo por página. Tudo acontece no seu navegador e nenhum arquivo é enviado.",
+it:"Unisci: aggiungi i PDF, ordinali e premi Unisci. Dividi: aggiungi un PDF, inserisci gli intervalli di pagine (ogni intervallo diventa un file) o scegli un file per pagina. Tutto avviene nel tuo browser e nessun file viene caricato.",
+nl:"Samenvoegen: voeg pdf’s toe, bepaal de volgorde en klik op Samenvoegen. Splitsen: voeg één pdf toe, typ paginabereiken (elk bereik wordt een bestand) of kies één bestand per pagina. Alles gebeurt in uw browser, er wordt niets geüpload.",
+pl:"Łączenie: dodaj pliki PDF, ustaw kolejność i naciśnij Połącz. Dzielenie: dodaj jeden PDF, wpisz zakresy stron (każdy zakres stanie się plikiem) lub wybierz jeden plik na stronę. Wszystko dzieje się w przeglądarce, żaden plik nie jest wysyłany.",
+uk:"Об’єднання: додайте PDF, розставте порядок і натисніть «Об’єднати». Поділ: додайте один PDF, введіть діапазони сторінок (кожен стане файлом) або виберіть «один файл на сторінку». Усе відбувається у вашому браузері, файли не передаються.",
+id:"Gabung: tambahkan PDF, atur urutan, lalu tekan Gabung. Pisah: tambahkan satu PDF, ketik rentang halaman (tiap rentang menjadi satu file) atau pilih satu file per halaman. Semua diproses di browser Anda dan tidak ada file yang diunggah.",
+ms:"Gabung: tambah PDF, susun urutan, kemudian tekan Gabung. Pisah: tambah satu PDF, taip julat halaman (setiap julat menjadi satu fail) atau pilih satu fail setiap halaman. Semuanya dilakukan dalam pelayar anda dan tiada fail dimuat naik.",
+th:"รวม: เพิ่ม PDF จัดลำดับ แล้วกดรวม แยก: เพิ่ม PDF หนึ่งไฟล์ ใส่ช่วงหน้า (แต่ละช่วงเป็นหนึ่งไฟล์) หรือเลือกหนึ่งไฟล์ต่อหน้า ทุกอย่างทำในเบราว์เซอร์ของคุณ ไม่มีการอัปโหลดไฟล์",
+vi:"Gộp: thêm PDF, sắp xếp thứ tự rồi nhấn Gộp. Tách: thêm một PDF, nhập phạm vi trang (mỗi phạm vi thành một tệp) hoặc chọn mỗi trang một tệp. Mọi thứ diễn ra trong trình duyệt của bạn, không tệp nào được tải lên.",
+ta:"இணை: PDF-களைச் சேர்த்து வரிசைப்படுத்தி இணை அழுத்தவும். பிரி: ஒரு PDF-ஐச் சேர்த்து, பக்க வரம்புகளை உள்ளிடவும் (ஒவ்வொரு வரம்பும் தனி கோப்பு) அல்லது ஒரு பக்கத்திற்கு ஒரு கோப்பைத் தேர்ந்தெடுக்கவும். எல்லாம் உங்கள் உலாவியிலேயே நடக்கும், எந்தக் கோப்பும் பதிவேற்றப்படாது.",
+te:"విలీనం: PDFలను చేర్చి క్రమం పెట్టి విలీనం నొక్కండి. విభజన: ఒక PDF చేర్చి పేజీ పరిధులు రాయండి (ప్రతి పరిధి ఒక ఫైల్ అవుతుంది) లేదా ప్రతి పేజీకి ఒక ఫైల్ ఎంచుకోండి. అంతా మీ బ్రౌజర్‌లోనే జరుగుతుంది, ఏ ఫైల్ అప్‌లోడ్ కాదు.",
+mr:"मर्ज: PDF जोडा, क्रम लावा आणि मर्ज दाबा. स्प्लिट: एक PDF जोडा, पृष्ठ श्रेणी लिहा (प्रत्येक श्रेणीची स्वतंत्र फाइल होईल) किंवा प्रत्येक पृष्ठाची एक फाइल निवडा. सर्व काही तुमच्या ब्राउझरमध्येच होते, कोणतीही फाइल अपलोड होत नाही.",
+ne:"मर्ज: PDF थप्नुहोस्, क्रम मिलाउनुहोस् र मर्ज थिच्नुहोस्। स्प्लिट: एउटा PDF थप्नुहोस्, पृष्ठ दायरा लेख्नुहोस् (प्रत्येक दायरा छुट्टै फाइल हुन्छ) वा प्रत्येक पृष्ठको एउटा फाइल छान्नुहोस्। सबै कुरा तपाईंको ब्राउजरमै हुन्छ, कुनै फाइल अपलोड हुँदैन।",
+si:"ඒකාබද්ධ: PDF එක් කර අනුපිළිවෙල සකසා ඒකාබද්ධ කරන්න ඔබන්න. බෙදන්න: එක් PDF එකක් එක් කර පිටු පරාස ලියන්න (එක් එක් පරාසය වෙනම ගොනුවක් වේ) හෝ පිටුවකට එක් ගොනුවක් තෝරන්න. සියල්ල ඔබේ බ්‍රවුසරයේම සිදු වේ, කිසිදු ගොනුවක් උඩුගත නොවේ.",
+sw:"Unganisha: ongeza PDF, panga mpangilio kisha bonyeza Unganisha. Gawanya: ongeza PDF moja, andika safu za kurasa (kila safu huwa faili) au chagua faili moja kwa kila ukurasa. Kila kitu hufanyika kwenye kivinjari chako, hakuna faili inayopakiwa.",
+he:"מיזוג: הוסיפו קובצי PDF, סדרו אותם ולחצו על מזג. פיצול: הוסיפו קובץ PDF אחד, הזינו טווחי עמודים (כל טווח יהפוך לקובץ) או בחרו קובץ לכל עמוד. הכול מתבצע בדפדפן שלכם ושום קובץ לא מועלה.",
+el:"Συγχώνευση: προσθέστε PDF, ορίστε τη σειρά και πατήστε Συγχώνευση. Διαχωρισμός: προσθέστε ένα PDF, γράψτε εύρη σελίδων (κάθε εύρος γίνεται αρχείο) ή επιλέξτε ένα αρχείο ανά σελίδα. Όλα γίνονται στον browser σας και κανένα αρχείο δεν ανεβαίνει.",
+sv:"Slå ihop: lägg till PDF-filer, ordna dem och tryck på Slå ihop. Dela: lägg till en PDF, ange sidintervall (varje intervall blir en fil) eller välj en fil per sida. Allt sker i din webbläsare och ingen fil laddas upp."};
+
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+let mode="m",items=[],res=[];
+const sizeTxt=b=>{const m=b>=1048576,v=m?b/1048576:b/1024;try{return new Intl.NumberFormat(ET.state.lang,{style:"unit",unit:m?"megabyte":"kilobyte",maximumFractionDigits:1}).format(v)}catch(e){return v.toFixed(1)+(m?" MB":" KB")}};
+const numTxt=n=>{try{return new Intl.NumberFormat(ET.state.lang).format(n)}catch(e){return String(n)}};
+/*CORE*/
+function parseRanges(s,n,lang){
+s=s.replace(/\p{Nd}/gu,c=>{const cp=c.codePointAt(0);let k=0;while(/\p{Nd}/u.test(String.fromCodePoint(cp-k-1)))k++;return String(k%10)}).replace(/[–—−‒－]/g,"-").replace(/[،;、，；]/g,",");
+const out=[];
+for(const part of s.split(",")){const t=part.trim();if(!t)continue;
+const m=t.match(/^(\d+)\s*(?:-\s*(\d+))?$/);if(!m)return null;
+const a=+m[1],b=m[2]?+m[2]:a;if(a<1||b<a||b>n)return null;out.push([a,b])}
+return out.length?out:null}
+async function mergeBufs(PL,bufs){const o=await PL.PDFDocument.create();
+for(const b of bufs){const s=await PL.PDFDocument.load(b);(await o.copyPages(s,s.getPageIndices())).forEach(p=>o.addPage(p))}
+return o.save()}
+async function splitBuf(PL,buf,ranges){const s=await PL.PDFDocument.load(buf),r=[];
+for(const [a,b] of ranges){const o=await PL.PDFDocument.create(),idx=[];for(let i=a-1;i<b;i++)idx.push(i);
+(await o.copyPages(s,idx)).forEach(p=>o.addPage(p));r.push(await o.save())}
+return r}
+/*ENDCORE*/
+const base=n=>n.replace(/\.[^.]+$/,"");
+function clearRes(){res.forEach(r=>URL.revokeObjectURL(r.url));res=[];renderRes()}
+async function addFiles(list){
+$("err").textContent="";clearRes();
+let L=[...list];if(mode==="s"){L=L.slice(0,1);items=[]}
+for(const f of L){
+try{if(!/pdf/i.test(f.type)&&!/\.pdf$/i.test(f.name))throw 0;
+const d=await PDFLib.PDFDocument.load(await f.arrayBuffer());items.push({f,pages:d.getPageCount()})}
+catch(e){$("err").textContent=f.name+": "+T(9)}}
+renderItems()}
+function renderItems(){
+const L=$("list");L.replaceChildren();
+items.forEach((it,i)=>{const d=document.createElement("div");d.className="item";
+const t=document.createElement("div");t.className="nm";t.textContent=it.f.name+" · "+T(7)+": "+numTxt(it.pages)+" · "+sizeTxt(it.f.size);d.appendChild(t);
+const mk=(s,fn,dis)=>{const b=document.createElement("button");b.type="button";b.textContent=s;b.disabled=!!dis;b.onclick=fn;d.appendChild(b)};
+if(mode==="m"){mk("↑",()=>{[items[i-1],items[i]]=[items[i],items[i-1]];renderItems()},i===0);mk("↓",()=>{[items[i+1],items[i]]=[items[i],items[i+1]];renderItems()},i===items.length-1)}
+mk("✕",()=>{items.splice(i,1);clearRes();renderItems()});
+L.appendChild(d)});
+$("sp").hidden=mode!=="s";$("one").hidden=mode!=="s";
+$("go").hidden=false;$("go").textContent=mode==="m"?T(1):T(2);
+$("go").disabled=mode==="m"?items.length<2:items.length<1;$("one").disabled=items.length<1;
+$("m1").setAttribute("aria-pressed",String(mode==="m"));$("m2").setAttribute("aria-pressed",String(mode==="s"));
+$("f").multiple=mode==="m"}
+function renderRes(){
+const L=$("res");L.replaceChildren();
+res.forEach(r=>{const d=document.createElement("div");d.className="item";
+const t=document.createElement("div");t.className="nm";t.textContent=r.name+" · "+T(7)+": "+numTxt(r.pages)+" · "+sizeTxt(r.size);
+const a=document.createElement("a");a.className="btn";a.href=r.url;a.download=r.name;a.textContent=T(6);
+d.appendChild(t);d.appendChild(a);L.appendChild(d)})}
+function addRes(name,bytes,pages){res.push({name,size:bytes.length,pages,url:URL.createObjectURL(new Blob([bytes],{type:"application/pdf"}))})}
+async function run(kind){
+$("err").textContent="";clearRes();$("busy").textContent="…";
+try{
+if(mode==="m"){
+const bytes=await mergeBufs(PDFLib,await Promise.all(items.map(i=>i.f.arrayBuffer())));
+const tot=items.reduce((s,i)=>s+i.pages,0);addRes("merged.pdf",bytes,tot);
+ET.logNow(T(1)+": "+items.map(i=>i.f.name).join(", ")+" → "+numTxt(tot)+" "+T(7))}
+else{
+const it=items[0];let rg;
+if(kind==="one")rg=Array.from({length:it.pages},(_,i)=>[i+1,i+1]);
+else{rg=parseRanges($("rg").value,it.pages,ET.state.lang);if(!rg){$("err").textContent=T(8);$("busy").textContent="";return}}
+const outs=await splitBuf(PDFLib,await it.f.arrayBuffer(),rg);
+outs.forEach((b,i)=>{const a=rg[i][0],z=rg[i][1];addRes(base(it.f.name)+"-"+(a===z?a:a+"-"+z)+".pdf",b,z-a+1)});
+ET.logNow(T(2)+": "+it.f.name+" → "+outs.length+" × PDF")}
+}catch(e){$("err").textContent=T(9)}
+$("busy").textContent="";renderRes()}
+function setMode(m){mode=m;if(m==="s"&&items.length>1)items=items.slice(0,1);clearRes();$("err").textContent="";renderItems()}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("m1").textContent=T(1);$("m2").textContent=T(2);$("pick").textContent=T(3);$("lr").textContent=T(4);$("one").textContent=T(5);
+renderItems();renderRes()}
+$("m1").onclick=()=>setMode("m");$("m2").onclick=()=>setMode("s");
+$("pick").onclick=()=>$("f").click();
+$("f").addEventListener("change",e=>{addFiles(e.target.files);e.target.value=""});
+const dz=$("drop");
+dz.addEventListener("dragover",e=>{e.preventDefault();dz.classList.add("on")});
+dz.addEventListener("dragleave",()=>dz.classList.remove("on"));
+dz.addEventListener("drop",e=>{e.preventDefault();dz.classList.remove("on");addFiles(e.dataTransfer.files)});
+$("go").onclick=()=>run("go");$("one").onclick=()=>run("one");
+ET.start({id:"pdf",file:"pdf.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(10),currency:false});
+</script>
+</body>
+</html>
