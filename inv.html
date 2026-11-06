@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Invoice Generator | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style id="pg">@page{size:A4;margin:12mm}</style>
+<style>
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media (max-width:520px){.g2{grid-template-columns:1fr}}
+textarea{width:100%;font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px 10px}
+h2.sh{font-size:1.15rem;margin:22px 0 4px}
+.entry{position:relative;border:1px solid var(--ln);border-radius:10px;padding:4px 10px 10px;margin:8px 0;background:var(--sf)}
+.entry label{margin:8px 0 2px}
+.rm{position:absolute;top:6px;inset-inline-end:6px;padding:2px 8px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.bar2 select{width:auto}
+.paper{background:#fff;color:#111;border:1px solid var(--ln);border-radius:4px;padding:28px;margin:18px auto;line-height:1.45;font-size:14px}
+.paper.a4{max-width:794px}.paper.lt{max-width:816px}
+.paper .hd{display:flex;justify-content:space-between;gap:18px;align-items:flex-start;border-bottom:2px solid #0f6b4f;padding-bottom:12px}
+.paper .ti{font-size:28px;margin:0;text-transform:uppercase;letter-spacing:.05em;color:#0f6b4f}
+.paper .mt{text-align:end;color:#444}
+.paper .ps{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0}
+.paper h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:#0f6b4f;margin:0 0 4px}
+.paper .pre{white-space:pre-line}
+.paper table{width:100%;border-collapse:collapse;margin-top:6px}
+.paper th{background:#eef4f1;text-align:start;font-size:12px;padding:6px 8px}
+.paper td{padding:6px 8px;border-bottom:1px solid #ddd}
+.paper .n{text-align:end;white-space:nowrap}
+.paper .tot{margin:14px 0 0 auto;max-width:300px}
+.paper .tl{display:flex;justify-content:space-between;gap:16px;padding:3px 0}
+.paper .gt{font-weight:700;font-size:17px;border-top:2px solid #111;margin-top:4px;padding-top:6px}
+.paper .nt{margin-top:22px}
+@media print{
+body{background:#fff}
+#et-top,#et-bottom,.form,h1{display:none!important}
+main{padding:0;max-width:none}
+.paper{border:0;border-radius:0;padding:0;margin:0;max-width:none;font-size:11pt}
+}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<div class="form">
+<h2 class="sh" id="hf"></h2>
+<label for="fn" id="l_fn"></label><input id="fn" autocomplete="organization">
+<label for="fa" id="l_fa"></label><textarea id="fa" rows="2"></textarea>
+<div class="g2"><div><label for="ft" id="l_ft"></label><input id="ft"></div><div><label for="fc" id="l_fc"></label><input id="fc"></div></div>
+<h2 class="sh" id="hb"></h2>
+<label for="bn" id="l_bn"></label><input id="bn">
+<label for="ba" id="l_ba"></label><textarea id="ba" rows="2"></textarea>
+<div class="g2"><div><label for="bt" id="l_bt"></label><input id="bt"></div><div><label for="bc" id="l_bc"></label><input id="bc"></div></div>
+<div class="g2" style="margin-top:14px"><div><label for="no" id="l_no"></label><input id="no"></div><div><label for="rate" id="l_rate"></label><input id="rate" inputmode="decimal"></div></div>
+<div class="g2"><div><label for="dt" id="l_dt"></label><input id="dt" type="date"></div><div><label for="du" id="l_du"></label><input id="du" type="date"></div></div>
+<h2 class="sh" id="hi"></h2><div id="itl"></div><button type="button" id="adi"></button>
+<label for="notes" id="l_notes"></label><textarea id="notes" rows="3"></textarea>
+<div class="bar2"><select id="pa"><option value="A4">A4</option><option value="Letter">Letter</option></select><button type="button" class="btn" id="pr"></button></div>
+</div>
+<div class="paper a4" id="cv"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"Invoice Generator|Invoice|From|Bill to|Name|Address|Tax ID|Contact|Invoice number|Date|Due date|Items|Description|Qty|Unit price|Amount|Add item|Tax|Tax rate (%)|Subtotal|Total|Notes and payment details|Print / Save as PDF|Check every figure before sending. The tax rate shown is only a default for some countries; confirm the correct rate and invoice rules with your tax authority.",
+bn:"ইনভয়েস জেনারেটর|ইনভয়েস|প্রেরক|বিলের প্রাপক|নাম|ঠিকানা|ট্যাক্স আইডি|যোগাযোগ|ইনভয়েস নম্বর|তারিখ|পরিশোধের শেষ তারিখ|পণ্য/সেবা|বিবরণ|পরিমাণ|একক দাম|মোট দাম|আইটেম যোগ করুন|ট্যাক্স|ট্যাক্সের হার (%)|উপমোট|সর্বমোট|নোট ও পেমেন্টের তথ্য|প্রিন্ট / PDF হিসেবে সেভ|পাঠানোর আগে প্রতিটি অঙ্ক যাচাই করুন। দেখানো ট্যাক্সের হার কিছু দেশের জন্য শুধু ডিফল্ট; সঠিক হার ও ইনভয়েসের নিয়ম আপনার কর কর্তৃপক্ষের কাছ থেকে নিশ্চিত করুন।",
+hi:"इनवॉइस जनरेटर|इनवॉइस|प्रेषक|बिल प्राप्तकर्ता|नाम|पता|टैक्स आईडी|संपर्क|इनवॉइस नंबर|तारीख|देय तिथि|आइटम|विवरण|मात्रा|इकाई मूल्य|राशि|आइटम जोड़ें|कर|कर दर (%)|उप-योग|कुल|नोट्स और भुगतान विवरण|प्रिंट / PDF सहेजें|भेजने से पहले हर आँकड़ा जाँचें। दिखाई गई कर दर कुछ देशों के लिए केवल डिफ़ॉल्ट है; सही दर और इनवॉइस के नियम अपने कर प्राधिकरण से पक्का करें।",
+ur:"انوائس جنریٹر|انوائس|بھیجنے والا|بل وصول کنندہ|نام|پتہ|ٹیکس آئی ڈی|رابطہ|انوائس نمبر|تاریخ|آخری تاریخ ادائیگی|اشیاء|تفصیل|مقدار|فی یونٹ قیمت|رقم|آئٹم شامل کریں|ٹیکس|ٹیکس کی شرح (%)|ذیلی میزان|کل|نوٹس اور ادائیگی کی تفصیلات|پرنٹ / PDF محفوظ کریں|بھیجنے سے پہلے ہر رقم جانچ لیں۔ دکھائی گئی ٹیکس شرح کچھ ممالک کے لیے صرف ڈیفالٹ ہے؛ درست شرح اور انوائس کے قواعد اپنی ٹیکس اتھارٹی سے تصدیق کریں۔",
+ar:"منشئ الفواتير|فاتورة|من|فاتورة إلى|الاسم|العنوان|الرقم الضريبي|جهة الاتصال|رقم الفاتورة|التاريخ|تاريخ الاستحقاق|البنود|الوصف|الكمية|سعر الوحدة|المبلغ|إضافة بند|الضريبة|نسبة الضريبة (%)|المجموع الفرعي|الإجمالي|ملاحظات وبيانات الدفع|طباعة / حفظ بصيغة PDF|راجع كل رقم قبل الإرسال. نسبة الضريبة المعروضة افتراضية فقط لبعض الدول؛ تأكد من النسبة الصحيحة وقواعد الفواتير لدى هيئة الضرائب.",
+fa:"ساخت فاکتور|فاکتور|فرستنده|صورتحساب برای|نام|نشانی|شناسه مالیاتی|تماس|شماره فاکتور|تاریخ|سررسید|اقلام|شرح|تعداد|قیمت واحد|مبلغ|افزودن قلم|مالیات|نرخ مالیات (٪)|جمع جزء|جمع کل|یادداشت‌ها و اطلاعات پرداخت|چاپ / ذخیره به‌صورت PDF|پیش از ارسال همه ارقام را بررسی کنید. نرخ مالیات نمایش‌داده‌شده برای برخی کشورها فقط پیش‌فرض است؛ نرخ درست و قوانین فاکتور را از سازمان مالیاتی تأیید کنید.",
+tr:"Fatura Oluşturucu|Fatura|Gönderen|Fatura edilen|Ad|Adres|Vergi no|İletişim|Fatura numarası|Tarih|Vade tarihi|Kalemler|Açıklama|Adet|Birim fiyat|Tutar|Kalem ekle|Vergi|Vergi oranı (%)|Ara toplam|Toplam|Notlar ve ödeme bilgileri|Yazdır / PDF olarak kaydet|Göndermeden önce tüm rakamları kontrol edin. Gösterilen vergi oranı bazı ülkeler için yalnızca varsayılandır; doğru oranı ve fatura kurallarını vergi idarenizden doğrulayın.",
+zh:"发票生成器|发票|开票方|收票方|名称|地址|税号|联系方式|发票编号|日期|到期日|项目|说明|数量|单价|金额|添加项目|税|税率（%）|小计|合计|备注与付款信息|打印 / 另存为 PDF|发送前请核对每个数字。所示税率仅为部分国家的默认值，请向税务机关确认正确的税率和发票规定。",
+ja:"請求書作成|請求書|請求元|請求先|名称|住所|税番号|連絡先|請求書番号|日付|支払期限|明細|内容|数量|単価|金額|明細を追加|税|税率（%）|小計|合計|備考・支払情報|印刷 / PDFで保存|送付前にすべての数字を確認してください。表示される税率は一部の国の初期値にすぎません。正しい税率と請求書のルールは税務当局で確認してください。",
+ko:"청구서 생성기|청구서|발행인|청구 대상|이름|주소|세금 ID|연락처|청구서 번호|날짜|지급 기한|항목|설명|수량|단가|금액|항목 추가|세금|세율(%)|소계|합계|메모 및 결제 정보|인쇄 / PDF로 저장|보내기 전에 모든 금액을 확인하세요. 표시된 세율은 일부 국가의 기본값일 뿐이므로 올바른 세율과 청구서 규정은 세무 당국에 확인하세요.",
+ru:"Генератор счетов|Счёт|От|Плательщик|Название|Адрес|Налоговый номер|Контакты|Номер счёта|Дата|Срок оплаты|Позиции|Описание|Кол-во|Цена за единицу|Сумма|Добавить позицию|Налог|Ставка налога (%)|Промежуточный итог|Итого|Примечания и платёжные реквизиты|Печать / сохранить как PDF|Проверьте все цифры перед отправкой. Показанная ставка налога — лишь значение по умолчанию для некоторых стран; уточните верную ставку и правила оформления счетов в налоговой службе.",
+es:"Generador de facturas|Factura|De|Facturar a|Nombre|Dirección|Identificación fiscal|Contacto|Número de factura|Fecha|Fecha de vencimiento|Conceptos|Descripción|Cant.|Precio unitario|Importe|Añadir concepto|Impuesto|Tipo de impuesto (%)|Subtotal|Total|Notas y datos de pago|Imprimir / Guardar como PDF|Revisa todas las cifras antes de enviar. El tipo de impuesto mostrado es solo un valor predeterminado para algunos países; confirma el tipo correcto y las normas de facturación con tu autoridad fiscal.",
+fr:"Générateur de factures|Facture|De|Facturer à|Nom|Adresse|Numéro fiscal|Contact|Numéro de facture|Date|Date d’échéance|Lignes|Description|Qté|Prix unitaire|Montant|Ajouter une ligne|Taxe|Taux de taxe (%)|Sous-total|Total|Notes et informations de paiement|Imprimer / Enregistrer en PDF|Vérifiez chaque chiffre avant l’envoi. Le taux de taxe affiché n’est qu’une valeur par défaut pour certains pays ; confirmez le taux exact et les règles de facturation auprès de votre administration fiscale.",
+de:"Rechnungsgenerator|Rechnung|Von|Rechnung an|Name|Adresse|Steuernummer|Kontakt|Rechnungsnummer|Datum|Fälligkeitsdatum|Positionen|Beschreibung|Menge|Einzelpreis|Betrag|Position hinzufügen|Steuer|Steuersatz (%)|Zwischensumme|Gesamt|Hinweise und Zahlungsinformationen|Drucken / Als PDF speichern|Prüfen Sie vor dem Versand jede Zahl. Der angezeigte Steuersatz ist nur für einige Länder ein Standardwert; klären Sie den richtigen Satz und die Rechnungsregeln mit Ihrer Steuerbehörde.",
+pt:"Gerador de faturas|Fatura|De|Faturar para|Nome|Endereço|Identificação fiscal|Contato|Número da fatura|Data|Data de vencimento|Itens|Descrição|Qtd.|Preço unitário|Valor|Adicionar item|Imposto|Taxa de imposto (%)|Subtotal|Total|Observações e dados de pagamento|Imprimir / Salvar como PDF|Confira todos os valores antes de enviar. A taxa de imposto exibida é apenas um padrão para alguns países; confirme a taxa correta e as regras de faturamento com a autoridade fiscal.",
+it:"Generatore di fatture|Fattura|Da|Fatturare a|Nome|Indirizzo|Codice fiscale / P. IVA|Contatto|Numero fattura|Data|Data di scadenza|Voci|Descrizione|Qtà|Prezzo unitario|Importo|Aggiungi voce|Imposta|Aliquota (%)|Subtotale|Totale|Note e dati di pagamento|Stampa / Salva come PDF|Controlla ogni cifra prima dell’invio. L’aliquota mostrata è solo un valore predefinito per alcuni paesi; conferma l’aliquota corretta e le regole di fatturazione con l’autorità fiscale.",
+nl:"Factuurgenerator|Factuur|Van|Factuur aan|Naam|Adres|Btw-/belastingnummer|Contact|Factuurnummer|Datum|Vervaldatum|Regels|Omschrijving|Aantal|Prijs per stuk|Bedrag|Regel toevoegen|Belasting|Belastingtarief (%)|Subtotaal|Totaal|Opmerkingen en betaalgegevens|Afdrukken / Opslaan als pdf|Controleer alle bedragen voor verzending. Het getoonde tarief is voor sommige landen slechts een standaardwaarde; bevestig het juiste tarief en de factuurregels bij uw belastingdienst.",
+pl:"Generator faktur|Faktura|Sprzedawca|Nabywca|Nazwa|Adres|Numer podatkowy|Kontakt|Numer faktury|Data|Termin płatności|Pozycje|Opis|Ilość|Cena jednostkowa|Kwota|Dodaj pozycję|Podatek|Stawka podatku (%)|Suma częściowa|Razem|Uwagi i dane do płatności|Drukuj / Zapisz jako PDF|Sprawdź wszystkie kwoty przed wysłaniem. Pokazana stawka podatku to tylko wartość domyślna dla niektórych krajów; potwierdź właściwą stawkę i zasady fakturowania w urzędzie skarbowym.",
+uk:"Генератор рахунків|Рахунок|Від|Платник|Назва|Адреса|Податковий номер|Контакти|Номер рахунку|Дата|Термін оплати|Позиції|Опис|Кількість|Ціна за одиницю|Сума|Додати позицію|Податок|Ставка податку (%)|Проміжний підсумок|Разом|Примітки та платіжні реквізити|Друк / зберегти як PDF|Перевірте всі цифри перед надсиланням. Показана ставка податку — лише значення за замовчуванням для деяких країн; уточніть правильну ставку та правила оформлення рахунків у податковій службі.",
+id:"Pembuat Faktur|Faktur|Dari|Tagihkan ke|Nama|Alamat|ID pajak|Kontak|Nomor faktur|Tanggal|Jatuh tempo|Item|Deskripsi|Jml|Harga satuan|Jumlah|Tambah item|Pajak|Tarif pajak (%)|Subtotal|Total|Catatan dan detail pembayaran|Cetak / Simpan sebagai PDF|Periksa semua angka sebelum mengirim. Tarif pajak yang ditampilkan hanya default untuk beberapa negara; konfirmasikan tarif yang benar dan aturan faktur dengan otoritas pajak.",
+ms:"Penjana Invois|Invois|Daripada|Bil kepada|Nama|Alamat|ID cukai|Hubungan|Nombor invois|Tarikh|Tarikh matang|Item|Perihalan|Kuantiti|Harga seunit|Jumlah|Tambah item|Cukai|Kadar cukai (%)|Jumlah kecil|Jumlah|Nota dan butiran pembayaran|Cetak / Simpan sebagai PDF|Semak semua angka sebelum menghantar. Kadar cukai yang dipaparkan hanya lalai bagi sesetengah negara; sahkan kadar yang betul dan peraturan invois dengan pihak berkuasa cukai.",
+th:"ตัวสร้างใบแจ้งหนี้|ใบแจ้งหนี้|จาก|เรียกเก็บจาก|ชื่อ|ที่อยู่|เลขประจำตัวผู้เสียภาษี|ติดต่อ|เลขที่ใบแจ้งหนี้|วันที่|วันครบกำหนด|รายการ|รายละเอียด|จำนวน|ราคาต่อหน่วย|จำนวนเงิน|เพิ่มรายการ|ภาษี|อัตราภาษี (%)|ยอดรวมย่อย|ยอดรวม|หมายเหตุและรายละเอียดการชำระเงิน|พิมพ์ / บันทึกเป็น PDF|ตรวจสอบตัวเลขทุกจุดก่อนส่ง อัตราภาษีที่แสดงเป็นค่าเริ่มต้นสำหรับบางประเทศเท่านั้น โปรดยืนยันอัตราที่ถูกต้องและกฎของใบแจ้งหนี้กับหน่วยงานสรรพากร",
+vi:"Trình tạo hóa đơn|Hóa đơn|Từ|Xuất hóa đơn cho|Tên|Địa chỉ|Mã số thuế|Liên hệ|Số hóa đơn|Ngày|Hạn thanh toán|Hạng mục|Mô tả|SL|Đơn giá|Thành tiền|Thêm hạng mục|Thuế|Thuế suất (%)|Tạm tính|Tổng cộng|Ghi chú và thông tin thanh toán|In / Lưu thành PDF|Hãy kiểm tra mọi con số trước khi gửi. Thuế suất hiển thị chỉ là mặc định cho một số quốc gia; hãy xác nhận thuế suất đúng và quy định hóa đơn với cơ quan thuế.",
+ta:"விலைப்பட்டியல் உருவாக்கி|விலைப்பட்டியல்|அனுப்புநர்|கட்டண பெறுநர்|பெயர்|முகவரி|வரி அடையாளம்|தொடர்பு|விலைப்பட்டியல் எண்|தேதி|செலுத்த வேண்டிய தேதி|பொருட்கள்|விவரம்|அளவு|அலகு விலை|தொகை|உருப்படி சேர்|வரி|வரி விகிதம் (%)|துணை மொத்தம்|மொத்தம்|குறிப்புகள் மற்றும் கட்டண விவரங்கள்|அச்சிடு / PDF ஆகச் சேமி|அனுப்பும் முன் ஒவ்வொரு எண்ணையும் சரிபார்க்கவும். காட்டப்படும் வரி விகிதம் சில நாடுகளுக்கான இயல்புநிலை மட்டுமே; சரியான விகிதத்தையும் விலைப்பட்டியல் விதிகளையும் வரி அதிகாரியிடம் உறுதிசெய்யவும்.",
+te:"ఇన్వాయిస్ జనరేటర్|ఇన్వాయిస్|పంపినవారు|బిల్ గ్రహీత|పేరు|చిరునామా|పన్ను ID|సంప్రదింపు|ఇన్వాయిస్ నంబర్|తేదీ|చెల్లింపు గడువు|అంశాలు|వివరణ|పరిమాణం|యూనిట్ ధర|మొత్తం|అంశం జోడించు|పన్ను|పన్ను రేటు (%)|ఉప మొత్తం|మొత్తం|గమనికలు మరియు చెల్లింపు వివరాలు|ప్రింట్ / PDFగా సేవ్ చేయి|పంపే ముందు ప్రతి సంఖ్యను సరిచూడండి. చూపిన పన్ను రేటు కొన్ని దేశాలకు డిఫాల్ట్ మాత్రమే; సరైన రేటు, ఇన్వాయిస్ నియమాలను పన్ను అధికారుల వద్ద నిర్ధారించుకోండి.",
+mr:"इनव्हॉइस जनरेटर|इनव्हॉइस|प्रेषक|बिल प्राप्तकर्ता|नाव|पत्ता|कर ओळख क्रमांक|संपर्क|इनव्हॉइस क्रमांक|तारीख|देय तारीख|बाबी|वर्णन|प्रमाण|एकक किंमत|रक्कम|बाब जोडा|कर|कर दर (%)|उप-बेरीज|एकूण|टिपा आणि पेमेंट तपशील|प्रिंट / PDF म्हणून सेव्ह करा|पाठवण्यापूर्वी प्रत्येक आकडा तपासा. दाखवलेला कर दर काही देशांसाठी फक्त डीफॉल्ट आहे; योग्य दर आणि इनव्हॉइसचे नियम कर प्राधिकरणाकडून खात्री करा.",
+ne:"इनभ्वाइस जेनेरेटर|इनभ्वाइस|पठाउने|बिल प्राप्तकर्ता|नाम|ठेगाना|कर आईडी|सम्पर्क|इनभ्वाइस नम्बर|मिति|भुक्तानी मिति|वस्तुहरू|विवरण|परिमाण|एकाइ मूल्य|रकम|वस्तु थप्नुहोस्|कर|कर दर (%)|उप-जम्मा|जम्मा|टिप्पणी र भुक्तानी विवरण|प्रिन्ट / PDF सेभ गर्नुहोस्|पठाउनु अघि हरेक अङ्क जाँच्नुहोस्। देखाइएको कर दर केही देशका लागि मात्र पूर्वनिर्धारित हो; सही दर र इनभ्वाइसका नियम कर निकायसँग पुष्टि गर्नुहोस्।",
+si:"ඉන්වොයිස් උත්පාදකය|ඉන්වොයිසය|යවන්නා|බිල්පත් ලබන්නා|නම|ලිපිනය|බදු හැඳුනුම|සම්බන්ධතා|ඉන්වොයිස් අංකය|දිනය|නියමිත දිනය|අයිතම|විස්තරය|ප්‍රමාණය|ඒකක මිල|මුදල|අයිතමයක් එක් කරන්න|බදු|බදු අනුපාතය (%)|උප එකතුව|මුළු එකතුව|සටහන් සහ ගෙවීම් තොරතුරු|මුද්‍රණය / PDF ලෙස සුරකින්න|යැවීමට පෙර සියලු අගයන් පරීක්ෂා කරන්න. පෙන්වන බදු අනුපාතය සමහර රටවල් සඳහා පෙරනිමියක් පමණි; නිවැරදි අනුපාතය සහ ඉන්වොයිස් නීති බදු අධිකාරියෙන් තහවුරු කරගන්න.",
+sw:"Kitengeneza Ankara|Ankara|Kutoka|Mlipishwa|Jina|Anwani|Kitambulisho cha kodi|Mawasiliano|Namba ya ankara|Tarehe|Tarehe ya mwisho wa malipo|Vipengee|Maelezo|Idadi|Bei ya kitengo|Kiasi|Ongeza kipengee|Kodi|Kiwango cha kodi (%)|Jumla ndogo|Jumla|Maelezo na taarifa za malipo|Chapisha / Hifadhi kama PDF|Hakiki kila namba kabla ya kutuma. Kiwango cha kodi kilichoonyeshwa ni chaguo-msingi tu kwa baadhi ya nchi; thibitisha kiwango sahihi na kanuni za ankara na mamlaka ya kodi.",
+he:"מחולל חשבוניות|חשבונית|מאת|לכבוד|שם|כתובת|מספר מס|איש קשר|מספר חשבונית|תאריך|תאריך פירעון|פריטים|תיאור|כמות|מחיר ליחידה|סכום|הוסף פריט|מס|שיעור מס (%)|סכום ביניים|סה״כ|הערות ופרטי תשלום|הדפסה / שמירה כ-PDF|בדקו כל מספר לפני השליחה. שיעור המס המוצג הוא ברירת מחדל בלבד עבור חלק מהמדינות; אשרו את השיעור הנכון ואת כללי החשבוניות מול רשות המסים.",
+el:"Δημιουργός τιμολογίων|Τιμολόγιο|Από|Χρέωση σε|Όνομα|Διεύθυνση|ΑΦΜ / φορολογικό ID|Επικοινωνία|Αριθμός τιμολογίου|Ημερομηνία|Ημερομηνία λήξης|Είδη|Περιγραφή|Ποσ.|Τιμή μονάδας|Ποσό|Προσθήκη είδους|Φόρος|Συντελεστής φόρου (%)|Μερικό σύνολο|Σύνολο|Σημειώσεις και στοιχεία πληρωμής|Εκτύπωση / Αποθήκευση ως PDF|Ελέγξτε κάθε ποσό πριν την αποστολή. Ο συντελεστής που εμφανίζεται είναι μόνο προεπιλογή για ορισμένες χώρες· επιβεβαιώστε τον σωστό συντελεστή και τους κανόνες τιμολόγησης με τη φορολογική αρχή.",
+sv:"Fakturagenerator|Faktura|Från|Faktureras till|Namn|Adress|Skatte-ID|Kontakt|Fakturanummer|Datum|Förfallodatum|Poster|Beskrivning|Antal|Á-pris|Belopp|Lägg till post|Skatt|Skattesats (%)|Delsumma|Totalt|Anteckningar och betalningsinformation|Skriv ut / Spara som PDF|Kontrollera alla belopp innan du skickar. Den visade skattesatsen är bara ett standardvärde för vissa länder; bekräfta rätt sats och fakturareglerna hos skattemyndigheten."};
+const S2={
+en:"Fill in your details and add items, and the invoice appears below. Currency, tax name and paper size follow the selected country, and you can change them. Press Print and choose “Save as PDF”. Your data stays in your browser and is erased when you leave this page.",
+bn:"আপনার তথ্য লিখে আইটেম যোগ করুন, নিচে ইনভয়েস দেখা যাবে। মুদ্রা, ট্যাক্সের নাম ও কাগজের মাপ নির্বাচিত দেশ অনুযায়ী বসে, আপনি বদলাতে পারবেন। প্রিন্ট চেপে “Save as PDF” বেছে নিন। আপনার তথ্য ব্রাউজারেই থাকে এবং এই পেজ ছাড়লে মুছে যায়।",
+hi:"अपनी जानकारी भरें और आइटम जोड़ें, इनवॉइस नीचे दिखेगा। मुद्रा, कर का नाम और कागज़ का आकार चुने हुए देश के अनुसार होते हैं, आप बदल सकते हैं। प्रिंट दबाकर “Save as PDF” चुनें। आपका डेटा ब्राउज़र में रहता है और इस पेज को छोड़ने पर मिट जाता है।",
+ur:"اپنی تفصیلات بھریں اور آئٹم شامل کریں، انوائس نیچے نظر آئے گی۔ کرنسی، ٹیکس کا نام اور کاغذ کا سائز منتخب ملک کے مطابق ہوتے ہیں، آپ بدل سکتے ہیں۔ پرنٹ دبا کر “Save as PDF” چنیں۔ آپ کا ڈیٹا براؤزر میں رہتا ہے اور اس صفحے سے نکلنے پر مٹ جاتا ہے۔",
+ar:"املأ بياناتك وأضف البنود لتظهر الفاتورة أدناه. تتبع العملة واسم الضريبة وحجم الورق الدولة المختارة ويمكنك تغييرها. اضغط طباعة واختر “Save as PDF”. تبقى بياناتك في متصفحك وتُمسح عند مغادرة هذه الصفحة.",
+fa:"اطلاعات خود را وارد و اقلام را اضافه کنید تا فاکتور در پایین نمایش داده شود. واحد پول، نام مالیات و اندازه کاغذ طبق کشور انتخاب‌شده تنظیم می‌شود و می‌توانید تغییرشان دهید. چاپ را بزنید و «Save as PDF» را انتخاب کنید. داده‌های شما در مرورگرتان می‌ماند و با ترک این صفحه پاک می‌شود.",
+tr:"Bilgilerinizi girin ve kalem ekleyin, fatura aşağıda görünür. Para birimi, vergi adı ve kâğıt boyutu seçilen ülkeye göre ayarlanır, değiştirebilirsiniz. Yazdır’a basıp “Save as PDF” seçin. Verileriniz tarayıcınızda kalır ve bu sayfadan çıkınca silinir.",
+zh:"填写您的信息并添加项目，发票会显示在下方。货币、税种名称和纸张大小按所选国家设置，您可以更改。点击打印并选择“Save as PDF”。数据保留在浏览器中，离开此页面后即被清除。",
+ja:"情報を入力して明細を追加すると、下に請求書が表示されます。通貨・税の名称・用紙サイズは選択した国に合わせて設定され、変更できます。印刷を押して「Save as PDF」を選びます。データはブラウザ内に保存され、このページを離れると消去されます。",
+ko:"정보를 입력하고 항목을 추가하면 아래에 청구서가 나타납니다. 통화, 세금 이름, 용지 크기는 선택한 국가에 맞춰 설정되며 변경할 수 있습니다. 인쇄를 눌러 “Save as PDF”를 선택하세요. 데이터는 브라우저에만 있고 이 페이지를 떠나면 삭제됩니다.",
+ru:"Заполните данные и добавьте позиции, счёт появится ниже. Валюта, название налога и размер бумаги зависят от выбранной страны, их можно изменить. Нажмите «Печать» и выберите «Сохранить как PDF». Данные остаются в вашем браузере и удаляются при выходе со страницы.",
+es:"Rellena tus datos y añade conceptos, la factura aparece abajo. La moneda, el nombre del impuesto y el tamaño del papel siguen el país elegido y puedes cambiarlos. Pulsa Imprimir y elige «Guardar como PDF». Tus datos permanecen en tu navegador y se borran al salir de esta página.",
+fr:"Renseignez vos informations et ajoutez des lignes, la facture apparaît ci-dessous. La devise, le nom de la taxe et le format de papier suivent le pays choisi, et vous pouvez les modifier. Appuyez sur Imprimer puis choisissez « Enregistrer au format PDF ». Vos données restent dans votre navigateur et sont effacées quand vous quittez cette page.",
+de:"Tragen Sie Ihre Daten ein und fügen Sie Positionen hinzu, dann erscheint die Rechnung unten. Währung, Steuerbezeichnung und Papierformat folgen dem gewählten Land, Sie können sie ändern. Klicken Sie auf Drucken und wählen Sie „Als PDF speichern“. Ihre Daten bleiben im Browser und werden beim Verlassen der Seite gelöscht.",
+pt:"Preencha seus dados e adicione itens, a fatura aparece abaixo. Moeda, nome do imposto e tamanho do papel seguem o país escolhido e você pode alterá-los. Toque em Imprimir e escolha “Salvar como PDF”. Seus dados ficam no navegador e são apagados ao sair desta página.",
+it:"Inserisci i tuoi dati e aggiungi le voci, la fattura appare qui sotto. Valuta, nome dell’imposta e formato della carta seguono il paese scelto e puoi modificarli. Premi Stampa e scegli «Salva come PDF». I tuoi dati restano nel browser e vengono cancellati quando lasci la pagina.",
+nl:"Vul uw gegevens in en voeg regels toe, de factuur verschijnt hieronder. Valuta, belastingnaam en papierformaat volgen het gekozen land en u kunt ze wijzigen. Klik op Afdrukken en kies “Opslaan als pdf”. Uw gegevens blijven in uw browser en worden gewist als u deze pagina verlaat.",
+pl:"Uzupełnij dane i dodaj pozycje, a faktura pojawi się poniżej. Waluta, nazwa podatku i format papieru zależą od wybranego kraju i możesz je zmienić. Naciśnij Drukuj i wybierz „Zapisz jako PDF”. Dane pozostają w przeglądarce i są usuwane po opuszczeniu strony.",
+uk:"Заповніть дані й додайте позиції, рахунок з’явиться нижче. Валюта, назва податку та розмір паперу залежать від обраної країни, їх можна змінити. Натисніть «Друк» і виберіть «Зберегти як PDF». Дані залишаються у вашому браузері й видаляються після виходу зі сторінки.",
+id:"Isi data Anda dan tambahkan item, faktur muncul di bawah. Mata uang, nama pajak, dan ukuran kertas mengikuti negara yang dipilih dan dapat Anda ubah. Tekan Cetak dan pilih “Simpan sebagai PDF”. Data Anda tetap di browser dan dihapus saat Anda meninggalkan halaman ini.",
+ms:"Isi butiran anda dan tambah item, invois muncul di bawah. Mata wang, nama cukai dan saiz kertas mengikut negara yang dipilih dan anda boleh mengubahnya. Tekan Cetak dan pilih “Save as PDF”. Data anda kekal dalam pelayar dan dipadam apabila anda meninggalkan halaman ini.",
+th:"กรอกข้อมูลและเพิ่มรายการ ใบแจ้งหนี้จะแสดงด้านล่าง สกุลเงิน ชื่อภาษี และขนาดกระดาษเป็นไปตามประเทศที่เลือก และคุณเปลี่ยนได้ กดพิมพ์แล้วเลือก “Save as PDF” ข้อมูลอยู่ในเบราว์เซอร์และจะถูกลบเมื่อออกจากหน้านี้",
+vi:"Điền thông tin và thêm hạng mục, hóa đơn hiện bên dưới. Tiền tệ, tên thuế và khổ giấy theo quốc gia đã chọn, bạn có thể thay đổi. Nhấn In rồi chọn “Save as PDF”. Dữ liệu ở lại trong trình duyệt và bị xóa khi bạn rời trang này.",
+ta:"உங்கள் விவரங்களை நிரப்பி உருப்படிகளைச் சேர்த்தால் விலைப்பட்டியல் கீழே தோன்றும். நாணயம், வரிப் பெயர், தாள் அளவு தேர்ந்த நாட்டைப் பின்பற்றும், நீங்கள் மாற்றலாம். அச்சிடு அழுத்தி “Save as PDF” தேர்வு செய்யவும். உங்கள் தரவு உலாவியிலேயே இருக்கும், இந்தப் பக்கத்தை விட்டுச் சென்றால் அழிக்கப்படும்.",
+te:"మీ వివరాలు నింపి అంశాలు జోడించండి, ఇన్వాయిస్ కింద కనిపిస్తుంది. కరెన్సీ, పన్ను పేరు, కాగితం పరిమాణం ఎంచుకున్న దేశాన్ని అనుసరిస్తాయి, మీరు మార్చవచ్చు. ప్రింట్ నొక్కి “Save as PDF” ఎంచుకోండి. మీ డేటా బ్రౌజర్‌లోనే ఉంటుంది, ఈ పేజీని వదిలితే తొలగించబడుతుంది.",
+mr:"तुमची माहिती भरा आणि बाबी जोडा, इनव्हॉइस खाली दिसेल. चलन, कराचे नाव आणि कागदाचा आकार निवडलेल्या देशानुसार ठरतात, तुम्ही बदलू शकता. प्रिंट दाबून “Save as PDF” निवडा. तुमचा डेटा ब्राउझरमध्येच राहतो आणि हे पान सोडल्यावर पुसला जातो.",
+ne:"आफ्ना विवरण भर्नुहोस् र वस्तु थप्नुहोस्, इनभ्वाइस तल देखिन्छ। मुद्रा, करको नाम र कागजको आकार छानिएको देश अनुसार हुन्छन्, तपाईं बदल्न सक्नुहुन्छ। प्रिन्ट थिचेर “Save as PDF” रोज्नुहोस्। तपाईंको डेटा ब्राउजरमै रहन्छ र यो पेज छोडेपछि मेटिन्छ।",
+si:"ඔබේ තොරතුරු පුරවා අයිතම එක් කරන්න, ඉන්වොයිසය පහළ පෙනේ. මුදල්, බදු නම සහ කඩදාසි ප්‍රමාණය තෝරාගත් රට අනුව සැකසේ, ඔබට වෙනස් කළ හැක. මුද්‍රණය ඔබා “Save as PDF” තෝරන්න. ඔබේ දත්ත බ්‍රවුසරයේම පවතී, මෙම පිටුවෙන් ඉවත් වූ විට මැකේ.",
+sw:"Jaza taarifa zako na uongeze vipengee, ankara itaonekana hapa chini. Sarafu, jina la kodi na ukubwa wa karatasi hufuata nchi uliyochagua, na unaweza kuvibadilisha. Bonyeza Chapisha na uchague “Save as PDF”. Data yako hubaki kwenye kivinjari na hufutwa unapoondoka kwenye ukurasa huu.",
+he:"מלאו את הפרטים והוסיפו פריטים, והחשבונית תופיע למטה. המטבע, שם המס וגודל הנייר נקבעים לפי המדינה שנבחרה, ואפשר לשנות אותם. לחצו על הדפסה ובחרו “Save as PDF”. הנתונים נשארים בדפדפן ונמחקים כשעוזבים את הדף.",
+el:"Συμπληρώστε τα στοιχεία σας και προσθέστε είδη, το τιμολόγιο εμφανίζεται παρακάτω. Το νόμισμα, η ονομασία του φόρου και το μέγεθος χαρτιού ακολουθούν τη χώρα που επιλέξατε και μπορείτε να τα αλλάξετε. Πατήστε Εκτύπωση και επιλέξτε «Save as PDF». Τα δεδομένα μένουν στον browser και διαγράφονται όταν φύγετε από τη σελίδα.",
+sv:"Fyll i dina uppgifter och lägg till poster, så visas fakturan nedan. Valuta, skattenamn och pappersstorlek följer det valda landet och du kan ändra dem. Tryck på Skriv ut och välj ”Spara som PDF”. Dina uppgifter stannar i webbläsaren och raderas när du lämnar sidan."};
+
+const $=id=>document.getElementById(id),T=k=>ET.t(k),KEY="et_inv";
+const pad=n=>String(n).padStart(2,"0"),now=new Date(),today=now.getFullYear()+"-"+pad(now.getMonth()+1)+"-"+pad(now.getDate());
+let D={fn:"",fa:"",ft:"",fc:"",bn:"",ba:"",bt:"",bc:"",no:"INV-0001",dt:today,du:"",rate:"",notes:"",items:[{}],paper:"A4",ov:{}};
+try{const s=JSON.parse(sessionStorage.getItem(KEY)||"null");if(s)D=Object.assign(D,s)}catch(e){}
+const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+/* tax name, tax-ID abbreviation, default standard rate (only where confirmed; otherwise blank). General guidance, not tax advice. */
+const TX={BD:["VAT","BIN",15],IN:["GST","GSTIN"],PK:["GST","NTN"],NP:["VAT","PAN"],LK:["VAT","TIN"],US:["Sales tax","EIN"],CA:["GST/HST","GST/HST",5],GB:["VAT","VAT",20],IE:["VAT","VAT",23],AU:["GST","ABN",10],DE:["USt","USt-IdNr."],AT:["USt","UID",20],CH:["MWST","UID",8.1],FR:["TVA","TVA"],ES:["IVA","NIF"],IT:["IVA","P.IVA"],NL:["BTW","BTW"],PL:["VAT","NIP",23],SE:["moms","VAT",25],GR:["ΦΠΑ","ΑΦΜ",24],TR:["KDV","VKN"],RU:["НДС","ИНН"],SA:["VAT","VAT"],AE:["VAT","TRN",5],ID:["PPN","NPWP"],ZA:["VAT","VAT"],MX:["IVA","RFC"],BR:["","CNPJ"],KE:["VAT","PIN",16],NG:["VAT","TIN"],SG:["GST","GST"]};
+const LETTER=["US","CA","MX"];
+function preset(){const r=TX[ET.state.country];
+if(!D.ov.rate)D.rate=r&&r[2]!==undefined?String(r[2]):"";
+if(!D.ov.paper)D.paper=LETTER.includes(ET.state.country)?"Letter":"A4"}
+const taxName=()=>{const r=TX[ET.state.country];return r&&r[0]?r[0]:T(17)};
+const idLbl=()=>{const r=TX[ET.state.country];return T(6)+(r&&r[1]?" ("+r[1]+")":"")};
+const num=v=>parseFloat(String(v||"").replace(",","."))||0;
+const digits=()=>{try{return new Intl.NumberFormat("en",{style:"currency",currency:ET.state.cur}).resolvedOptions().maximumFractionDigits}catch(e){return 2}};
+const nf=(n,d)=>{try{return new Intl.NumberFormat(ET.state.lang,{maximumFractionDigits:d}).format(n)}catch(e){return String(n)}};
+const dateTxt=v=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(v||"");if(!m)return v||"";try{return new Intl.DateTimeFormat(ET.state.lang,{dateStyle:"medium"}).format(new Date(+m[1],+m[2]-1,+m[3]))}catch(e){return v}};
+/*CALC*/
+function calc(){
+const f=Math.pow(10,digits());let sub=0;
+const rows=D.items.filter(o=>o.d||o.q||o.p).map(o=>{const q=num(o.q),pm=Math.round(num(o.p)*f),am=Math.round(q*pm);sub+=am;return{d:o.d||"",q,pm,am}});
+const r=num(D.rate),tax=Math.round(sub*r/100);
+return{rows,sub,tax,tot:sub+tax,f,r}}
+/*ENDCALC*/
+const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined&&txt!==null)e.textContent=txt;e.setAttribute("dir","auto");return e};
+function party(title,n,a,t,c){
+const d=el("div","pt");d.appendChild(el("h3","",title));
+if(n)d.appendChild(el("strong","",n));if(a)d.appendChild(el("div","pre",a));if(c)d.appendChild(el("div","",c));if(t)d.appendChild(el("div","",idLbl()+": "+t));return d}
+function drawDoc(){
+const c=$("cv"),k=calc(),m=x=>ET.money(x/k.f);c.replaceChildren();
+const hd=el("div","hd"),l=el("div","");l.appendChild(el("h2","ti",T(1)));hd.appendChild(l);
+const r=el("div","mt");[D.no&&T(8)+": "+D.no,D.dt&&T(9)+": "+dateTxt(D.dt),D.du&&T(10)+": "+dateTxt(D.du)].filter(Boolean).forEach(x=>r.appendChild(el("div","",x)));hd.appendChild(r);c.appendChild(hd);
+const ps=el("div","ps");ps.appendChild(party(T(2),D.fn,D.fa,D.ft,D.fc));ps.appendChild(party(T(3),D.bn,D.ba,D.bt,D.bc));c.appendChild(ps);
+const tb=document.createElement("table"),row=(cells,h)=>{const tr=document.createElement("tr");cells.forEach((x,i)=>{const td=document.createElement(h?"th":"td");td.textContent=x;td.setAttribute("dir","auto");if(i>0)td.className="n";tr.appendChild(td)});tb.appendChild(tr)};
+row([T(12),T(13),T(14),T(15)],1);
+k.rows.forEach(o=>row([o.d,nf(o.q,4),m(o.pm),m(o.am)]));c.appendChild(tb);
+const tt=el("div","tot"),line=(a,b,cls)=>{const d=el("div","tl"+(cls?" "+cls:""));d.appendChild(el("span","",a));d.appendChild(el("span","",b));tt.appendChild(d)};
+line(T(19),m(k.sub));if(k.r)line(taxName()+" ("+nf(k.r,2)+"%)",m(k.tax));line(T(20),m(k.tot),"gt");c.appendChild(tt);
+if(D.notes.trim()){const n=el("div","nt");n.appendChild(el("h3","",T(21)));n.appendChild(el("div","pre",D.notes));c.appendChild(n)}}
+function fld(lbl,val,fn,cls){
+const w=document.createElement("label"),s=document.createElement("span"),i=document.createElement("input");
+s.textContent=lbl;i.value=val||"";if(cls==="n")i.setAttribute("inputmode","decimal");
+i.addEventListener("input",()=>{fn(i.value);save();drawDoc()});w.appendChild(s);w.appendChild(i);return w}
+function entries(){
+const box=$("itl");box.replaceChildren();
+D.items.forEach((o,i)=>{const d=document.createElement("div");d.className="entry";
+d.appendChild(fld(T(12),o.d,v=>{o.d=v}));
+const g=document.createElement("div");g.className="g2";g.appendChild(fld(T(13),o.q,v=>{o.q=v},"n"));g.appendChild(fld(T(14),o.p,v=>{o.p=v},"n"));d.appendChild(g);
+const x=document.createElement("button");x.type="button";x.className="rm";x.textContent="✕";
+x.onclick=()=>{D.items.splice(i,1);if(!D.items.length)D.items.push({});save();entries();drawDoc()};
+d.appendChild(x);box.appendChild(d)})}
+const IDS=["fn","fa","ft","fc","bn","ba","bt","bc","no","dt","du","rate","notes"],LB={fn:4,fa:5,fc:7,bn:4,ba:5,bc:7,no:8,dt:9,du:10,rate:18,notes:21};
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+Object.keys(LB).forEach(k=>{$("l_"+k).textContent=T(LB[k])});
+$("l_ft").textContent=idLbl();$("l_bt").textContent=idLbl();$("hf").textContent=T(2);$("hb").textContent=T(3);$("hi").textContent=T(11);
+$("adi").textContent="+ "+T(16);$("pr").textContent=T(22);
+preset();$("rate").value=D.rate;$("pa").value=D.paper;
+$("pg").textContent="@page{size:"+(D.paper==="Letter"?"letter":"A4")+";margin:12mm}";
+$("cv").className="paper "+(D.paper==="Letter"?"lt":"a4");entries();drawDoc()}
+IDS.forEach(k=>{const i=$(k);i.value=D[k]||"";i.addEventListener("input",()=>{D[k]=i.value;if(k==="rate")D.ov.rate=1;save();drawDoc()})});
+$("pa").onchange=e=>{D.paper=e.target.value;D.ov.paper=1;save();$("pg").textContent="@page{size:"+(D.paper==="Letter"?"letter":"A4")+";margin:12mm}";$("cv").className="paper "+(D.paper==="Letter"?"lt":"a4")};
+$("adi").onclick=()=>{D.items.push({});save();entries()};
+$("pr").onclick=()=>{const k=calc();ET.logNow(T(1)+" "+(D.no||"")+": "+ET.money(k.tot/k.f));window.print()};
+ET.start({id:"inv",file:"inv.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(23)});
+</script>
+</body>
+</html>

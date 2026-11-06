@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CV Builder | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style id="pg">@page{size:A4;margin:12mm}</style>
+<style>
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}
+@media (max-width:520px){.g2{grid-template-columns:1fr}}
+textarea{width:100%;font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px 10px}
+.chk{display:flex;gap:8px;align-items:center;font-weight:600}
+.chk input{width:auto}
+h2.sh{font-size:1.15rem;margin:22px 0 4px}
+.entry{position:relative;border:1px solid var(--ln);border-radius:10px;padding:4px 10px 10px;margin:8px 0;background:var(--sf)}
+.entry label{margin:8px 0 2px}
+.rm{position:absolute;top:6px;inset-inline-end:6px;padding:2px 8px}
+.bar2{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:18px 0}
+.bar2 select{width:auto}
+.paper{background:#fff;color:#111;border:1px solid var(--ln);border-radius:4px;padding:28px;margin:18px auto;line-height:1.45;font-size:14px}
+.paper.a4{max-width:794px}.paper.lt{max-width:816px}
+.paper .hd{display:flex;gap:18px;align-items:center;border-bottom:2px solid #0f6b4f;padding-bottom:12px}
+.paper .ph{width:96px;height:120px;object-fit:cover;border-radius:4px}
+.paper .nm{font-size:26px;margin:0;line-height:1.2}
+.paper .jb{font-size:16px;color:#0f6b4f;font-weight:600}
+.paper .mt{color:#444;font-size:13px}
+.paper h3{font-size:14px;text-transform:uppercase;letter-spacing:.06em;color:#0f6b4f;border-bottom:1px solid #ccc;margin:16px 0 6px;padding-bottom:2px}
+.paper .rw{display:flex;justify-content:space-between;gap:12px}
+.paper .dt{color:#555;white-space:nowrap}
+.paper .tx{margin:2px 0 8px;white-space:pre-line}
+.paper .en{margin-bottom:6px}
+@media print{
+body{background:#fff}
+#et-top,#et-bottom,.form,h1{display:none!important}
+main{padding:0;max-width:none}
+.paper{border:0;border-radius:0;padding:0;margin:0;max-width:none;font-size:12pt}
+}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<div class="form">
+<div class="g2"><div><label for="fn" id="l_fn"></label><input id="fn" autocomplete="name"></div><div><label for="jt" id="l_jt"></label><input id="jt"></div></div>
+<div class="g2"><div><label for="em" id="l_em"></label><input id="em" type="email" autocomplete="email"></div><div><label for="ph" id="l_ph"></label><input id="ph" type="tel" autocomplete="tel"></div></div>
+<label for="ad" id="l_ad"></label><input id="ad" autocomplete="street-address">
+<label class="chk" style="margin-top:14px"><input type="checkbox" id="pp"><span id="lpp"></span></label>
+<input type="file" id="pf" accept="image/*" hidden>
+<label class="chk" style="margin-top:14px"><input type="checkbox" id="pd"><span id="lpd"></span></label>
+<div id="pw" hidden><div class="g2"><div><label for="dob" id="l_dob"></label><input id="dob" type="date"></div><div><label for="nat" id="l_nat"></label><input id="nat"></div></div>
+<label for="mar" id="l_mar"></label><input id="mar"></div>
+<label for="su" id="l_su"></label><textarea id="su" rows="3"></textarea>
+<h2 class="sh" id="h12"></h2><div id="exl"></div><button type="button" id="adx"></button>
+<h2 class="sh" id="h13"></h2><div id="edl"></div><button type="button" id="ade"></button>
+<label for="sk" id="l_sk"></label><input id="sk">
+<label for="la" id="l_la"></label><input id="la">
+<div class="bar2"><select id="pa"><option value="A4">A4</option><option value="Letter">Letter</option></select><button type="button" class="btn" id="pr"></button></div>
+</div>
+<div class="paper a4" id="cv"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"CV Builder|Full name|Job title|Email|Phone|Address|Personal details|Date of birth|Nationality|Marital status|Photo|Summary|Experience|Education|Skills (separated by commas)|Languages (separated by commas)|Add|Employer|School|Degree|From|To|Print / Save as PDF|Check every detail, then choose Print and “Save as PDF”. CV customs differ by country and employer, so adjust the photo and personal details if needed.",
+bn:"সিভি বিল্ডার|পুরো নাম|পদবি|ইমেইল|ফোন|ঠিকানা|ব্যক্তিগত তথ্য|জন্ম তারিখ|জাতীয়তা|বৈবাহিক অবস্থা|ছবি|সারসংক্ষেপ|অভিজ্ঞতা|শিক্ষা|দক্ষতা (কমা দিয়ে আলাদা করুন)|ভাষা (কমা দিয়ে আলাদা করুন)|যোগ করুন|নিয়োগকর্তা|প্রতিষ্ঠান|ডিগ্রি|শুরু|শেষ|প্রিন্ট / PDF হিসেবে সেভ|প্রতিটি তথ্য যাচাই করুন, তারপর প্রিন্ট বেছে “Save as PDF” দিন। সিভির নিয়ম দেশ ও নিয়োগকর্তাভেদে আলাদা, তাই দরকারে ছবি ও ব্যক্তিগত তথ্য বদলে নিন।",
+hi:"सीवी बिल्डर|पूरा नाम|पद|ईमेल|फ़ोन|पता|व्यक्तिगत जानकारी|जन्म तिथि|राष्ट्रीयता|वैवाहिक स्थिति|फ़ोटो|सारांश|अनुभव|शिक्षा|कौशल (कॉमा से अलग करें)|भाषाएँ (कॉमा से अलग करें)|जोड़ें|नियोक्ता|संस्थान|डिग्री|से|तक|प्रिंट / PDF सहेजें|हर जानकारी जाँचें, फिर प्रिंट चुनकर “Save as PDF” चुनें। सीवी के नियम देश और नियोक्ता के अनुसार अलग होते हैं, इसलिए ज़रूरत हो तो फ़ोटो और व्यक्तिगत जानकारी बदलें।",
+ur:"سی وی بلڈر|پورا نام|عہدہ|ای میل|فون|پتہ|ذاتی تفصیلات|تاریخ پیدائش|قومیت|ازدواجی حیثیت|تصویر|خلاصہ|تجربہ|تعلیم|مہارتیں (کوما سے الگ کریں)|زبانیں (کوما سے الگ کریں)|شامل کریں|آجر|ادارہ|ڈگری|از|تک|پرنٹ / PDF محفوظ کریں|ہر تفصیل جانچ لیں، پھر پرنٹ چن کر “Save as PDF” منتخب کریں۔ سی وی کے اصول ملک اور آجر کے لحاظ سے مختلف ہوتے ہیں، اس لیے ضرورت ہو تو تصویر اور ذاتی تفصیلات بدل لیں۔",
+ar:"منشئ السيرة الذاتية|الاسم الكامل|المسمى الوظيفي|البريد الإلكتروني|الهاتف|العنوان|البيانات الشخصية|تاريخ الميلاد|الجنسية|الحالة الاجتماعية|صورة|نبذة|الخبرة|التعليم|المهارات (افصل بفواصل)|اللغات (افصل بفواصل)|إضافة|جهة العمل|المؤسسة التعليمية|الدرجة العلمية|من|إلى|طباعة / حفظ بصيغة PDF|راجع كل التفاصيل ثم اختر طباعة و“Save as PDF”. تختلف أعراف السيرة الذاتية بحسب الدولة وجهة العمل، فعدّل الصورة والبيانات الشخصية عند الحاجة.",
+fa:"ساخت رزومه|نام کامل|عنوان شغلی|ایمیل|تلفن|نشانی|اطلاعات شخصی|تاریخ تولد|ملیت|وضعیت تأهل|عکس|خلاصه|سوابق کاری|تحصیلات|مهارت‌ها (با ویرگول جدا کنید)|زبان‌ها (با ویرگول جدا کنید)|افزودن|کارفرما|مؤسسه|مدرک|از|تا|چاپ / ذخیره به‌صورت PDF|همه جزئیات را بررسی کنید، سپس چاپ و «Save as PDF» را انتخاب کنید. رسم رزومه در هر کشور و نزد هر کارفرما فرق دارد؛ در صورت نیاز عکس و اطلاعات شخصی را تغییر دهید.",
+tr:"Özgeçmiş Oluşturucu|Ad soyad|Unvan|E-posta|Telefon|Adres|Kişisel bilgiler|Doğum tarihi|Uyruk|Medeni durum|Fotoğraf|Özet|Deneyim|Eğitim|Beceriler (virgülle ayırın)|Diller (virgülle ayırın)|Ekle|İşveren|Okul|Derece|Başlangıç|Bitiş|Yazdır / PDF olarak kaydet|Tüm bilgileri kontrol edin, sonra Yazdır’ı seçip “Save as PDF” deyin. Özgeçmiş gelenekleri ülkeye ve işverene göre değişir; gerekirse fotoğrafı ve kişisel bilgileri ayarlayın.",
+zh:"简历生成器|姓名|职位|电子邮件|电话|地址|个人信息|出生日期|国籍|婚姻状况|照片|个人简介|工作经历|教育背景|技能（用逗号分隔）|语言（用逗号分隔）|添加|雇主|学校|学位|开始|结束|打印 / 另存为 PDF|请核对所有信息，然后选择打印并“Save as PDF”。各国和各雇主对简历的惯例不同，必要时请调整照片和个人信息。",
+ja:"履歴書ビルダー|氏名|職種|メール|電話|住所|個人情報|生年月日|国籍|婚姻状況|写真|自己PR|職歴|学歴|スキル（カンマ区切り）|言語（カンマ区切り）|追加|勤務先|学校|学位|開始|終了|印刷 / PDFで保存|内容をすべて確認し、印刷から「Save as PDF」を選んでください。履歴書の慣習は国や企業で異なるため、必要に応じて写真や個人情報を調整してください。",
+ko:"이력서 작성기|이름|직함|이메일|전화번호|주소|개인 정보|생년월일|국적|결혼 여부|사진|요약|경력|학력|기술(쉼표로 구분)|언어(쉼표로 구분)|추가|회사|학교|학위|시작|종료|인쇄 / PDF로 저장|모든 내용을 확인한 뒤 인쇄를 선택하고 “Save as PDF”를 고르세요. 이력서 관행은 국가와 회사마다 다르므로 필요하면 사진과 개인 정보를 조정하세요.",
+ru:"Конструктор резюме|Полное имя|Должность|Эл. почта|Телефон|Адрес|Личные данные|Дата рождения|Гражданство|Семейное положение|Фото|О себе|Опыт работы|Образование|Навыки (через запятую)|Языки (через запятую)|Добавить|Работодатель|Учебное заведение|Степень|С|По|Печать / сохранить как PDF|Проверьте все данные, затем выберите «Печать» и «Сохранить как PDF». Традиции оформления резюме зависят от страны и работодателя, при необходимости измените фото и личные данные.",
+es:"Creador de CV|Nombre completo|Puesto|Correo electrónico|Teléfono|Dirección|Datos personales|Fecha de nacimiento|Nacionalidad|Estado civil|Foto|Resumen|Experiencia|Formación|Habilidades (separadas por comas)|Idiomas (separados por comas)|Añadir|Empresa|Centro de estudios|Titulación|Desde|Hasta|Imprimir / Guardar como PDF|Revisa todos los datos y elige Imprimir y «Guardar como PDF». Las costumbres del CV varían según el país y la empresa; ajusta la foto y los datos personales si hace falta.",
+fr:"Créateur de CV|Nom complet|Intitulé du poste|E-mail|Téléphone|Adresse|Informations personnelles|Date de naissance|Nationalité|Situation familiale|Photo|Résumé|Expérience|Formation|Compétences (séparées par des virgules)|Langues (séparées par des virgules)|Ajouter|Employeur|Établissement|Diplôme|Du|Au|Imprimer / Enregistrer en PDF|Vérifiez chaque détail, puis choisissez Imprimer et « Enregistrer au format PDF ». Les usages du CV varient selon le pays et l’employeur ; ajustez la photo et les informations personnelles si besoin.",
+de:"Lebenslauf-Ersteller|Vollständiger Name|Berufsbezeichnung|E-Mail|Telefon|Adresse|Persönliche Angaben|Geburtsdatum|Staatsangehörigkeit|Familienstand|Foto|Profil|Berufserfahrung|Ausbildung|Kenntnisse (durch Kommas getrennt)|Sprachen (durch Kommas getrennt)|Hinzufügen|Arbeitgeber|Schule|Abschluss|Von|Bis|Drucken / Als PDF speichern|Prüfen Sie alle Angaben, wählen Sie dann Drucken und „Als PDF speichern“. Die Gepflogenheiten für Lebensläufe unterscheiden sich je nach Land und Arbeitgeber; passen Sie Foto und persönliche Angaben bei Bedarf an.",
+pt:"Criador de currículo|Nome completo|Cargo|E-mail|Telefone|Endereço|Dados pessoais|Data de nascimento|Nacionalidade|Estado civil|Foto|Resumo|Experiência|Formação|Habilidades (separadas por vírgulas)|Idiomas (separados por vírgulas)|Adicionar|Empregador|Instituição|Grau|De|Até|Imprimir / Salvar como PDF|Confira todos os dados e escolha Imprimir e “Salvar como PDF”. Os costumes de currículo variam conforme o país e o empregador; ajuste a foto e os dados pessoais se necessário.",
+it:"Creatore di CV|Nome completo|Posizione|E-mail|Telefono|Indirizzo|Dati personali|Data di nascita|Nazionalità|Stato civile|Foto|Profilo|Esperienza|Istruzione|Competenze (separate da virgole)|Lingue (separate da virgole)|Aggiungi|Datore di lavoro|Istituto|Titolo di studio|Da|A|Stampa / Salva come PDF|Controlla ogni dato, poi scegli Stampa e «Salva come PDF». Le consuetudini del CV cambiano in base al paese e al datore di lavoro; modifica foto e dati personali se serve.",
+nl:"CV-maker|Volledige naam|Functie|E-mail|Telefoon|Adres|Persoonlijke gegevens|Geboortedatum|Nationaliteit|Burgerlijke staat|Foto|Samenvatting|Werkervaring|Opleiding|Vaardigheden (gescheiden door komma’s)|Talen (gescheiden door komma’s)|Toevoegen|Werkgever|School|Diploma|Van|Tot|Afdrukken / Opslaan als pdf|Controleer alle gegevens en kies Afdrukken en “Opslaan als pdf”. Cv-gebruiken verschillen per land en werkgever; pas foto en persoonlijke gegevens zo nodig aan.",
+pl:"Kreator CV|Imię i nazwisko|Stanowisko|E-mail|Telefon|Adres|Dane osobowe|Data urodzenia|Narodowość|Stan cywilny|Zdjęcie|Podsumowanie|Doświadczenie|Wykształcenie|Umiejętności (oddzielone przecinkami)|Języki (oddzielone przecinkami)|Dodaj|Pracodawca|Szkoła|Stopień|Od|Do|Drukuj / Zapisz jako PDF|Sprawdź wszystkie dane, potem wybierz Drukuj i „Zapisz jako PDF”. Zwyczaje dotyczące CV różnią się w zależności od kraju i pracodawcy; w razie potrzeby zmień zdjęcie i dane osobowe.",
+uk:"Конструктор резюме|Повне ім’я|Посада|Ел. пошта|Телефон|Адреса|Особисті дані|Дата народження|Громадянство|Сімейний стан|Фото|Про себе|Досвід роботи|Освіта|Навички (через кому)|Мови (через кому)|Додати|Роботодавець|Навчальний заклад|Ступінь|З|По|Друк / зберегти як PDF|Перевірте всі дані, потім виберіть «Друк» і «Зберегти як PDF». Звичаї щодо резюме залежать від країни та роботодавця, за потреби змініть фото й особисті дані.",
+id:"Pembuat CV|Nama lengkap|Jabatan|Email|Telepon|Alamat|Data pribadi|Tanggal lahir|Kewarganegaraan|Status pernikahan|Foto|Ringkasan|Pengalaman|Pendidikan|Keahlian (pisahkan dengan koma)|Bahasa (pisahkan dengan koma)|Tambah|Perusahaan|Sekolah|Gelar|Dari|Sampai|Cetak / Simpan sebagai PDF|Periksa semua data, lalu pilih Cetak dan “Simpan sebagai PDF”. Kebiasaan CV berbeda di tiap negara dan perusahaan; ubah foto dan data pribadi jika perlu.",
+ms:"Pembina CV|Nama penuh|Jawatan|E-mel|Telefon|Alamat|Maklumat peribadi|Tarikh lahir|Kewarganegaraan|Status perkahwinan|Gambar|Ringkasan|Pengalaman|Pendidikan|Kemahiran (asingkan dengan koma)|Bahasa (asingkan dengan koma)|Tambah|Majikan|Sekolah|Ijazah|Dari|Hingga|Cetak / Simpan sebagai PDF|Semak semua butiran, kemudian pilih Cetak dan “Save as PDF”. Adat resume berbeza mengikut negara dan majikan; laraskan gambar dan maklumat peribadi jika perlu.",
+th:"ตัวสร้างเรซูเม่|ชื่อ-นามสกุล|ตำแหน่งงาน|อีเมล|โทรศัพท์|ที่อยู่|ข้อมูลส่วนตัว|วันเกิด|สัญชาติ|สถานภาพสมรส|รูปถ่าย|สรุปประวัติ|ประสบการณ์|การศึกษา|ทักษะ (คั่นด้วยจุลภาค)|ภาษา (คั่นด้วยจุลภาค)|เพิ่ม|นายจ้าง|สถานศึกษา|วุฒิการศึกษา|ตั้งแต่|ถึง|พิมพ์ / บันทึกเป็น PDF|ตรวจสอบทุกรายละเอียด แล้วเลือกพิมพ์และ “Save as PDF” ธรรมเนียมเรซูเม่ต่างกันตามประเทศและนายจ้าง ปรับรูปถ่ายและข้อมูลส่วนตัวได้ตามต้องการ",
+vi:"Trình tạo CV|Họ và tên|Chức danh|Email|Điện thoại|Địa chỉ|Thông tin cá nhân|Ngày sinh|Quốc tịch|Tình trạng hôn nhân|Ảnh|Tóm tắt|Kinh nghiệm|Học vấn|Kỹ năng (ngăn cách bằng dấu phẩy)|Ngôn ngữ (ngăn cách bằng dấu phẩy)|Thêm|Nhà tuyển dụng|Trường|Bằng cấp|Từ|Đến|In / Lưu thành PDF|Hãy kiểm tra mọi thông tin, rồi chọn In và “Save as PDF”. Thông lệ viết CV khác nhau theo quốc gia và nhà tuyển dụng; hãy điều chỉnh ảnh và thông tin cá nhân nếu cần.",
+ta:"சுயவிவர உருவாக்கி|முழுப் பெயர்|பதவி|மின்னஞ்சல்|தொலைபேசி|முகவரி|தனிப்பட்ட விவரங்கள்|பிறந்த தேதி|குடியுரிமை|திருமண நிலை|புகைப்படம்|சுருக்கம்|அனுபவம்|கல்வி|திறன்கள் (காற்புள்ளியால் பிரிக்கவும்)|மொழிகள் (காற்புள்ளியால் பிரிக்கவும்)|சேர்|நிறுவனம்|பள்ளி|பட்டம்|முதல்|வரை|அச்சிடு / PDF ஆகச் சேமி|அனைத்து விவரங்களையும் சரிபார்த்து, அச்சிடு என்பதைத் தேர்ந்து “Save as PDF” தேர்வு செய்யவும். சுயவிவர வழக்கங்கள் நாடு மற்றும் நிறுவனத்தைப் பொறுத்து மாறும்; தேவைப்பட்டால் புகைப்படம், தனிப்பட்ட விவரங்களை மாற்றவும்.",
+te:"రెజ్యూమె బిల్డర్|పూర్తి పేరు|ఉద్యోగ పేరు|ఇమెయిల్|ఫోన్|చిరునామా|వ్యక్తిగత వివరాలు|పుట్టిన తేదీ|జాతీయత|వైవాహిక స్థితి|ఫోటో|సారాంశం|అనుభవం|విద్య|నైపుణ్యాలు (కామాలతో వేరు చేయండి)|భాషలు (కామాలతో వేరు చేయండి)|జోడించు|యజమాని|పాఠశాల|డిగ్రీ|నుండి|వరకు|ప్రింట్ / PDFగా సేవ్ చేయి|అన్ని వివరాలు సరిచూసి, ప్రింట్ ఎంచుకుని “Save as PDF” ఎంచుకోండి. రెజ్యూమె ఆచారాలు దేశం, యజమానిని బట్టి మారతాయి; అవసరమైతే ఫోటో, వ్యక్తిగత వివరాలు మార్చండి.",
+mr:"सीव्ही बिल्डर|पूर्ण नाव|पदनाम|ईमेल|फोन|पत्ता|वैयक्तिक माहिती|जन्मतारीख|राष्ट्रीयत्व|वैवाहिक स्थिती|फोटो|सारांश|अनुभव|शिक्षण|कौशल्ये (स्वल्पविरामाने वेगळी करा)|भाषा (स्वल्पविरामाने वेगळ्या करा)|जोडा|नियोक्ता|शाळा|पदवी|पासून|पर्यंत|प्रिंट / PDF म्हणून सेव्ह करा|सर्व माहिती तपासा, मग प्रिंट निवडून “Save as PDF” निवडा. सीव्हीच्या रूढी देश आणि नियोक्त्यानुसार वेगळ्या असतात; गरज असल्यास फोटो आणि वैयक्तिक माहिती बदला.",
+ne:"सीभी बिल्डर|पूरा नाम|पद|इमेल|फोन|ठेगाना|व्यक्तिगत विवरण|जन्म मिति|राष्ट्रियता|वैवाहिक स्थिति|फोटो|सारांश|अनुभव|शिक्षा|सीप (अल्पविरामले छुट्याउनुहोस्)|भाषा (अल्पविरामले छुट्याउनुहोस्)|थप्नुहोस्|रोजगारदाता|विद्यालय|उपाधि|देखि|सम्म|प्रिन्ट / PDF सेभ गर्नुहोस्|सबै विवरण जाँच्नुहोस्, त्यसपछि प्रिन्ट छानेर “Save as PDF” रोज्नुहोस्। सीभीका चलन देश र रोजगारदाता अनुसार फरक हुन्छन्; आवश्यक परे फोटो र व्यक्तिगत विवरण बदल्नुहोस्।",
+si:"චරිතාපදාන ගොනු තනන්නා|සම්පූර්ණ නම|රැකියා තනතුර|විද්‍යුත් තැපෑල|දුරකථනය|ලිපිනය|පුද්ගලික තොරතුරු|උපන් දිනය|ජාතිකත්වය|විවාහක තත්ත්වය|ඡායාරූපය|සාරාංශය|පළපුරුද්ද|අධ්‍යාපනය|කුසලතා (කොමාවෙන් වෙන් කරන්න)|භාෂා (කොමාවෙන් වෙන් කරන්න)|එක් කරන්න|සේවායෝජකයා|පාසල|උපාධිය|සිට|දක්වා|මුද්‍රණය / PDF ලෙස සුරකින්න|සියලු තොරතුරු පරීක්ෂා කර, මුද්‍රණය තෝරා “Save as PDF” තෝරන්න. චරිතාපදාන සම්ප්‍රදාය රට සහ සේවායෝජකයා අනුව වෙනස් වේ; අවශ්‍ය නම් ඡායාරූපය සහ පුද්ගලික තොරතුරු වෙනස් කරන්න.",
+sw:"Kitengeneza CV|Jina kamili|Cheo|Barua pepe|Simu|Anwani|Taarifa binafsi|Tarehe ya kuzaliwa|Uraia|Hali ya ndoa|Picha|Muhtasari|Uzoefu|Elimu|Ujuzi (tenganisha kwa koma)|Lugha (tenganisha kwa koma)|Ongeza|Mwajiri|Shule|Shahada|Kuanzia|Hadi|Chapisha / Hifadhi kama PDF|Hakiki kila taarifa, kisha chagua Chapisha na “Save as PDF”. Desturi za CV hutofautiana kwa nchi na mwajiri; rekebisha picha na taarifa binafsi ikihitajika.",
+he:"בונה קורות חיים|שם מלא|תפקיד|אימייל|טלפון|כתובת|פרטים אישיים|תאריך לידה|אזרחות|מצב משפחתי|תמונה|תקציר|ניסיון|השכלה|כישורים (מופרדים בפסיקים)|שפות (מופרדות בפסיקים)|הוסף|מעסיק|מוסד לימוד|תואר|מ־|עד|הדפסה / שמירה כ-PDF|בדקו כל פרט, ואז בחרו הדפסה ו-“Save as PDF”. מנהגי קורות החיים שונים בין מדינות ומעסיקים; התאימו את התמונה והפרטים האישיים לפי הצורך.",
+el:"Δημιουργός βιογραφικού|Ονοματεπώνυμο|Θέση εργασίας|Email|Τηλέφωνο|Διεύθυνση|Προσωπικά στοιχεία|Ημερομηνία γέννησης|Εθνικότητα|Οικογενειακή κατάσταση|Φωτογραφία|Περίληψη|Επαγγελματική εμπειρία|Εκπαίδευση|Δεξιότητες (χωρισμένες με κόμμα)|Γλώσσες (χωρισμένες με κόμμα)|Προσθήκη|Εργοδότης|Σχολή|Πτυχίο|Από|Έως|Εκτύπωση / Αποθήκευση ως PDF|Ελέγξτε κάθε στοιχείο και επιλέξτε Εκτύπωση και «Save as PDF». Οι συνήθειες για τα βιογραφικά διαφέρουν ανά χώρα και εργοδότη· προσαρμόστε τη φωτογραφία και τα προσωπικά στοιχεία αν χρειάζεται.",
+sv:"CV-byggare|Fullständigt namn|Titel|E-post|Telefon|Adress|Personuppgifter|Födelsedatum|Nationalitet|Civilstånd|Foto|Sammanfattning|Erfarenhet|Utbildning|Färdigheter (separerade med kommatecken)|Språk (separerade med kommatecken)|Lägg till|Arbetsgivare|Skola|Examen|Från|Till|Skriv ut / Spara som PDF|Kontrollera alla uppgifter och välj Skriv ut och ”Spara som PDF”. CV-seder skiljer sig mellan länder och arbetsgivare; justera foto och personuppgifter vid behov."};
+const S2={
+en:"Fill in the form and your CV appears below. Photo and personal details follow the usual customs of the selected country, and you can change them. Your data stays in your browser and is erased when you leave this page.",
+bn:"ফর্ম পূরণ করলে নিচে আপনার সিভি দেখা যাবে। ছবি ও ব্যক্তিগত তথ্য নির্বাচিত দেশের প্রচলিত রীতি অনুযায়ী বসে, আপনি বদলাতে পারবেন। আপনার তথ্য ব্রাউজারেই থাকে এবং এই পেজ ছাড়লে মুছে যায়।",
+hi:"फ़ॉर्म भरें, आपका सीवी नीचे दिखेगा। फ़ोटो और व्यक्तिगत जानकारी चुने हुए देश की सामान्य रीति के अनुसार होती है, आप इन्हें बदल सकते हैं। आपका डेटा ब्राउज़र में रहता है और इस पेज को छोड़ने पर मिट जाता है।",
+ur:"فارم بھریں، آپ کا سی وی نیچے نظر آئے گا۔ تصویر اور ذاتی تفصیلات منتخب ملک کے عام رواج کے مطابق ہوتی ہیں، آپ انہیں بدل سکتے ہیں۔ آپ کا ڈیٹا براؤزر میں رہتا ہے اور اس صفحے سے نکلنے پر مٹ جاتا ہے۔",
+ar:"املأ النموذج لتظهر سيرتك الذاتية أدناه. الصورة والبيانات الشخصية تتبع الأعراف المعتادة للدولة المختارة ويمكنك تغييرها. تبقى بياناتك في متصفحك وتُمسح عند مغادرة هذه الصفحة.",
+fa:"فرم را پر کنید تا رزومه‌تان در پایین نمایش داده شود. عکس و اطلاعات شخصی طبق رسم رایج کشور انتخاب‌شده تنظیم می‌شود و می‌توانید تغییرشان دهید. داده‌های شما در مرورگرتان می‌ماند و با ترک این صفحه پاک می‌شود.",
+tr:"Formu doldurun, özgeçmişiniz aşağıda görünür. Fotoğraf ve kişisel bilgiler seçilen ülkenin yaygın geleneklerine göre ayarlanır, değiştirebilirsiniz. Verileriniz tarayıcınızda kalır ve bu sayfadan çıkınca silinir.",
+zh:"填写表单，简历会显示在下方。照片和个人信息按所选国家的常见惯例设置，您可以更改。数据保留在浏览器中，离开此页面后即被清除。",
+ja:"フォームに入力すると、下に履歴書が表示されます。写真と個人情報は選択した国の一般的な慣習に合わせて設定され、変更できます。データはブラウザ内に保存され、このページを離れると消去されます。",
+ko:"양식을 채우면 아래에 이력서가 나타납니다. 사진과 개인 정보는 선택한 국가의 일반적인 관행에 맞춰 설정되며 변경할 수 있습니다. 데이터는 브라우저에만 있고 이 페이지를 떠나면 삭제됩니다.",
+ru:"Заполните форму, и резюме появится ниже. Фото и личные данные настроены по обычаям выбранной страны, их можно изменить. Данные остаются в вашем браузере и удаляются при выходе со страницы.",
+es:"Rellena el formulario y tu CV aparecerá abajo. La foto y los datos personales siguen las costumbres habituales del país elegido y puedes cambiarlos. Tus datos permanecen en tu navegador y se borran al salir de esta página.",
+fr:"Remplissez le formulaire et votre CV apparaît ci-dessous. La photo et les informations personnelles suivent les usages courants du pays choisi, et vous pouvez les modifier. Vos données restent dans votre navigateur et sont effacées quand vous quittez cette page.",
+de:"Füllen Sie das Formular aus, dann erscheint Ihr Lebenslauf unten. Foto und persönliche Angaben folgen den üblichen Gepflogenheiten des gewählten Landes, Sie können sie ändern. Ihre Daten bleiben im Browser und werden beim Verlassen der Seite gelöscht.",
+pt:"Preencha o formulário e seu currículo aparece abaixo. A foto e os dados pessoais seguem os costumes habituais do país escolhido e você pode alterá-los. Seus dados ficam no navegador e são apagados ao sair desta página.",
+it:"Compila il modulo e il tuo CV apparirà qui sotto. Foto e dati personali seguono le consuetudini del paese scelto e puoi modificarli. I tuoi dati restano nel browser e vengono cancellati quando lasci la pagina.",
+nl:"Vul het formulier in en uw cv verschijnt hieronder. Foto en persoonlijke gegevens volgen de gebruikelijke gewoonten van het gekozen land en u kunt ze wijzigen. Uw gegevens blijven in uw browser en worden gewist als u deze pagina verlaat.",
+pl:"Wypełnij formularz, a Twoje CV pojawi się poniżej. Zdjęcie i dane osobowe zależą od zwyczajów wybranego kraju i możesz je zmienić. Dane pozostają w przeglądarce i są usuwane po opuszczeniu strony.",
+uk:"Заповніть форму, і резюме з’явиться нижче. Фото та особисті дані налаштовано за звичаями обраної країни, їх можна змінити. Дані залишаються у вашому браузері й видаляються після виходу зі сторінки.",
+id:"Isi formulir dan CV Anda muncul di bawah. Foto dan data pribadi mengikuti kebiasaan umum negara yang dipilih dan dapat Anda ubah. Data Anda tetap di browser dan dihapus saat Anda meninggalkan halaman ini.",
+ms:"Isi borang dan CV anda muncul di bawah. Gambar dan maklumat peribadi mengikut adat lazim negara yang dipilih dan anda boleh mengubahnya. Data anda kekal dalam pelayar dan dipadam apabila anda meninggalkan halaman ini.",
+th:"กรอกแบบฟอร์มแล้วเรซูเม่จะแสดงด้านล่าง รูปถ่ายและข้อมูลส่วนตัวเป็นไปตามธรรมเนียมทั่วไปของประเทศที่เลือก และคุณเปลี่ยนได้ ข้อมูลอยู่ในเบราว์เซอร์และจะถูกลบเมื่อออกจากหน้านี้",
+vi:"Điền biểu mẫu và CV của bạn sẽ hiện bên dưới. Ảnh và thông tin cá nhân theo thông lệ phổ biến của quốc gia đã chọn, bạn có thể thay đổi. Dữ liệu ở lại trong trình duyệt và bị xóa khi bạn rời trang này.",
+ta:"படிவத்தை நிரப்பினால் உங்கள் சுயவிவரம் கீழே தோன்றும். புகைப்படமும் தனிப்பட்ட விவரங்களும் தேர்ந்த நாட்டின் பொதுவான வழக்கப்படி அமையும், நீங்கள் மாற்றலாம். உங்கள் தரவு உலாவியிலேயே இருக்கும், இந்தப் பக்கத்தை விட்டுச் சென்றால் அழிக்கப்படும்.",
+te:"ఫారం నింపితే మీ రెజ్యూమె కింద కనిపిస్తుంది. ఫోటో, వ్యక్తిగత వివరాలు ఎంచుకున్న దేశపు సాధారణ ఆచారాల ప్రకారం ఉంటాయి, మీరు మార్చవచ్చు. మీ డేటా బ్రౌజర్‌లోనే ఉంటుంది, ఈ పేజీని వదిలితే తొలగించబడుతుంది.",
+mr:"फॉर्म भरा, तुमचा सीव्ही खाली दिसेल. फोटो आणि वैयक्तिक माहिती निवडलेल्या देशाच्या सामान्य रूढीनुसार असते, तुम्ही ती बदलू शकता. तुमचा डेटा ब्राउझरमध्येच राहतो आणि हे पान सोडल्यावर पुसला जातो.",
+ne:"फारम भरेपछि तपाईंको सीभी तल देखिन्छ। फोटो र व्यक्तिगत विवरण छानिएको देशको सामान्य चलन अनुसार हुन्छ, तपाईं बदल्न सक्नुहुन्छ। तपाईंको डेटा ब्राउजरमै रहन्छ र यो पेज छोडेपछि मेटिन्छ।",
+si:"පෝරමය පුරවන්න, ඔබගේ චරිතාපදානය පහළ පෙනේ. ඡායාරූපය සහ පුද්ගලික තොරතුරු තෝරාගත් රටේ සාමාන්‍ය සම්ප්‍රදාය අනුව සැකසේ, ඔබට වෙනස් කළ හැක. ඔබේ දත්ත බ්‍රවුසරයේම පවතී, මෙම පිටුවෙන් ඉවත් වූ විට මැකේ.",
+sw:"Jaza fomu na CV yako itaonekana hapa chini. Picha na taarifa binafsi hufuata desturi za kawaida za nchi uliyochagua, na unaweza kuzibadilisha. Data yako hubaki kwenye kivinjari na hufutwa unapoondoka kwenye ukurasa huu.",
+he:"מלאו את הטופס וקורות החיים יופיעו למטה. התמונה והפרטים האישיים נקבעים לפי המנהג הנפוץ במדינה שנבחרה, ואפשר לשנות אותם. הנתונים נשארים בדפדפן ונמחקים כשעוזבים את הדף.",
+el:"Συμπληρώστε τη φόρμα και το βιογραφικό σας εμφανίζεται παρακάτω. Η φωτογραφία και τα προσωπικά στοιχεία ακολουθούν τις συνήθειες της επιλεγμένης χώρας και μπορείτε να τα αλλάξετε. Τα δεδομένα μένουν στον browser και διαγράφονται όταν φύγετε από τη σελίδα.",
+sv:"Fyll i formuläret så visas ditt CV nedan. Foto och personuppgifter följer vanliga seder i det valda landet och du kan ändra dem. Dina uppgifter stannar i webbläsaren och raderas när du lämnar sidan."};
+
+const $=id=>document.getElementById(id),T=k=>ET.t(k),KEY="et_cv";
+let D={fn:"",jt:"",em:"",ph:"",ad:"",dob:"",nat:"",mar:"",su:"",sk:"",la:"",ex:[{}],ed:[{}],pp:false,pd:false,photo:"",paper:"A4",ov:{}};
+try{const s=JSON.parse(sessionStorage.getItem(KEY)||"null");if(s)D=Object.assign(D,s)}catch(e){}
+const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+/* common CV customs by country: p = photo usual, d = personal details usual, l = US Letter paper. Other countries: A4, no photo, no personal details. General customs only. */
+const PR={US:{l:1},CA:{l:1},MX:{l:1},DE:{p:1,d:1},JP:{p:1,d:1},CN:{p:1,d:1},KR:{p:1,d:1},ID:{p:1,d:1},MY:{p:1,d:1},TR:{p:1,d:1},RU:{p:1},SA:{p:1,d:1},AE:{p:1,d:1},EG:{p:1,d:1},BD:{p:1,d:1},IN:{p:1,d:1},PK:{p:1,d:1},NP:{p:1,d:1},LK:{p:1,d:1}};
+function preset(){const r=PR[ET.state.country]||{};
+if(!D.ov.pp)D.pp=!!r.p;if(!D.ov.pd)D.pd=!!r.d;if(!D.ov.paper)D.paper=r.l?"Letter":"A4"}
+const FL={fn:1,jt:2,em:3,ph:4,ad:5,dob:7,nat:8,mar:9,su:11,sk:14,la:15};
+const el=(tag,cls,txt)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined&&txt!==null)e.textContent=txt;e.setAttribute("dir","auto");return e};
+const dateTxt=v=>{const m=/^(\d{4})-(\d\d)-(\d\d)$/.exec(v||"");if(!m)return v||"";try{return new Intl.DateTimeFormat(ET.state.lang,{dateStyle:"long"}).format(new Date(+m[1],+m[2]-1,+m[3]))}catch(e){return v}};
+const list=s=>(s||"").split(/[,،、，]/).map(x=>x.trim()).filter(Boolean).join(" · ");
+const span=(f,t)=>f||t?(f||"")+" – "+(t||""):"";
+function drawCV(){
+const c=$("cv");c.replaceChildren();
+const hd=el("div","hd");
+if(D.pp&&D.photo){const im=document.createElement("img");im.src=D.photo;im.alt="";im.className="ph";hd.appendChild(im)}
+const hb=el("div","hb");hb.appendChild(el("h2","nm",D.fn));if(D.jt)hb.appendChild(el("div","jb",D.jt));
+const ct=[D.em,D.ph,D.ad].filter(Boolean).join(" · ");if(ct)hb.appendChild(el("div","mt",ct));
+if(D.pd){const pd=[D.dob&&T(7)+": "+dateTxt(D.dob),D.nat&&T(8)+": "+D.nat,D.mar&&T(9)+": "+D.mar].filter(Boolean).join(" · ");if(pd)hb.appendChild(el("div","mt",pd))}
+hd.appendChild(hb);c.appendChild(hd);
+const sec=(title,nodes)=>{if(!nodes.length)return;const s=el("section","sc");s.appendChild(el("h3","",title));nodes.forEach(n=>s.appendChild(n));c.appendChild(s)};
+if(D.su.trim())sec(T(11),[el("p","tx",D.su)]);
+const en=(a,b,dt,tx)=>{const d=el("div","en"),r=el("div","rw");r.appendChild(el("strong","",[a,b].filter(Boolean).join(" — ")));if(dt)r.appendChild(el("span","dt",dt));d.appendChild(r);if(tx)d.appendChild(el("p","tx",tx));return d};
+sec(T(12),D.ex.filter(o=>o.r||o.c||o.f||o.t||o.d).map(o=>en(o.r,o.c,span(o.f,o.t),o.d)));
+sec(T(13),D.ed.filter(o=>o.s||o.g||o.f||o.t).map(o=>en(o.s,o.g,span(o.f,o.t))));
+if(list(D.sk))sec(T(14).replace(/\s*[\(（].*$/,""),[el("p","tx",list(D.sk))]);
+if(list(D.la))sec(T(15).replace(/\s*[\(（].*$/,""),[el("p","tx",list(D.la))])}
+function fld(lbl,val,fn,area){
+const w=document.createElement("label"),s=document.createElement("span"),i=document.createElement(area?"textarea":"input");
+s.textContent=lbl;if(area)i.rows=2;i.value=val||"";
+i.addEventListener("input",()=>{fn(i.value);save();drawCV()});w.appendChild(s);w.appendChild(i);return w}
+function entries(id,arr,defs){
+const box=$(id);box.replaceChildren();
+arr.forEach((o,i)=>{const d=document.createElement("div");d.className="entry";
+defs.forEach(f=>d.appendChild(fld(T(f[1]),o[f[0]],v=>{o[f[0]]=v},f[2])));
+const x=document.createElement("button");x.type="button";x.className="rm";x.textContent="✕";
+x.onclick=()=>{arr.splice(i,1);if(!arr.length)arr.push({});save();entries(id,arr,defs);drawCV()};
+d.appendChild(x);box.appendChild(d)})}
+const EXD=[["c",17],["r",2],["f",20],["t",21],["d",11,1]],EDD=[["s",18],["g",19],["f",20],["t",21]];
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+Object.keys(FL).forEach(k=>{$("l_"+k).textContent=T(FL[k])});
+$("lpd").textContent=T(6);$("lpp").textContent=T(10);$("h12").textContent=T(12);$("h13").textContent=T(13);
+$("adx").textContent="+ "+T(16)+" · "+T(12);$("ade").textContent="+ "+T(16)+" · "+T(13);$("pr").textContent=T(22);
+preset();$("pd").checked=D.pd;$("pp").checked=D.pp;$("pf").hidden=!D.pp;$("pw").hidden=!D.pd;$("pa").value=D.paper;
+entries("exl",D.ex,EXD);entries("edl",D.ed,EDD);
+$("pg").textContent="@page{size:"+(D.paper==="Letter"?"letter":"A4")+";margin:12mm}";
+$("cv").className="paper "+(D.paper==="Letter"?"lt":"a4");drawCV()}
+Object.keys(FL).forEach(k=>{const i=$(k);i.value=D[k]||"";i.addEventListener("input",()=>{D[k]=i.value;save();drawCV()})});
+$("pd").onchange=e=>{D.pd=e.target.checked;D.ov.pd=1;save();$("pw").hidden=!D.pd;drawCV()};
+$("pp").onchange=e=>{D.pp=e.target.checked;D.ov.pp=1;save();$("pf").hidden=!D.pp;drawCV()};
+$("pa").onchange=e=>{D.paper=e.target.value;D.ov.paper=1;save();$("pg").textContent="@page{size:"+(D.paper==="Letter"?"letter":"A4")+";margin:12mm}";$("cv").className="paper "+(D.paper==="Letter"?"lt":"a4")};
+$("adx").onclick=()=>{D.ex.push({});save();entries("exl",D.ex,EXD)};
+$("ade").onclick=()=>{D.ed.push({});save();entries("edl",D.ed,EDD)};
+$("pf").addEventListener("change",e=>{const f=e.target.files[0];if(!f)return;
+const im=new Image(),u=URL.createObjectURL(f);
+im.onload=()=>{const sc=Math.min(1,360/Math.max(im.width,im.height)),c=document.createElement("canvas");
+c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext("2d").drawImage(im,0,0,c.width,c.height);
+D.photo=c.toDataURL("image/jpeg",.85);URL.revokeObjectURL(u);save();drawCV()};
+im.onerror=()=>URL.revokeObjectURL(u);im.src=u});
+$("pr").onclick=()=>{ET.logNow(T(0)+": "+(D.fn||"—")+" ("+D.paper+")");window.print()};
+ET.start({id:"cv",file:"cv.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(23),currency:false});
+</script>
+</body>
+</html>
