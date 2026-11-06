@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Land Record Helper | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>.res{margin:14px 0;padding:0;list-style:none}.res li{padding:8px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--sf);margin:6px 0;font-weight:600}.res li:first-child{border-color:var(--ac);color:var(--ac);font-size:1.15rem}.lr{border:1px dashed var(--ln);border-radius:8px;padding:8px 12px}</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="am" id="l_am"></label><input id="am" inputmode="decimal" autocomplete="off">
+<label for="un" id="l_un"></label><select id="un"></select>
+<label id="l_sh"></label>
+<div class="row"><input id="sn" inputmode="decimal" aria-label="part"><input id="sd" inputmode="decimal" aria-label="total"></div>
+<h2 id="h_rs" style="font-size:1.1rem;margin:18px 0 0"></h2>
+<ul class="res" id="out" role="status" aria-live="polite"></ul>
+<p class="mu" id="lt"></p><div class="lr" id="lr" dir="auto"></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+/* Strings, in this order: 0 title | 1 Total area | 2 Unit | 3 Your share | 4 Result | 5 Land records | 6 Warning | 7 Guide */
+const S={
+en:"Land Record Helper|Total area|Unit|Your share (part / total)|Your area|Local land records|Units vary by district. Confirm with your land office.|Enter the area, its unit and your share (e.g. 1 / 3).",
+bn:"জমির খতিয়ান সহায়ক|মোট জমি|একক|আপনার অংশ (অংশ / মোট)|আপনার জমি|স্থানীয় ভূমি রেকর্ড|এলাকাভেদে একক ভিন্ন হয়। ভূমি অফিসে নিশ্চিত হোন।|জমির পরিমাণ, একক ও আপনার অংশ দিন (যেমন ১ / ৩)।",
+hi:"भूमि अभिलेख सहायक|कुल क्षेत्रफल|इकाई|आपका हिस्सा (भाग / कुल)|आपकी ज़मीन|स्थानीय भू-अभिलेख|इकाइयाँ जिले के अनुसार अलग होती हैं। भूमि कार्यालय से पुष्टि करें।|क्षेत्रफल, इकाई और अपना हिस्सा दें (जैसे 1 / 3)।",
+ur:"زمینی ریکارڈ معاون|کل رقبہ|اکائی|آپ کا حصہ (حصہ / کل)|آپ کی زمین|مقامی اراضی ریکارڈ|اکائیاں ضلع کے لحاظ سے مختلف ہوتی ہیں۔ محکمہ مال سے تصدیق کریں۔|رقبہ، اکائی اور اپنا حصہ درج کریں (مثلاً 1 / 3)۔",
+ar:"مساعد سجلات الأراضي|المساحة الكلية|الوحدة|حصتك (الجزء / الكل)|مساحتك|سجلات الأراضي المحلية|تختلف الوحدات من منطقة لأخرى. تأكد من مكتب الأراضي.|أدخل المساحة ووحدتها وحصتك (مثل 1 / 3).",
+fa:"دستیار سوابق زمین|مساحت کل|واحد|سهم شما (سهم / کل)|مساحت شما|سوابق زمین محلی|واحدها در هر منطقه متفاوت است. با اداره ثبت تأیید کنید.|مساحت، واحد و سهم خود را وارد کنید (مثلاً 1 / 3).",
+tr:"Arazi Kaydı Yardımcısı|Toplam alan|Birim|Hissen (pay / toplam)|Alanın|Yerel tapu kayıtları|Birimler bölgeye göre değişir. Tapu müdürlüğünden doğrulayın.|Alanı, birimini ve hissenizi girin (örn. 1 / 3).",
+zh:"土地登记助手|总面积|单位|您的份额（份/总）|您的面积|当地土地登记|各地单位可能不同，请向土地管理部门确认。|输入面积、单位和您的份额（如 1 / 3）。",
+ja:"土地登記アシスタント|総面積|単位|あなたの持分（分子/分母）|あなたの面積|現地の土地登記|単位は地域で異なります。登記所でご確認ください。|面積・単位・持分を入力してください（例 1 / 3）。",
+ko:"토지 등기 도우미|총 면적|단위|내 지분(부분 / 전체)|내 면적|현지 토지 기록|단위는 지역마다 다릅니다. 관할 기관에 확인하세요.|면적, 단위, 지분을 입력하세요(예: 1 / 3).",
+ru:"Помощник по земельным записям|Общая площадь|Единица|Ваша доля (часть / всего)|Ваша площадь|Местные земельные документы|Единицы различаются по регионам. Уточните в земельном органе.|Введите площадь, единицу и свою долю (например, 1 / 3).",
+es:"Asistente de registro de tierras|Superficie total|Unidad|Tu parte (parte / total)|Tu superficie|Registros de tierras locales|Las unidades varían según la zona. Confirma en el registro.|Introduce la superficie, la unidad y tu parte (p. ej., 1 / 3).",
+fr:"Assistant foncier|Surface totale|Unité|Votre part (part / total)|Votre surface|Registres fonciers locaux|Les unités varient selon la région. Vérifiez auprès du service foncier.|Saisissez la surface, l’unité et votre part (ex. 1 / 3).",
+de:"Grundbuch-Helfer|Gesamtfläche|Einheit|Ihr Anteil (Teil / Gesamt)|Ihre Fläche|Lokale Grundstücksregister|Einheiten variieren je nach Region. Beim Grundbuchamt prüfen.|Fläche, Einheit und Ihren Anteil eingeben (z. B. 1 / 3).",
+pt:"Assistente de registro de terras|Área total|Unidade|Sua parte (parte / total)|Sua área|Registros de terras locais|As unidades variam por região. Confirme no cartório.|Informe a área, a unidade e sua parte (ex.: 1 / 3).",
+it:"Assistente catasto|Superficie totale|Unità|La tua quota (parte / totale)|La tua superficie|Registri fondiari locali|Le unità variano da zona a zona. Verifica presso l’ufficio competente.|Inserisci superficie, unità e la tua quota (es. 1 / 3).",
+nl:"Kadaster-assistent|Totale oppervlakte|Eenheid|Uw aandeel (deel / totaal)|Uw oppervlakte|Lokale grondregisters|Eenheden verschillen per regio. Controleer bij het kadaster.|Voer oppervlakte, eenheid en uw aandeel in (bijv. 1 / 3).",
+pl:"Asystent ewidencji gruntów|Powierzchnia całkowita|Jednostka|Twój udział (część / całość)|Twoja powierzchnia|Lokalne rejestry gruntów|Jednostki różnią się w regionach. Potwierdź w urzędzie.|Wpisz powierzchnię, jednostkę i swój udział (np. 1 / 3).",
+uk:"Помічник із земельних записів|Загальна площа|Одиниця|Ваша частка (частина / всього)|Ваша площа|Місцеві земельні реєстри|Одиниці різняться залежно від регіону. Уточніть у земельному органі.|Введіть площу, одиницю та свою частку (наприклад, 1 / 3).",
+id:"Asisten Catatan Tanah|Luas total|Satuan|Bagian Anda (bagian / total)|Luas Anda|Catatan tanah lokal|Satuan berbeda tiap daerah. Pastikan ke kantor pertanahan.|Masukkan luas, satuan, dan bagian Anda (mis. 1 / 3).",
+ms:"Pembantu Rekod Tanah|Keluasan keseluruhan|Unit|Bahagian anda (bahagian / jumlah)|Keluasan anda|Rekod tanah tempatan|Unit berbeza mengikut daerah. Sahkan di pejabat tanah.|Masukkan keluasan, unit dan bahagian anda (cth. 1 / 3).",
+th:"ผู้ช่วยทะเบียนที่ดิน|พื้นที่รวม|หน่วย|ส่วนของคุณ (ส่วน / ทั้งหมด)|พื้นที่ของคุณ|ทะเบียนที่ดินท้องถิ่น|หน่วยต่างกันตามพื้นที่ โปรดยืนยันกับสำนักงานที่ดิน|ใส่พื้นที่ หน่วย และส่วนของคุณ (เช่น 1 / 3)",
+vi:"Trợ lý hồ sơ đất đai|Tổng diện tích|Đơn vị|Phần của bạn (phần / tổng)|Diện tích của bạn|Hồ sơ đất đai địa phương|Đơn vị khác nhau theo vùng. Hãy xác nhận với văn phòng đất đai.|Nhập diện tích, đơn vị và phần của bạn (vd: 1 / 3).",
+ta:"நில ஆவண உதவியாளர்|மொத்த பரப்பு|அலகு|உங்கள் பங்கு (பங்கு / மொத்தம்)|உங்கள் பரப்பு|உள்ளூர் நில ஆவணங்கள்|அலகுகள் பகுதிக்கு ஏற்ப மாறும். நில அலுவலகத்தில் உறுதிசெய்யுங்கள்.|பரப்பு, அலகு, உங்கள் பங்கை உள்ளிடவும் (எ.கா. 1 / 3).",
+te:"భూ రికార్డుల సహాయకుడు|మొత్తం విస్తీర్ణం|యూనిట్|మీ వాటా (భాగం / మొత్తం)|మీ విస్తీర్ణం|స్థానిక భూ రికార్డులు|యూనిట్లు ప్రాంతాన్ని బట్టి మారతాయి. భూ కార్యాలయంలో నిర్ధారించుకోండి.|విస్తీర్ణం, యూనిట్, మీ వాటా నమోదు చేయండి (ఉదా. 1 / 3).",
+mr:"जमीन अभिलेख सहाय्यक|एकूण क्षेत्रफळ|एकक|तुमचा वाटा (भाग / एकूण)|तुमचे क्षेत्रफळ|स्थानिक जमीन अभिलेख|एकके भागानुसार वेगळी असतात. भूमी कार्यालयात खात्री करा.|क्षेत्रफळ, एकक आणि तुमचा वाटा टाका (उदा. 1 / 3).",
+ne:"जग्गा अभिलेख सहायक|कुल क्षेत्रफल|एकाइ|तपाईंको हिस्सा (भाग / जम्मा)|तपाईंको क्षेत्रफल|स्थानीय जग्गा अभिलेख|एकाइ क्षेत्र अनुसार फरक हुन्छन्। मालपोत कार्यालयमा पुष्टि गर्नुहोस्।|क्षेत्रफल, एकाइ र आफ्नो हिस्सा राख्नुहोस् (जस्तै 1 / 3)।",
+si:"ඉඩම් වාර්තා සහායක|මුළු වපසරිය|ඒකකය|ඔබේ කොටස (කොටස / මුළු)|ඔබේ වපසරිය|ප්‍රාදේශීය ඉඩම් වාර්තා|ඒකක ප්‍රදේශය අනුව වෙනස් වේ. ඉඩම් කාර්යාලයෙන් තහවුරු කරගන්න.|වපසරිය, ඒකකය සහ ඔබේ කොටස ඇතුළත් කරන්න (උදා. 1 / 3).",
+sw:"Msaidizi wa Rekodi za Ardhi|Eneo jumla|Kipimo|Sehemu yako (sehemu / jumla)|Eneo lako|Rekodi za ardhi za eneo|Vipimo hutofautiana kwa eneo. Thibitisha ofisi ya ardhi.|Weka eneo, kipimo na sehemu yako (mf. 1 / 3).",
+he:"עוזר רישום מקרקעין|שטח כולל|יחידה|החלק שלך (חלק / סך הכול)|השטח שלך|רישומי מקרקעין מקומיים|היחידות משתנות לפי אזור. אשרו במשרד המקרקעין.|הזינו שטח, יחידה והחלק שלכם (למשל 1 / 3).",
+el:"Βοηθός κτηματολογίου|Συνολική έκταση|Μονάδα|Το μερίδιό σας (μέρος / σύνολο)|Η έκτασή σας|Τοπικά κτηματολόγια|Οι μονάδες διαφέρουν ανά περιοχή. Επιβεβαιώστε στην υπηρεσία γης.|Εισάγετε έκταση, μονάδα και μερίδιο (π.χ. 1 / 3).",
+sv:"Fastighetsregisterhjälp|Total yta|Enhet|Din andel (del / totalt)|Din yta|Lokala markregister|Enheter varierar mellan regioner. Bekräfta hos lantmäteriet.|Ange yta, enhet och din andel (t.ex. 1 / 3)."};
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+/* square metres per unit. Local units are guidance only: katha/bigha/kanal etc. differ by district. */
+const U={sqm:1,sqft:.09290304,ac:4046.8564224,ha:1e4,dec:40.468564224,katha:66.8901888,bigha:1335.4626,marla:25.29285264,kanal:505.8570528,guntha:101.171282,ropani:508.737,aana:31.796,perch:25.29285264,mu:666.6667,tsubo:3.305785,sotka:100,morgen:8567};
+const N={sqm:"m²",sqft:"ft²",ac:"ac",ha:"ha",dec:"শতাংশ / cent",katha:"কাঠা / katha",bigha:"বিঘা / bigha (33 dec.)",marla:"مرلہ / marla",kanal:"کنال / kanal",guntha:"गुंठा / guntha",ropani:"रोपनी / ropani",aana:"आना / aana",perch:"perch",mu:"亩 / mu",tsubo:"坪 / tsubo",sotka:"сотка",morgen:"morgen"};
+/* units shown per country; add a country by adding one line */
+const L={INT:["sqm","ha","sqft","ac"],BD:["dec","katha","bigha","sqft","sqm","ac","ha"],IN:["guntha","dec","kanal","marla","sqft","sqm","ac","ha"],PK:["marla","kanal","sqft","sqm","ac","ha"],NP:["ropani","aana","sqft","sqm","ac","ha"],LK:["perch","ac","ha","sqm","sqft"],CN:["mu","sqm","ha"],JP:["tsubo","sqm","ha"],RU:["sotka","sqm","ha"],ZA:["morgen","ha","sqm","ac"],US:["sqft","ac","sqm","ha"]};
+["CA","GB","IE","AU"].forEach(c=>L[c]=L.US);["UA","KZ"].forEach(c=>L[c]=L.RU);
+/* local names of land records (proper nouns, shown as written locally) */
+const R={INT:"Title deed · Cadastre · Land registry",BD:"খতিয়ান · দাগ · মৌজা · নামজারি · ই-পর্চা",IN:"Khata · Jamabandi · RoR · 7/12 · Bhulekh",PK:"Fard · Jamabandi · Khasra",NP:"लालपुर्जा · नापी नक्सा",LK:"Deed · Survey plan",US:"Deed · Title · Plat · County recorder",CA:"Land title · Survey plan",GB:"Title register · Title plan (HM Land Registry)",IE:"Folio · Map",AU:"Certificate of Title",DE:"Grundbuch · Flurkarte",AT:"Grundbuch",CH:"Grundbuch",FR:"Cadastre · Livre foncier",ES:"Catastro · Registro de la Propiedad",IT:"Visura catastale",NL:"Kadaster",CN:"不动产权证书",JP:"登記事項証明書",KR:"등기부등본",RU:"Выписка из ЕГРН",TR:"Tapu",SA:"صك الملكية",ZA:"Title deed"};
+let D={a:"1",u:"",n:"1",d:"1"};
+/* accepts Arabic-Indic, Persian, Devanagari and Bengali digits; comma or dot as decimal mark */
+function num(v){let s=String(v||"").trim().replace(/\s/g,"");
+s=s.replace(/[\u0660-\u0669]/g,c=>c.charCodeAt(0)-0x660).replace(/[\u06F0-\u06F9]/g,c=>c.charCodeAt(0)-0x6F0).replace(/[\u0966-\u096F]/g,c=>c.charCodeAt(0)-0x966).replace(/[\u09E6-\u09EF]/g,c=>c.charCodeAt(0)-0x9E6);
+if(s.includes(",")&&s.includes("."))s=s.replace(/,/g,"");else s=s.replace(",",".");
+const n=parseFloat(s);return isFinite(n)&&n>=0?n:0}
+const list=()=>L[ET.state.country]||L.INT;
+const nf=x=>{try{return new Intl.NumberFormat(ET.state.lang,{maximumFractionDigits:4}).format(x)}catch(e){return String(x)}};
+function draw(){
+const l=list(),out=$("out");out.replaceChildren();
+const a=num(D.a),n=num(D.n),d=num(D.d);
+if(!a||!d){return}
+const m2=a*U[D.u]*n/d,rows=l.map(k=>nf(m2/U[k])+" "+N[k]);
+rows.forEach(x=>{const li=document.createElement("li");li.textContent=x;li.setAttribute("dir","auto");out.appendChild(li)});
+$("lr").textContent=R[ET.state.country]||R.INT;
+ET.log(nf(a)+" "+N[D.u]+" × "+nf(n)+"/"+nf(d)+" = "+rows.slice(0,3).join(" · "))}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l_am").textContent=T(1);$("l_un").textContent=T(2);$("l_sh").textContent=T(3);$("h_rs").textContent=T(4);$("lt").textContent=T(5);
+const l=list();if(!l.includes(D.u))D.u=l[0];
+$("un").innerHTML=l.map(k=>'<option value="'+k+'">'+N[k]+'</option>').join("");$("un").value=D.u;
+$("lr").textContent=R[ET.state.country]||R.INT;draw()}
+$("am").value=D.a;$("sn").value=D.n;$("sd").value=D.d;
+$("am").oninput=e=>{D.a=e.target.value;draw()};
+$("sn").oninput=e=>{D.n=e.target.value;draw()};
+$("sd").oninput=e=>{D.d=e.target.value;draw()};
+$("un").onchange=e=>{D.u=e.target.value;draw()};
+ET.start({id:"land",file:"land.html",S,labels,guide:()=>T(7),warn:()=>T(6),currency:false});
+</script>
+</body>
+</html>
