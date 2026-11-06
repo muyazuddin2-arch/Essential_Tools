@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CGPA Converter | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>input[type=checkbox]{width:auto;margin-inline-end:6px}.ck{font-weight:400;display:flex;align-items:center}.big{font-size:2rem;font-weight:700;color:var(--ac);margin:14px 0 4px;word-break:break-word}.res{list-style:none;padding:0;margin:8px 0}.res li{display:flex;justify-content:space-between;padding:6px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--sf);margin:5px 0}.cls{font-weight:600}</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="g" id="l_g"></label><input id="g" inputmode="decimal" autocomplete="off">
+<div class="set"><div><label for="fs" id="l_f"></label><select id="fs"></select></div><div><label for="ts" id="l_t"></label><select id="ts"></select></div></div>
+<label class="ck" id="cb" hidden><input type="checkbox" id="cbx">CBSE: % = CGPA × 9.5</label>
+<div class="big" id="big" role="status" aria-live="polite" dir="auto"></div>
+<p class="cls" id="cl" dir="auto"></p>
+<h2 id="h_o" style="font-size:1.05rem;margin:14px 0 0"></h2>
+<ul class="res" id="out"></ul>
+<p class="mu" id="sc" dir="auto"></p>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+/* Strings, in this order: 0 title | 1 Your CGPA / grade | 2 From scale | 3 To scale | 4 Other scales | 5 Warning | 6 Guide | 7 Above maximum */
+const S={
+en:"CGPA Converter|Your CGPA / grade|From scale|To scale|Other scales|No universal official formula exists. Results are estimates; confirm with the institution or evaluator.|Enter your CGPA, choose its scale, then the scale to convert to.|Value is above the scale maximum.",
+bn:"CGPA কনভার্টার|আপনার CGPA / গ্রেড|যে স্কেল থেকে|যে স্কেলে|অন্যান্য স্কেল|সর্বজনীন কোনো সরকারি সূত্র নেই। ফলাফল আনুমানিক; প্রতিষ্ঠান বা মূল্যায়ন সংস্থার সাথে নিশ্চিত হোন।|আপনার CGPA দিন, তার স্কেল বেছে নিন, তারপর যে স্কেলে রূপান্তর করবেন সেটি বেছে নিন।|মান স্কেলের সর্বোচ্চ সীমার বেশি।",
+hi:"CGPA कन्वर्टर|आपका CGPA / ग्रेड|किस स्केल से|किस स्केल में|अन्य स्केल|कोई सार्वभौमिक आधिकारिक सूत्र नहीं है। परिणाम अनुमानित हैं; संस्थान या मूल्यांकनकर्ता से पुष्टि करें।|अपना CGPA दें, उसका स्केल चुनें, फिर जिस स्केल में बदलना है उसे चुनें।|मान स्केल की अधिकतम सीमा से अधिक है।",
+ur:"CGPA کنورٹر|آپ کا CGPA / گریڈ|کس اسکیل سے|کس اسکیل میں|دیگر اسکیلز|کوئی عالمگیر سرکاری فارمولا موجود نہیں۔ نتائج تخمینی ہیں؛ ادارے یا جانچ کنندہ سے تصدیق کریں۔|اپنا CGPA درج کریں، اس کا اسکیل چنیں، پھر جس اسکیل میں بدلنا ہے وہ چنیں۔|قدر اسکیل کی زیادہ سے زیادہ حد سے زیادہ ہے۔",
+ar:"محوّل المعدل التراكمي|معدلك التراكمي / درجتك|من المقياس|إلى المقياس|مقاييس أخرى|لا توجد صيغة رسمية موحدة. النتائج تقديرية؛ تأكد من الجامعة أو جهة التقييم.|أدخل معدلك التراكمي، واختر مقياسه، ثم المقياس المراد التحويل إليه.|القيمة أعلى من الحد الأقصى للمقياس.",
+fa:"مبدل معدل کل (CGPA)|معدل / نمره شما|از مقیاس|به مقیاس|مقیاس‌های دیگر|فرمول رسمی جهانی وجود ندارد. نتایج تقریبی است؛ با مؤسسه یا ارزیاب تأیید کنید.|معدل خود را وارد کنید، مقیاس آن را انتخاب کنید، سپس مقیاس مقصد را برگزینید.|مقدار از حداکثر مقیاس بیشتر است.",
+tr:"CGPA Dönüştürücü|CGPA / notunuz|Kaynak ölçek|Hedef ölçek|Diğer ölçekler|Evrensel resmî bir formül yoktur. Sonuçlar tahminidir; kurum veya değerlendirme kuruluşuyla doğrulayın.|CGPA’nızı girin, ölçeğini seçin, ardından dönüştürülecek ölçeği seçin.|Değer ölçeğin üst sınırını aşıyor.",
+zh:"绩点转换器|您的绩点/成绩|原评分制|目标评分制|其他评分制|不存在通用的官方公式，结果仅为估算，请向院校或认证机构确认。|输入您的绩点，选择其评分制，再选择要转换到的评分制。|数值超过该评分制的最大值。",
+ja:"GPA換算ツール|あなたのGPA／成績|換算元の尺度|換算先の尺度|他の尺度|公式な共通換算式はありません。結果は概算です。大学や評価機関にご確認ください。|GPAを入力し、その尺度と換算先の尺度を選んでください。|値が尺度の上限を超えています。",
+ko:"학점 변환기|내 학점/성적|변환 전 척도|변환 후 척도|다른 척도|공식적인 공통 환산식은 없습니다. 결과는 추정치이며 학교나 평가기관에 확인하세요.|학점을 입력하고 척도를 고른 뒤 변환할 척도를 선택하세요.|값이 척도의 최댓값을 넘습니다.",
+ru:"Конвертер среднего балла|Ваш средний балл / оценка|Из шкалы|В шкалу|Другие шкалы|Единой официальной формулы нет. Результат приблизителен; уточните в вузе или оценочной организации.|Введите средний балл, выберите его шкалу, затем шкалу для перевода.|Значение выше максимума шкалы.",
+es:"Conversor de promedio (CGPA)|Tu promedio / nota|Escala de origen|Escala de destino|Otras escalas|No existe una fórmula oficial universal. Los resultados son estimados; confirma con la institución o el evaluador.|Introduce tu promedio, elige su escala y luego la escala a la que convertir.|El valor supera el máximo de la escala.",
+fr:"Convertisseur de moyenne (CGPA)|Votre moyenne / note|Échelle de départ|Échelle d’arrivée|Autres échelles|Il n’existe pas de formule officielle universelle. Résultats estimatifs; vérifiez auprès de l’établissement ou de l’évaluateur.|Saisissez votre moyenne, choisissez son échelle, puis l’échelle de conversion.|La valeur dépasse le maximum de l’échelle.",
+de:"Notendurchschnitt-Umrechner (CGPA)|Ihr Durchschnitt / Ihre Note|Von Skala|Zu Skala|Andere Skalen|Es gibt keine einheitliche offizielle Formel. Ergebnisse sind Schätzungen; bei der Hochschule oder Anerkennungsstelle bestätigen.|Durchschnitt eingeben, seine Skala wählen, dann die Zielskala wählen.|Wert liegt über dem Maximum der Skala.",
+pt:"Conversor de CGPA|Seu CGPA / nota|Escala de origem|Escala de destino|Outras escalas|Não há fórmula oficial universal. Resultados são estimativas; confirme com a instituição ou avaliador.|Informe seu CGPA, escolha a escala e depois a escala de destino.|O valor excede o máximo da escala.",
+it:"Convertitore di media (CGPA)|La tua media / voto|Scala di partenza|Scala di arrivo|Altre scale|Non esiste una formula ufficiale universale. Risultati indicativi; conferma con l’istituzione o il valutatore.|Inserisci la tua media, scegli la scala e poi quella di destinazione.|Il valore supera il massimo della scala.",
+nl:"CGPA-omzetter|Uw gemiddelde / cijfer|Van schaal|Naar schaal|Andere schalen|Er is geen universele officiële formule. Resultaten zijn schattingen; bevestig bij de instelling of beoordelaar.|Voer uw gemiddelde in, kies de schaal en daarna de doelschaal.|Waarde is hoger dan het maximum van de schaal.",
+pl:"Przelicznik CGPA|Twoja średnia / ocena|Ze skali|Na skalę|Inne skale|Brak uniwersalnego oficjalnego wzoru. Wyniki są szacunkowe; potwierdź w uczelni lub u oceniającego.|Wpisz średnią, wybierz jej skalę, a potem skalę docelową.|Wartość przekracza maksimum skali.",
+uk:"Конвертер середнього балу|Ваш середній бал / оцінка|Зі шкали|У шкалу|Інші шкали|Універсальної офіційної формули немає. Результат орієнтовний; уточніть у закладі чи оцінювача.|Введіть середній бал, виберіть його шкалу, потім шкалу для перетворення.|Значення перевищує максимум шкали.",
+id:"Konverter IPK/CGPA|IPK / nilai Anda|Dari skala|Ke skala|Skala lain|Tidak ada rumus resmi universal. Hasil hanya perkiraan; konfirmasi ke institusi atau penilai.|Masukkan IPK Anda, pilih skalanya, lalu skala tujuan.|Nilai melebihi batas maksimum skala.",
+ms:"Penukar CGPA|CGPA / gred anda|Dari skala|Ke skala|Skala lain|Tiada formula rasmi universal. Hasil ialah anggaran; sahkan dengan institusi atau penilai.|Masukkan CGPA anda, pilih skalanya, kemudian skala tujuan.|Nilai melebihi had maksimum skala.",
+th:"ตัวแปลงเกรดเฉลี่ย (CGPA)|เกรดเฉลี่ย / เกรดของคุณ|จากมาตราส่วน|เป็นมาตราส่วน|มาตราส่วนอื่น|ไม่มีสูตรทางการที่ใช้ได้ทั่วโลก ผลลัพธ์เป็นค่าประมาณ โปรดยืนยันกับสถาบันหรือผู้ประเมิน|ใส่เกรดเฉลี่ย เลือกมาตราส่วนของเกรด แล้วเลือกมาตราส่วนที่ต้องการแปลง|ค่าสูงกว่าค่าสูงสุดของมาตราส่วน",
+vi:"Công cụ quy đổi điểm trung bình (CGPA)|Điểm trung bình / điểm của bạn|Từ thang điểm|Sang thang điểm|Thang điểm khác|Không có công thức chính thức chung. Kết quả chỉ là ước tính; hãy xác nhận với trường hoặc đơn vị đánh giá.|Nhập điểm trung bình, chọn thang điểm, rồi chọn thang điểm cần quy đổi.|Giá trị vượt quá mức tối đa của thang điểm.",
+ta:"CGPA மாற்றி|உங்கள் CGPA / தரம்|எந்த அளவிலிருந்து|எந்த அளவுக்கு|பிற அளவுகள்|உலகளாவிய அதிகாரப்பூர்வ சூத்திரம் இல்லை. முடிவுகள் மதிப்பீடுகளே; நிறுவனம் அல்லது மதிப்பீட்டாளரிடம் உறுதிசெய்யுங்கள்.|உங்கள் CGPA-ஐ உள்ளிட்டு, அதன் அளவைத் தேர்ந்து, மாற்ற வேண்டிய அளவைத் தேர்ந்தெடுங்கள்.|மதிப்பு அளவின் அதிகபட்சத்தை மீறுகிறது.",
+te:"CGPA కన్వర్టర్|మీ CGPA / గ్రేడ్|ఏ స్కేల్ నుండి|ఏ స్కేల్‌కు|ఇతర స్కేల్‌లు|సార్వత్రిక అధికారిక సూత్రం లేదు. ఫలితాలు అంచనాలే; సంస్థ లేదా మూల్యాంకన సంస్థతో నిర్ధారించుకోండి.|మీ CGPA నమోదు చేసి, దాని స్కేల్ ఎంచుకుని, మార్చాల్సిన స్కేల్ ఎంచుకోండి.|విలువ స్కేల్ గరిష్ఠాన్ని మించింది.",
+mr:"CGPA कन्वर्टर|तुमचा CGPA / ग्रेड|कोणत्या स्केलमधून|कोणत्या स्केलमध्ये|इतर स्केल|सार्वत्रिक अधिकृत सूत्र नाही. निकाल अंदाजे आहेत; संस्था किंवा मूल्यांकनकर्त्याकडे खात्री करा.|तुमचा CGPA टाका, त्याचा स्केल निवडा, मग रूपांतर करायचा स्केल निवडा.|मूल्य स्केलच्या कमाल मर्यादेपेक्षा जास्त आहे.",
+ne:"CGPA कन्भर्टर|तपाईंको CGPA / ग्रेड|कुन स्केलबाट|कुन स्केलमा|अन्य स्केल|विश्वव्यापी आधिकारिक सूत्र छैन। नतिजा अनुमानित हुन्; संस्था वा मूल्यांकनकर्तासँग पुष्टि गर्नुहोस्।|आफ्नो CGPA राख्नुहोस्, त्यसको स्केल छान्नुहोस्, अनि रूपान्तरण गर्ने स्केल छान्नुहोस्।|मान स्केलको अधिकतम सीमाभन्दा बढी छ।",
+si:"CGPA පරිවර්තකය|ඔබේ CGPA / ශ්‍රේණිය|මෙම පරිමාණයෙන්|මෙම පරිමාණයට|වෙනත් පරිමාණ|විශ්වීය නිල සූත්‍රයක් නැත. ප්‍රතිඵල ඇස්තමේන්තු පමණි; ආයතනය හෝ ඇගයුම්කරුගෙන් තහවුරු කරගන්න.|ඔබේ CGPA ඇතුළත් කර, එහි පරිමාණය තෝරා, පරිවර්තනය කළ යුතු පරිමාණය තෝරන්න.|අගය පරිමාණයේ උපරිමය ඉක්මවයි.",
+sw:"Kigeuza CGPA|CGPA / daraja lako|Kutoka kipimo|Kwenda kipimo|Vipimo vingine|Hakuna kanuni rasmi ya kimataifa. Matokeo ni makadirio; thibitisha na taasisi au mtathmini.|Weka CGPA yako, chagua kipimo chake, kisha kipimo cha kubadilishia.|Thamani ni kubwa kuliko kiwango cha juu cha kipimo.",
+he:"ממיר ממוצע (CGPA)|הממוצע / הציון שלך|מסולם|לסולם|סולמות אחרים|אין נוסחה רשמית אוניברסלית. התוצאות הן הערכה; אשרו מול המוסד או גוף ההערכה.|הזינו את הממוצע, בחרו את הסולם שלו ואז את סולם היעד.|הערך גבוה ממקסימום הסולם.",
+el:"Μετατροπέας βαθμού (CGPA)|Ο μέσος όρος / βαθμός σας|Από κλίμακα|Σε κλίμακα|Άλλες κλίμακες|Δεν υπάρχει καθολικός επίσημος τύπος. Τα αποτελέσματα είναι εκτιμήσεις· επιβεβαιώστε με το ίδρυμα.|Εισάγετε τον μέσο όρο, επιλέξτε την κλίμακα και μετά την κλίμακα μετατροπής.|Η τιμή υπερβαίνει το μέγιστο της κλίμακας.",
+sv:"CGPA-omvandlare|Ditt snittbetyg / betyg|Från skala|Till skala|Andra skalor|Det finns ingen universell officiell formel. Resultaten är uppskattningar; bekräfta med lärosätet eller bedömaren.|Ange ditt snitt, välj dess skala och sedan målskalan.|Värdet är över skalans maximum."};
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+/* scale maximums. 100 = percentage. Conversion is proportional (value / max); there is no official universal formula. */
+const SC=[4,4.5,5,7,10,20,100],LB={100:"100 %"};
+const lb=s=>LB[s]||(Number.isInteger(s)&&s>=10?String(s):s.toFixed(1));
+/* default "from" scale per country; "to" defaults to 4.0 (or 100 % when from is 4.0). Local scales are numbers, shown as written. */
+const P={BD:4,IN:10,PK:4,NP:4,LK:4,US:4,CA:4,GB:100,IE:100,AU:7,FR:20,NL:10,ES:10,RU:5,CN:100,JP:4,KR:4.5,TR:4,SA:5,ZA:100,NG:5};
+/* scales commonly used locally (numbers and proper terms only) */
+const I={BD:"5.0 · 4.0",IN:"10 · 100 %",PK:"4.0 · 100 %",NP:"4.0 · 100 %",LK:"4.0",US:"4.0",CA:"4.0 · 100 %",GB:"100 % · First · 2:1 · 2:2 · Third",IE:"4.0 · 100 %",AU:"7.0",FR:"20",NL:"10",ES:"10",RU:"5",CN:"100 % · 4.0",JP:"4.0",KR:"4.5 · 4.3",TR:"4.0 · 100 %",SA:"5.0 · 4.0",NG:"5.0"};
+let D={g:"",f:4,t:100,ov:0};
+function num(v){let s=String(v||"").trim().replace(/\s/g,"");
+s=s.replace(/[\u0660-\u0669]/g,c=>c.charCodeAt(0)-0x660).replace(/[\u06F0-\u06F9]/g,c=>c.charCodeAt(0)-0x6F0).replace(/[\u0966-\u096F]/g,c=>c.charCodeAt(0)-0x966).replace(/[\u09E6-\u09EF]/g,c=>c.charCodeAt(0)-0x9E6);
+if(s.includes(",")&&s.includes("."))s=s.replace(/,/g,"");else s=s.replace(",",".");
+const n=parseFloat(s);return isFinite(n)&&n>=0?n:0}
+const nf=x=>{try{return new Intl.NumberFormat(ET.state.lang,{minimumFractionDigits:2,maximumFractionDigits:2}).format(x)}catch(e){return x.toFixed(2)}};
+const fmt=(x,s)=>nf(x)+(s===100?" %":"");
+const cbse=()=>ET.state.country==="IN"&&D.f===10&&$("cbx").checked;
+function draw(){
+const big=$("big"),out=$("out"),cl=$("cl");out.replaceChildren();cl.textContent="";
+$("cb").hidden=!(ET.state.country==="IN"&&D.f===10);
+const v=num(D.g);
+if(!v){big.textContent="";return}
+if(v>D.f){big.textContent=T(7);return}
+const pct=cbse()?v*9.5:v/D.f*100,r=pct/100*D.t;
+big.textContent=fmt(r,D.t);
+SC.filter(s=>s!==D.t&&s!==D.f).forEach(s=>{const li=document.createElement("li"),a=document.createElement("span"),b=document.createElement("span");a.textContent=lb(s);b.textContent=fmt(pct/100*s,s);li.append(a,b);out.appendChild(li)});
+if(ET.state.country==="GB"){cl.textContent="🎓 "+(pct>=70?"First":pct>=60?"2:1":pct>=50?"2:2":pct>=40?"Third":"–")}
+ET.log(fmt(v,D.f)+" ("+lb(D.f)+") = "+fmt(r,D.t)+" ("+lb(D.t)+")")}
+function fill(){
+const opts=SC.map(s=>'<option value="'+s+'">'+lb(s)+"</option>").join("");
+$("fs").innerHTML=opts;$("ts").innerHTML=opts;$("fs").value=D.f;$("ts").value=D.t}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l_g").textContent=T(1);$("l_f").textContent=T(2);$("l_t").textContent=T(3);$("h_o").textContent=T(4);
+if(!D.ov){D.f=P[ET.state.country]||4;D.t=D.f===4?100:4}
+$("sc").textContent=I[ET.state.country]?"📘 "+I[ET.state.country]:"";
+fill();draw()}
+$("g").oninput=e=>{D.g=e.target.value;draw()};
+$("fs").onchange=e=>{D.f=+e.target.value;D.ov=1;draw()};
+$("ts").onchange=e=>{D.t=+e.target.value;D.ov=1;draw()};
+$("cbx").onchange=draw;
+ET.start({id:"cgpa",file:"cgpa.html",S,labels,guide:()=>T(6),warn:()=>T(5),currency:false});
+</script>
+</body>
+</html>
