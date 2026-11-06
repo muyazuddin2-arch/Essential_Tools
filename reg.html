@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Land Registration Cost | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>.rw{display:flex;gap:6px;margin:6px 0}.rw .nm{flex:1;min-width:0}.rw .rt{width:5.5rem;flex:none}.res{list-style:none;padding:0;margin:14px 0}.res li{display:flex;justify-content:space-between;gap:10px;padding:8px 12px;border:1px solid var(--ln);border-radius:8px;background:var(--sf);margin:6px 0}.res li.tt{border-color:var(--ac);color:var(--ac);font-weight:700;font-size:1.1rem}</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="v" id="l_v"></label><input id="v" inputmode="decimal" autocomplete="off">
+<div id="hv"><label for="h" id="l_h"></label><input id="h" inputmode="decimal" autocomplete="off"></div>
+<h2 id="h_r" style="font-size:1.1rem;margin:18px 0 4px"></h2>
+<div id="rows"></div>
+<button type="button" id="ad"></button>
+<ul class="res" id="out" role="status" aria-live="polite"></ul>
+<p class="mu" id="of" dir="auto"></p>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+/* Strings, in this order: 0 title | 1 Land value | 2 Assessed value | 3 Tax or fee | 4 Total cost | 5 Add row | 6 Warning | 7 Guide */
+const S={
+en:"Land Registration Cost|Land value|Assessed value (the higher applies)|Tax or fee|Total cost|Add row|Rates change often and vary by area. Enter current rates from your registry office; results are estimates.|Enter the land value, then each tax or fee with its rate (%). The total is added up for you.",
+bn:"জমি রেজিস্ট্রেশন খরচ|জমির মূল্য|সরকারি নির্ধারিত মূল্য (যেটা বেশি সেটা ধরা হয়)|কর বা ফি|মোট খরচ|সারি যোগ করুন|হার প্রায়ই বদলায় ও এলাকাভেদে আলাদা। রেজিস্ট্রি অফিস থেকে বর্তমান হার নিয়ে দিন; ফলাফল আনুমানিক।|জমির মূল্য দিন, তারপর প্রতিটি কর বা ফি ও তার হার (%) দিন। মোট নিজে থেকেই যোগ হবে।",
+hi:"भूमि पंजीकरण खर्च|भूमि का मूल्य|सरकारी निर्धारित मूल्य (जो अधिक हो वही लगेगा)|कर या शुल्क|कुल खर्च|पंक्ति जोड़ें|दरें अक्सर बदलती हैं और क्षेत्र के अनुसार अलग होती हैं। रजिस्ट्री कार्यालय से वर्तमान दरें डालें; परिणाम अनुमानित हैं।|भूमि का मूल्य दें, फिर हर कर या शुल्क और उसकी दर (%) दें। कुल अपने आप जुड़ जाएगा।",
+ur:"زمین رجسٹریشن لاگت|زمین کی قیمت|سرکاری تشخیص شدہ قیمت (زیادہ والی لاگو ہوگی)|ٹیکس یا فیس|کل لاگت|قطار شامل کریں|شرحیں اکثر بدلتی ہیں اور علاقے کے لحاظ سے مختلف ہوتی ہیں۔ رجسٹری دفتر سے موجودہ شرحیں درج کریں؛ نتائج تخمینی ہیں۔|زمین کی قیمت درج کریں، پھر ہر ٹیکس یا فیس اور اس کی شرح (%) دیں۔ کل خود جمع ہو جائے گا۔",
+ar:"تكلفة تسجيل الأرض|قيمة الأرض|القيمة التقديرية الرسمية (تُعتمد الأعلى)|ضريبة أو رسم|التكلفة الإجمالية|إضافة صف|تتغير النسب كثيرًا وتختلف حسب المنطقة. أدخل النسب الحالية من مكتب التسجيل؛ النتائج تقديرية.|أدخل قيمة الأرض ثم كل ضريبة أو رسم مع نسبته (%). يُحسب المجموع تلقائيًا.",
+fa:"هزینه ثبت زمین|ارزش زمین|ارزش ارزیابی‌شده دولتی (مقدار بیشتر اعمال می‌شود)|مالیات یا عوارض|هزینه کل|افزودن ردیف|نرخ‌ها اغلب تغییر می‌کنند و در هر منطقه متفاوت‌اند. نرخ‌های فعلی را از اداره ثبت وارد کنید؛ نتایج تقریبی است.|ارزش زمین را وارد کنید، سپس هر مالیات یا عوارض را با نرخ آن (%). جمع کل خودکار محاسبه می‌شود.",
+tr:"Arazi Tescil Maliyeti|Arazi değeri|Resmî rayiç değer (yüksek olan geçerli)|Vergi veya harç|Toplam maliyet|Satır ekle|Oranlar sık değişir ve bölgeye göre farklıdır. Güncel oranları tapu müdürlüğünden girin; sonuçlar tahminidir.|Arazi değerini, ardından her vergi veya harcı oranıyla (%) girin. Toplam otomatik hesaplanır.",
+zh:"土地登记费用|土地价值|政府评估价值（取较高者）|税费|总费用|添加行|税率常有变动且因地区而异。请向登记机构获取现行税率；结果仅为估算。|输入土地价值，再输入各项税费及税率（%）。总额自动计算。",
+ja:"土地登記費用|土地の価値|公的評価額（高い方を適用）|税金・手数料|合計費用|行を追加|税率は頻繁に変わり地域でも異なります。登記所で最新の税率を確認して入力してください。結果は概算です。|土地の価値を入力し、各税金・手数料と税率（%）を入力してください。合計は自動計算されます。",
+ko:"토지 등기 비용|토지 가치|공시 평가액(높은 쪽 적용)|세금 또는 수수료|총 비용|행 추가|세율은 자주 바뀌고 지역마다 다릅니다. 등기소에서 현재 세율을 확인해 입력하세요. 결과는 추정치입니다.|토지 가치를 입력한 뒤 각 세금·수수료와 세율(%)을 입력하세요. 합계는 자동 계산됩니다.",
+ru:"Расходы на регистрацию земли|Стоимость земли|Кадастровая (оценочная) стоимость (применяется большая)|Налог или сбор|Итого расходов|Добавить строку|Ставки часто меняются и зависят от региона. Введите актуальные ставки из регистрирующего органа; результат приблизительный.|Введите стоимость земли, затем каждый налог или сбор с его ставкой (%). Итог считается автоматически.",
+es:"Costo de registro de terreno|Valor del terreno|Valor catastral (se aplica el mayor)|Impuesto o tasa|Costo total|Añadir fila|Las tasas cambian a menudo y varían por zona. Introduce las vigentes de tu registro; el resultado es una estimación.|Introduce el valor del terreno y luego cada impuesto o tasa con su porcentaje (%). El total se suma solo.",
+fr:"Frais d’enregistrement foncier|Valeur du terrain|Valeur estimée officielle (la plus élevée s’applique)|Taxe ou frais|Coût total|Ajouter une ligne|Les taux changent souvent et varient selon la zone. Saisissez les taux actuels auprès de votre service; résultat estimatif.|Saisissez la valeur du terrain, puis chaque taxe ou frais avec son taux (%). Le total est calculé automatiquement.",
+de:"Kosten der Grundstücksregistrierung|Grundstückswert|Amtlicher Schätzwert (der höhere gilt)|Steuer oder Gebühr|Gesamtkosten|Zeile hinzufügen|Sätze ändern sich oft und variieren je nach Region. Aktuelle Sätze beim Amt erfragen; Ergebnisse sind Schätzungen.|Grundstückswert eingeben, dann jede Steuer oder Gebühr mit Satz (%). Die Summe wird automatisch berechnet.",
+pt:"Custo de registro de terreno|Valor do terreno|Valor avaliado oficial (aplica-se o maior)|Imposto ou taxa|Custo total|Adicionar linha|As taxas mudam com frequência e variam por região. Informe as atuais do cartório; resultado estimado.|Informe o valor do terreno e depois cada imposto ou taxa com sua alíquota (%). O total é somado automaticamente.",
+it:"Costi di registrazione terreno|Valore del terreno|Valore catastale (si applica il maggiore)|Imposta o tassa|Costo totale|Aggiungi riga|Le aliquote cambiano spesso e variano per zona. Inserisci quelle attuali dall’ufficio competente; risultato indicativo.|Inserisci il valore del terreno, poi ogni imposta o tassa con la sua aliquota (%). Il totale si calcola da solo.",
+nl:"Kosten grondregistratie|Grondwaarde|Getaxeerde waarde (de hoogste geldt)|Belasting of kosten|Totale kosten|Rij toevoegen|Tarieven veranderen vaak en verschillen per regio. Voer actuele tarieven van uw kantoor in; resultaten zijn schattingen.|Voer de grondwaarde in, dan elke belasting of kosten met tarief (%). Het totaal wordt automatisch opgeteld.",
+pl:"Koszty rejestracji gruntu|Wartość gruntu|Wartość urzędowa (stosuje się wyższą)|Podatek lub opłata|Koszt całkowity|Dodaj wiersz|Stawki często się zmieniają i różnią regionalnie. Wpisz aktualne stawki z urzędu; wyniki są szacunkowe.|Wpisz wartość gruntu, potem każdy podatek lub opłatę ze stawką (%). Suma liczy się automatycznie.",
+uk:"Витрати на реєстрацію землі|Вартість землі|Оціночна вартість (застосовується більша)|Податок або збір|Загальні витрати|Додати рядок|Ставки часто змінюються й залежать від регіону. Введіть актуальні ставки з реєстру; результат орієнтовний.|Введіть вартість землі, потім кожен податок або збір зі ставкою (%). Підсумок рахується автоматично.",
+id:"Biaya Pendaftaran Tanah|Nilai tanah|Nilai taksiran pemerintah (yang lebih tinggi berlaku)|Pajak atau biaya|Total biaya|Tambah baris|Tarif sering berubah dan berbeda tiap daerah. Masukkan tarif terkini dari kantor pertanahan; hasil hanya perkiraan.|Masukkan nilai tanah, lalu tiap pajak atau biaya beserta tarifnya (%). Total dihitung otomatis.",
+ms:"Kos Pendaftaran Tanah|Nilai tanah|Nilai taksiran kerajaan (yang lebih tinggi digunakan)|Cukai atau fi|Jumlah kos|Tambah baris|Kadar kerap berubah dan berbeza mengikut kawasan. Masukkan kadar semasa dari pejabat tanah; hasil ialah anggaran.|Masukkan nilai tanah, kemudian setiap cukai atau fi dengan kadarnya (%). Jumlah dikira secara automatik.",
+th:"ค่าใช้จ่ายจดทะเบียนที่ดิน|มูลค่าที่ดิน|ราคาประเมินของรัฐ (ใช้ราคาที่สูงกว่า)|ภาษีหรือค่าธรรมเนียม|ค่าใช้จ่ายรวม|เพิ่มแถว|อัตราเปลี่ยนบ่อยและต่างกันตามพื้นที่ ใส่อัตราปัจจุบันจากสำนักงานที่ดิน ผลลัพธ์เป็นค่าประมาณ|ใส่มูลค่าที่ดิน แล้วใส่ภาษีหรือค่าธรรมเนียมแต่ละรายการพร้อมอัตรา (%) ยอดรวมคำนวณให้อัตโนมัติ",
+vi:"Chi phí đăng ký đất đai|Giá trị đất|Giá trị định giá của nhà nước (áp dụng mức cao hơn)|Thuế hoặc phí|Tổng chi phí|Thêm dòng|Mức thuế phí thay đổi thường xuyên và khác nhau theo vùng. Hãy nhập mức hiện hành từ văn phòng đăng ký; kết quả chỉ là ước tính.|Nhập giá trị đất, rồi từng loại thuế hoặc phí kèm mức (%). Tổng được cộng tự động.",
+ta:"நில பதிவு செலவு|நில மதிப்பு|அரசு மதிப்பீடு (அதிகமானது பொருந்தும்)|வரி அல்லது கட்டணம்|மொத்த செலவு|வரிசை சேர்|விகிதங்கள் அடிக்கடி மாறும்; பகுதிக்கு ஏற்ப வேறுபடும். பதிவு அலுவலகத்தில் தற்போதைய விகிதங்களை உள்ளிடுங்கள்; முடிவுகள் மதிப்பீடுகளே.|நில மதிப்பை உள்ளிட்டு, ஒவ்வொரு வரி அல்லது கட்டணத்தையும் அதன் விகிதத்துடன் (%) உள்ளிடுங்கள். மொத்தம் தானாகக் கூட்டப்படும்.",
+te:"భూ రిజిస్ట్రేషన్ ఖర్చు|భూమి విలువ|ప్రభుత్వ అంచనా విలువ (ఎక్కువది వర్తిస్తుంది)|పన్ను లేదా రుసుము|మొత్తం ఖర్చు|వరుస జోడించు|రేట్లు తరచూ మారుతాయి, ప్రాంతాన్ని బట్టి వేరుగా ఉంటాయి. రిజిస్ట్రీ కార్యాలయం నుంచి ప్రస్తుత రేట్లు నమోదు చేయండి; ఫలితాలు అంచనాలే.|భూమి విలువ నమోదు చేసి, ప్రతి పన్ను లేదా రుసుమును దాని రేటుతో (%) ఇవ్వండి. మొత్తం ఆటోమేటిక్‌గా కూడుతుంది.",
+mr:"जमीन नोंदणी खर्च|जमिनीचे मूल्य|शासकीय निर्धारित मूल्य (जे जास्त ते लागू)|कर किंवा शुल्क|एकूण खर्च|ओळ जोडा|दर वारंवार बदलतात आणि भागानुसार वेगळे असतात. नोंदणी कार्यालयातून सध्याचे दर टाका; निकाल अंदाजे आहेत.|जमिनीचे मूल्य टाका, मग प्रत्येक कर किंवा शुल्क त्याच्या दरासह (%) टाका. एकूण आपोआप जोडले जाते.",
+ne:"जग्गा रजिस्ट्रेसन खर्च|जग्गाको मूल्य|सरकारी निर्धारित मूल्य (बढी भएको लागू हुन्छ)|कर वा शुल्क|कुल खर्च|पङ्क्ति थप्नुहोस्|दर प्रायः बदलिन्छन् र क्षेत्र अनुसार फरक हुन्छन्। मालपोत कार्यालयबाट हालको दर राख्नुहोस्; नतिजा अनुमानित हुन्।|जग्गाको मूल्य राख्नुहोस्, त्यसपछि प्रत्येक कर वा शुल्क र त्यसको दर (%) राख्नुहोस्। जम्मा आफैं जोडिन्छ।",
+si:"ඉඩම් ලියාපදිංචි වියදම|ඉඩමේ වටිනාකම|රජයේ තක්සේරු වටිනාකම (වැඩි එක අදාළ වේ)|බදු හෝ ගාස්තුව|මුළු වියදම|පේළියක් එක් කරන්න|අනුපාත නිතර වෙනස් වන අතර ප්‍රදේශය අනුව වෙනස් වේ. ලියාපදිංචි කාර්යාලයෙන් වත්මන් අනුපාත ඇතුළත් කරන්න; ප්‍රතිඵල ඇස්තමේන්තු පමණි.|ඉඩමේ වටිනාකම ඇතුළත් කර, එක් එක් බදු හෝ ගාස්තුව එහි අනුපාතය (%) සමඟ ඇතුළත් කරන්න. එකතුව ස්වයංක්‍රීයව ගණනය වේ.",
+sw:"Gharama ya Kusajili Ardhi|Thamani ya ardhi|Thamani iliyokadiriwa na serikali (ya juu hutumika)|Kodi au ada|Gharama jumla|Ongeza safu|Viwango hubadilika mara kwa mara na hutofautiana kwa eneo. Weka viwango vya sasa kutoka ofisi ya usajili; matokeo ni makadirio.|Weka thamani ya ardhi, kisha kila kodi au ada na kiwango chake (%). Jumla hujumlishwa kiotomatiki.",
+he:"עלות רישום מקרקעין|שווי הקרקע|שווי מוערך רשמי (הגבוה חל)|מס או אגרה|עלות כוללת|הוספת שורה|השיעורים משתנים לעיתים קרובות ושונים לפי אזור. הזינו שיעורים עדכניים מלשכת הרישום; התוצאות הן הערכה.|הזינו את שווי הקרקע, ואז כל מס או אגרה עם שיעורם (%). הסכום מחושב אוטומטית.",
+el:"Κόστος μεταγραφής γης|Αξία γης|Αντικειμενική αξία (ισχύει η μεγαλύτερη)|Φόρος ή τέλος|Συνολικό κόστος|Προσθήκη γραμμής|Οι συντελεστές αλλάζουν συχνά και διαφέρουν ανά περιοχή. Βάλτε τους τρέχοντες από την υπηρεσία· τα αποτελέσματα είναι εκτιμήσεις.|Εισάγετε την αξία γης και μετά κάθε φόρο ή τέλος με τον συντελεστή (%). Το σύνολο υπολογίζεται αυτόματα.",
+sv:"Kostnad för lagfart av mark|Markvärde|Taxeringsvärde (det högre gäller)|Skatt eller avgift|Total kostnad|Lägg till rad|Satser ändras ofta och varierar mellan regioner. Ange aktuella satser från myndigheten; resultaten är uppskattningar.|Ange markvärdet, sedan varje skatt eller avgift med sats (%). Summan räknas ut automatiskt."};
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+/* Typical tax/fee names per country (local terms, shown as written locally). Rates are NOT preset: they change often and differ by area, so the user enters current ones from the registry office. */
+const C={BD:["স্ট্যাম্প শুল্ক","রেজিস্ট্রেশন ফি","স্থানীয় সরকার কর","গেইন ট্যাক্স","VAT"],IN:["Stamp duty","Registration fee","Cess / surcharge"],PK:["Stamp duty","Registration fee","Withholding tax"],NP:["रजिस्ट्रेसन दस्तुर","पुँजीगत लाभ कर"],LK:["Stamp duty","Registration fee"],US:["Transfer tax","Recording fee"],CA:["Land transfer tax","Registration fee"],GB:["Stamp Duty Land Tax","Land Registry fee"],IE:["Stamp duty","Land Registry fee"],AU:["Transfer duty","Registration fee"],DE:["Grunderwerbsteuer","Notar","Grundbuch"],AT:["Grunderwerbsteuer","Eintragungsgebühr"],CH:["Handänderungssteuer","Notar / Grundbuch"],FR:["Droits de mutation","Émoluments du notaire"],ES:["ITP / IVA","AJD","Notaría / Registro"],IT:["Imposta di registro","Imposte ipotecaria e catastale","Notaio"],NL:["Overdrachtsbelasting","Notaris","Kadaster"],GR:["Φόρος μεταβίβασης","Συμβολαιογράφος"],PL:["PCC","Taksa notarialna","Opłata sądowa"],SE:["Lagfartsavgift"],RU:["Госпошлина"],TR:["Tapu harcı","Döner sermaye"],CN:["契税","印花税","登记费"],JP:["登録免許税","不動産取得税"],KR:["취득세","등록면허세"],ZA:["Transfer duty","Conveyancing"]};
+const O={BD:"সাব-রেজিস্ট্রি অফিস",IN:"Sub-Registrar Office",PK:"Sub-Registrar",NP:"मालपोत कार्यालय",LK:"Land Registry",US:"County recorder",CA:"Land Titles Office",GB:"HM Land Registry",IE:"Land Registry",AU:"Land titles office",DE:"Grundbuchamt",AT:"Grundbuch",CH:"Grundbuchamt",FR:"Notaire / Service de la publicité foncière",ES:"Registro de la Propiedad",IT:"Agenzia delle Entrate",NL:"Kadaster",GR:"Κτηματολόγιο",PL:"Księga wieczysta",SE:"Lantmäteriet",RU:"Росреестр",TR:"Tapu Müdürlüğü",CN:"不动产登记中心",JP:"法務局",KR:"등기소",ZA:"Deeds Office"};
+/* countries where the registry charges on the higher of deal value and government-assessed value */
+const HV=["BD","IN","PK","NP"];
+let D={v:"",h:"",rows:[],ov:0};
+function num(v){let s=String(v||"").trim().replace(/\s/g,"");
+s=s.replace(/[\u0660-\u0669]/g,c=>c.charCodeAt(0)-0x660).replace(/[\u06F0-\u06F9]/g,c=>c.charCodeAt(0)-0x6F0).replace(/[\u0966-\u096F]/g,c=>c.charCodeAt(0)-0x966).replace(/[\u09E6-\u09EF]/g,c=>c.charCodeAt(0)-0x9E6);
+if(s.includes(",")&&s.includes("."))s=s.replace(/,/g,"");else s=s.replace(",",".");
+const n=parseFloat(s);return isFinite(n)&&n>=0?n:0}
+const nf=x=>{try{return new Intl.NumberFormat(ET.state.lang,{maximumFractionDigits:2}).format(x)}catch(e){return String(x)}};
+const hv=()=>HV.includes(ET.state.country);
+function draw(){
+const out=$("out");out.replaceChildren();
+const base=Math.max(num(D.v),hv()?num(D.h):0);
+if(!base)return;
+let tot=0;const log=[];
+const li=(a,b,c)=>{const e=document.createElement("li");if(c)e.className=c;const x=document.createElement("span"),y=document.createElement("span");x.textContent=a;x.setAttribute("dir","auto");y.textContent=b;e.append(x,y);out.appendChild(e)};
+D.rows.forEach(r=>{const p=num(r.r);if(!p)return;const a=base*p/100;tot+=a;li((r.n||T(3))+" ("+nf(p)+"%)",ET.money(a))});
+if(!tot)return;
+li(T(4)+" ("+nf(tot/base*100)+"%)",ET.money(tot),"tt");
+ET.log(ET.money(base)+" → "+ET.money(tot))}
+function rowsUI(){
+const box=$("rows");box.replaceChildren();
+D.rows.forEach((r,i)=>{const d=document.createElement("div");d.className="rw";
+const n=document.createElement("input"),p=document.createElement("input"),x=document.createElement("button");
+n.className="nm";n.value=r.n;n.placeholder=T(3);n.setAttribute("aria-label",T(3));n.setAttribute("dir","auto");
+p.className="rt";p.value=r.r;p.placeholder="%";p.setAttribute("inputmode","decimal");p.setAttribute("aria-label","%");
+x.type="button";x.textContent="✕";x.setAttribute("aria-label","✕");
+n.oninput=()=>{r.n=n.value;D.ov=1;draw()};p.oninput=()=>{r.r=p.value;D.ov=1;draw()};
+x.onclick=()=>{D.rows.splice(i,1);D.ov=1;rowsUI();draw()};
+d.append(n,p,x);box.appendChild(d)})}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l_v").textContent=T(1);$("l_h").textContent=T(2);$("h_r").textContent=T(3);$("ad").textContent="+ "+T(5);
+$("hv").hidden=!hv();
+if(!D.ov)D.rows=(C[ET.state.country]||[""]).map(n=>({n,r:""}));
+$("of").textContent=O[ET.state.country]?"🏛 "+O[ET.state.country]:"";
+rowsUI();draw()}
+$("v").oninput=e=>{D.v=e.target.value;draw()};
+$("h").oninput=e=>{D.h=e.target.value;draw()};
+$("ad").onclick=()=>{D.rows.push({n:"",r:""});D.ov=1;rowsUI()};
+ET.start({id:"reg",file:"reg.html",S,labels,guide:()=>T(7),warn:()=>T(6)});
+</script>
+</body>
+</html>

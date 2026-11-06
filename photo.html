@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Passport Photo Maker | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>.pv{display:block;margin:12px auto;max-width:240px;width:100%;border:1px solid var(--ln);background:#fff}.sl{display:flex;gap:10px;align-items:center;margin:6px 0}.sl span{width:2rem;text-align:center;font-size:1.2rem}.sl input{flex:1;padding:0}.bt{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0}.bt button{flex:1}button:disabled{opacity:.5;cursor:not-allowed}.bt button:not(:disabled){border-color:var(--ac);color:var(--ac);font-weight:600}</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="f" id="l_f"></label><input id="f" type="file" accept="image/*">
+<div class="set"><div><label for="sz" id="l_sz"></label><select id="sz"></select></div><div><label for="pp" id="l_pp"></label><select id="pp"><option value="A4">A4</option><option value="4x6">4×6 in</option></select></div></div>
+<p class="mu" id="cn" dir="auto"></p>
+<canvas class="pv" id="pv" aria-hidden="true"></canvas>
+<div class="sl"><span>🔍</span><input id="zm" type="range" min="1" max="3" step="0.01" value="1" aria-label="Zoom"></div>
+<div class="sl"><span>↔</span><input id="ox" type="range" min="-100" max="100" value="0" aria-label="↔"></div>
+<div class="sl"><span>↕</span><input id="oy" type="range" min="-100" max="100" value="0" aria-label="↕"></div>
+<div class="bt"><button type="button" id="d1" disabled></button><button type="button" id="d2" disabled></button></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+/* Strings, in this order: 0 title | 1 Upload photo | 2 Photo size | 3 Zoom | 4 Paper | 5 Warning | 6 Guide */
+const S={
+en:"Passport Photo Maker|Upload photo|Photo size|Zoom|Paper|Rules differ by country and application. Check the official photo requirements.|Upload a front-facing photo on a plain light background, adjust it, then download. Your photo never leaves your device.",
+bn:"পাসপোর্ট সাইজ ফটো মেকার|ছবি আপলোড করুন|ছবির সাইজ|জুম|কাগজ|নিয়ম দেশ ও আবেদনভেদে আলাদা। সরকারি ফটো নির্দেশনা দেখে নিন।|সাদামাটা হালকা পটভূমিতে সামনে থেকে তোলা ছবি দিন, ঠিক করে ডাউনলোড করুন। ছবি আপনার ডিভাইস থেকে বাইরে যায় না।",
+hi:"पासपोर्ट साइज़ फ़ोटो मेकर|फ़ोटो अपलोड करें|फ़ोटो का आकार|ज़ूम|कागज़|नियम देश और आवेदन के अनुसार अलग हैं। आधिकारिक फ़ोटो निर्देश देखें।|सादे हल्के बैकग्राउंड पर सामने से खींची फ़ोटो दें, एडजस्ट करें, फिर डाउनलोड करें। फ़ोटो आपके डिवाइस से बाहर नहीं जाती।",
+ur:"پاسپورٹ سائز فوٹو میکر|تصویر اپ لوڈ کریں|تصویر کا سائز|زوم|کاغذ|قواعد ملک اور درخواست کے لحاظ سے مختلف ہیں۔ سرکاری فوٹو ہدایات دیکھیں۔|سادہ ہلکے پس منظر میں سامنے سے لی گئی تصویر دیں، درست کریں، پھر ڈاؤن لوڈ کریں۔ تصویر آپ کے ڈیوائس سے باہر نہیں جاتی۔",
+ar:"صانع صور جواز السفر|ارفع الصورة|مقاس الصورة|تكبير|الورق|تختلف القواعد حسب الدولة والطلب. راجع شروط الصور الرسمية.|ارفع صورة أمامية بخلفية فاتحة سادة، عدّلها ثم نزّلها. لا تغادر صورتك جهازك.",
+fa:"ساخت عکس پاسپورتی|بارگذاری عکس|اندازه عکس|بزرگ‌نمایی|کاغذ|قوانین بسته به کشور و درخواست متفاوت است. الزامات رسمی عکس را بررسی کنید.|عکس روبه‌رو با پس‌زمینه ساده و روشن بارگذاری کنید، تنظیم و دانلود کنید. عکس شما از دستگاهتان خارج نمی‌شود.",
+tr:"Vesikalık Fotoğraf Oluşturucu|Fotoğraf yükle|Fotoğraf boyutu|Yakınlaştır|Kağıt|Kurallar ülkeye ve başvuruya göre değişir. Resmî fotoğraf şartlarını kontrol edin.|Düz, açık renkli arka planda karşıdan çekilmiş fotoğraf yükleyin, ayarlayın ve indirin. Fotoğrafınız cihazınızdan çıkmaz.",
+zh:"证件照制作器|上传照片|照片尺寸|缩放|纸张|各国及各类申请要求不同，请查看官方照片要求。|上传浅色纯色背景的正面照片，调整后下载。照片不会离开您的设备。",
+ja:"証明写真メーカー|写真をアップロード|写真サイズ|ズーム|用紙|規定は国や申請によって異なります。公式の写真要件を確認してください。|無地で明るい背景の正面写真をアップロードし、調整してダウンロード。写真は端末外に送信されません。",
+ko:"여권 사진 만들기|사진 업로드|사진 크기|확대|용지|규정은 국가와 신청 종류에 따라 다릅니다. 공식 사진 규정을 확인하세요.|밝은 단색 배경의 정면 사진을 올리고 조정한 뒤 다운로드하세요. 사진은 기기 밖으로 나가지 않습니다.",
+ru:"Фото на паспорт|Загрузить фото|Размер фото|Масштаб|Бумага|Требования различаются по странам и видам заявок. Проверьте официальные требования.|Загрузите фото анфас на светлом однотонном фоне, настройте и скачайте. Фото не покидает ваше устройство.",
+es:"Fotos tamaño pasaporte|Subir foto|Tamaño de la foto|Zoom|Papel|Las normas varían según el país y el trámite. Consulta los requisitos oficiales.|Sube una foto de frente con fondo claro liso, ajústala y descárgala. Tu foto no sale de tu dispositivo.",
+fr:"Photo d’identité|Importer une photo|Taille de la photo|Zoom|Papier|Les règles varient selon le pays et la démarche. Consultez les exigences officielles.|Importez une photo de face sur fond clair uni, ajustez-la, puis téléchargez. Votre photo ne quitte pas votre appareil.",
+de:"Passfoto-Ersteller|Foto hochladen|Fotogröße|Zoom|Papier|Vorgaben unterscheiden sich je nach Land und Antrag. Offizielle Anforderungen prüfen.|Frontales Foto auf einfarbig hellem Hintergrund hochladen, anpassen und herunterladen. Ihr Foto verlässt Ihr Gerät nicht.",
+pt:"Gerador de foto para passaporte|Enviar foto|Tamanho da foto|Zoom|Papel|As regras variam por país e solicitação. Consulte os requisitos oficiais.|Envie uma foto de frente com fundo claro liso, ajuste e baixe. Sua foto não sai do seu dispositivo.",
+it:"Foto tessera|Carica foto|Dimensione foto|Zoom|Carta|Le regole variano per paese e pratica. Controlla i requisiti ufficiali.|Carica una foto frontale su sfondo chiaro uniforme, regolala e scaricala. La foto non lascia il tuo dispositivo.",
+nl:"Pasfoto-maker|Foto uploaden|Fotoformaat|Zoom|Papier|Regels verschillen per land en aanvraag. Controleer de officiële eisen.|Upload een foto van voren met effen lichte achtergrond, pas aan en download. Uw foto verlaat uw apparaat niet.",
+pl:"Kreator zdjęć paszportowych|Prześlij zdjęcie|Rozmiar zdjęcia|Powiększenie|Papier|Zasady różnią się zależnie od kraju i wniosku. Sprawdź oficjalne wymagania.|Prześlij zdjęcie en face na jasnym jednolitym tle, dopasuj i pobierz. Zdjęcie nie opuszcza Twojego urządzenia.",
+uk:"Фото на паспорт|Завантажити фото|Розмір фото|Масштаб|Папір|Вимоги різняться залежно від країни та заяви. Перевірте офіційні вимоги.|Завантажте фото анфас на світлому однотонному фоні, налаштуйте й завантажте. Фото не залишає ваш пристрій.",
+id:"Pembuat Pas Foto Paspor|Unggah foto|Ukuran foto|Zoom|Kertas|Aturan berbeda tiap negara dan keperluan. Periksa persyaratan resmi.|Unggah foto tampak depan berlatar terang polos, atur, lalu unduh. Foto Anda tidak keluar dari perangkat.",
+ms:"Pembuat Gambar Pasport|Muat naik foto|Saiz foto|Zum|Kertas|Peraturan berbeza mengikut negara dan permohonan. Semak keperluan rasmi.|Muat naik foto menghadap depan berlatar belakang cerah biasa, laras, kemudian muat turun. Foto anda kekal dalam peranti.",
+th:"ตัวสร้างรูปถ่ายติดหนังสือเดินทาง|อัปโหลดรูป|ขนาดรูป|ซูม|กระดาษ|กฎต่างกันตามประเทศและการสมัคร โปรดตรวจสอบข้อกำหนดทางการ|อัปโหลดรูปหน้าตรงพื้นหลังสีอ่อนเรียบ ปรับแต่งแล้วดาวน์โหลด รูปของคุณไม่ออกจากอุปกรณ์",
+vi:"Tạo ảnh hộ chiếu|Tải ảnh lên|Kích thước ảnh|Thu phóng|Giấy|Quy định khác nhau theo quốc gia và hồ sơ. Hãy kiểm tra yêu cầu chính thức.|Tải ảnh chụp thẳng, nền sáng trơn, chỉnh rồi tải xuống. Ảnh không rời khỏi thiết bị của bạn.",
+ta:"கடவுச்சீட்டு புகைப்பட உருவாக்கி|புகைப்படத்தைப் பதிவேற்றவும்|புகைப்பட அளவு|பெரிதாக்கு|காகிதம்|விதிகள் நாடு மற்றும் விண்ணப்பத்திற்கு ஏற்ப மாறும். அதிகாரப்பூர்வ தேவைகளைப் பாருங்கள்.|எளிய வெளிர் பின்னணியில் நேராக எடுத்த படத்தை பதிவேற்றி, சரிசெய்து, பதிவிறக்குங்கள். உங்கள் படம் சாதனத்தை விட்டு வெளியேறாது.",
+te:"పాస్‌పోర్ట్ ఫోటో మేకర్|ఫోటో అప్‌లోడ్ చేయండి|ఫోటో పరిమాణం|జూమ్|కాగితం|నియమాలు దేశం, దరఖాస్తును బట్టి మారతాయి. అధికారిక ఫోటో అవసరాలు చూడండి.|సాదా లేత నేపథ్యంలో ముందు నుంచి తీసిన ఫోటో అప్‌లోడ్ చేసి, సరిచేసి, డౌన్‌లోడ్ చేయండి. ఫోటో మీ పరికరం దాటి వెళ్లదు.",
+mr:"पासपोर्ट साइज फोटो मेकर|फोटो अपलोड करा|फोटोचा आकार|झूम|कागद|नियम देश आणि अर्जानुसार वेगळे असतात. अधिकृत फोटो अटी पहा.|साध्या फिकट पार्श्वभूमीवर समोरून काढलेला फोटो द्या, समायोजित करा आणि डाउनलोड करा. फोटो तुमच्या डिव्हाइसबाहेर जात नाही.",
+ne:"राहदानी साइज फोटो मेकर|फोटो अपलोड गर्नुहोस्|फोटोको आकार|जुम|कागज|नियम देश र आवेदन अनुसार फरक हुन्छन्। आधिकारिक फोटो आवश्यकता हेर्नुहोस्।|सादा हल्का पृष्ठभूमिमा अगाडिबाट खिचेको फोटो दिनुहोस्, मिलाउनुहोस् र डाउनलोड गर्नुहोस्। फोटो तपाईंको उपकरणबाट बाहिर जाँदैन।",
+si:"ගමන් බලපත්‍ර ඡායාරූප සාදනය|ඡායාරූපය උඩුගත කරන්න|ඡායාරූප ප්‍රමාණය|විශාල කරන්න|කඩදාසි|නීති රට සහ ඉල්ලුම අනුව වෙනස් වේ. නිල ඡායාරූප අවශ්‍යතා පරීක්ෂා කරන්න.|සරල ලා පසුබිමක ඉදිරියෙන් ගත් ඡායාරූපයක් දමා, සකසා, බාගන්න. ඔබේ ඡායාරූපය උපාංගයෙන් පිටතට නොයයි.",
+sw:"Kitengeneza Picha za Pasipoti|Pakia picha|Ukubwa wa picha|Kuza|Karatasi|Sheria hutofautiana kwa nchi na maombi. Angalia mahitaji rasmi.|Pakia picha ya uso wa mbele yenye mandhari nyepesi ya kawaida, irekebishe, kisha pakua. Picha yako haitoki kwenye kifaa chako.",
+he:"יוצר תמונות פספורט|העלאת תמונה|גודל התמונה|זום|נייר|הכללים משתנים לפי מדינה ובקשה. בדקו את הדרישות הרשמיות.|העלו תמונה חזיתית על רקע בהיר חלק, התאימו והורידו. התמונה לא עוזבת את המכשיר שלכם.",
+el:"Φωτογραφίες διαβατηρίου|Μεταφόρτωση φωτογραφίας|Μέγεθος φωτογραφίας|Ζουμ|Χαρτί|Οι κανόνες διαφέρουν ανά χώρα και αίτηση. Ελέγξτε τις επίσημες απαιτήσεις.|Ανεβάστε φωτογραφία κατά πρόσωπο σε απλό ανοιχτό φόντο, προσαρμόστε και κατεβάστε. Η φωτογραφία δεν φεύγει από τη συσκευή σας.",
+sv:"Passfotoskapare|Ladda upp foto|Fotostorlek|Zoom|Papper|Reglerna skiljer sig mellan länder och ansökningar. Kontrollera officiella krav.|Ladda upp ett framifrånfoto mot enfärgad ljus bakgrund, justera och ladda ner. Ditt foto lämnar aldrig din enhet."};
+const $=id=>document.getElementById(id),T=k=>ET.t(k);
+/* photo sizes in mm [width,height]. Country default below; guidance only, confirm with the issuing office. */
+const SZ=[[35,45],[40,50],[45,55],[51,51],[50,70],[33,48],[50,60]];
+const P={BD:2,US:3,CA:4,CN:5,TR:6};
+const PAPER={A4:[210,297],"4x6":[101.6,152.4]},LETTER=["US","CA"],DPI=300;
+let D={sz:0,pp:"A4",ov:{}},img=null;
+const px=mm=>Math.round(mm/25.4*DPI);
+const dn=c=>{try{return new Intl.DisplayNames([ET.state.lang],{type:"region"}).of(c)||c}catch(e){return c}};
+function paint(c,w,h){
+c.width=w;c.height=h;const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,w,h);
+if(!img)return;
+const s=Math.max(w/img.width,h/img.height)*$("zm").value,iw=img.width*s,ih=img.height*s;
+const x=-(iw-w)*(+$("ox").value+100)/200,y=-(ih-h)*(+$("oy").value+100)/200;
+g.drawImage(img,x,y,iw,ih)}
+const size=()=>SZ[D.sz],name=()=>size()[0]+"×"+size()[1]+" mm";
+function draw(){const z=size();paint($("pv"),px(z[0]),px(z[1]))}
+function save(c,file){c.toBlob(b=>{const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=file;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),4000)},"image/jpeg",.95)}
+function sheet(){
+const z=size(),p=PAPER[D.pp],m=5,gp=2;let best=null;
+[[p[0],p[1]],[p[1],p[0]]].forEach(o=>{const cl=Math.floor((o[0]-2*m+gp)/(z[0]+gp)),rw=Math.floor((o[1]-2*m+gp)/(z[1]+gp));if(!best||cl*rw>best.n)best={W:o[0],H:o[1],cl,rw,n:cl*rw}});
+const one=document.createElement("canvas");paint(one,px(z[0]),px(z[1]));
+const c=document.createElement("canvas");c.width=px(best.W);c.height=px(best.H);const g=c.getContext("2d");g.fillStyle="#fff";g.fillRect(0,0,c.width,c.height);
+const ox=(best.W-(best.cl*(z[0]+gp)-gp))/2,oy=(best.H-(best.rw*(z[1]+gp)-gp))/2;
+g.strokeStyle="#bbb";g.lineWidth=1;
+for(let r=0;r<best.rw;r++)for(let k=0;k<best.cl;k++){const x=px(ox+k*(z[0]+gp)),y=px(oy+r*(z[1]+gp));g.drawImage(one,x,y);g.strokeRect(x+.5,y+.5,one.width-1,one.height-1)}
+return c}
+function info(){const c=ET.state.country;$("cn").textContent=(c==="INT"?"":dn(c)+": ")+name()}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+$("l_f").textContent=T(1);$("l_sz").textContent=T(2);$("l_pp").textContent=T(4);$("zm").setAttribute("aria-label",T(3));
+if(!D.ov.sz)D.sz=P[ET.state.country]||0;
+if(!D.ov.pp)D.pp=LETTER.includes(ET.state.country)?"4x6":"A4";
+$("sz").innerHTML=SZ.map((z,i)=>'<option value="'+i+'">'+z[0]+"×"+z[1]+" mm</option>").join("");$("sz").value=D.sz;$("pp").value=D.pp;
+$("d1").textContent="⬇ JPG";$("d2").textContent="⬇ "+(D.pp==="A4"?"A4":"4×6 in");
+info();draw()}
+$("f").onchange=e=>{const f=e.target.files[0];if(!f)return;const i=new Image();i.onload=()=>{img=i;$("d1").disabled=$("d2").disabled=false;draw()};i.src=URL.createObjectURL(f)};
+["zm","ox","oy"].forEach(k=>$(k).oninput=draw);
+$("sz").onchange=e=>{D.sz=+e.target.value;D.ov.sz=1;info();draw()};
+$("pp").onchange=e=>{D.pp=e.target.value;D.ov.pp=1;$("d2").textContent="⬇ "+(D.pp==="A4"?"A4":"4×6 in")};
+$("d1").onclick=()=>{const c=document.createElement("canvas");paint(c,px(size()[0]),px(size()[1]));save(c,"passport-photo.jpg");ET.logNow(name()+" · JPG")};
+$("d2").onclick=()=>{save(sheet(),"passport-photo-sheet.jpg");ET.logNow(name()+" · "+(D.pp==="A4"?"A4":"4×6 in"))};
+ET.start({id:"photo",file:"photo.html",S,labels,guide:()=>T(6),warn:()=>T(5),currency:false});
+</script>
+</body>
+</html>
