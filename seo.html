@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SEO Meta Tag Generator | Essential Tools</title>
+<link rel="stylesheet" href="common.css">
+<style>
+textarea{width:100%;font:inherit;color:var(--tx);background:var(--sf);border:1px solid var(--ln);border-radius:8px;padding:8px 10px}
+#out{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;direction:ltr;text-align:left}
+h2.sh{font-size:1.15rem;margin:22px 0 4px}
+.cnt{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.cnt .mu{margin:2px 0}
+.sr{background:#fff;color:#202124;border:1px solid var(--ln);border-radius:12px;padding:14px 16px;max-width:640px}
+.sr .u{font-size:13px;color:#4d5156}.sr .tt{font-size:20px;color:#1a0dab;line-height:1.3;margin:2px 0}.sr .dd{font-size:14px;color:#4d5156}
+</style>
+</head>
+<body>
+<main>
+<div id="et-top"></div>
+<h1 id="t"></h1>
+<label for="ti" id="l_ti"></label><input id="ti">
+<div class="cnt"><span class="mu" id="ct"></span><span class="mu" id="mt"></span></div>
+<label for="de" id="l_de"></label><textarea id="de" rows="3"></textarea>
+<div class="cnt"><span class="mu" id="cd"></span><span class="mu" id="md"></span></div>
+<label for="ur" id="l_ur"></label><input id="ur" type="url" placeholder="https://example.com/page">
+<label for="sn" id="l_sn"></label><input id="sn">
+<label for="im" id="l_im"></label><input id="im" type="url" placeholder="https://example.com/image.jpg">
+<label for="lc" id="l_lc"></label><input id="lc" autocomplete="off">
+<label class="chk" style="display:flex;gap:8px;align-items:center;margin-top:14px"><input type="checkbox" id="idx" style="width:auto"><span id="lidx"></span></label>
+<h2 class="sh" id="h12"></h2>
+<div id="w_vg" hidden><label for="vg" id="l_vg"></label><input id="vg" autocomplete="off"></div><div id="w_vb" hidden><label for="vb" id="l_vb"></label><input id="vb" autocomplete="off"></div><div id="w_vy" hidden><label for="vy" id="l_vy"></label><input id="vy" autocomplete="off"></div><div id="w_vz" hidden><label for="vz" id="l_vz"></label><input id="vz" autocomplete="off"></div><div id="w_vn" hidden><label for="vn" id="l_vn"></label><input id="vn" autocomplete="off"></div>
+<h2 class="sh" id="h8"></h2>
+<div class="sr" dir="auto"><div class="u" id="pvu"></div><div class="tt" id="pvt"></div><div class="dd" id="pvd"></div></div>
+<h2 class="sh" id="h9"></h2>
+<textarea id="out" rows="8" readonly spellcheck="false"></textarea>
+<div style="margin-top:10px"><button type="button" class="btn" id="cp"></button></div>
+<div id="et-bottom"></div>
+</main>
+<script src="common.js"></script>
+<script>
+const S={
+en:"SEO Meta Tag Generator|Page title|Meta description|Page URL (canonical)|Site name|Image URL for sharing|Language and region code (e.g. en_US)|Allow search engines to index and follow this page|Search preview|Generated code|Copy|Copied|Search engine verification codes (optional)|Too long: it may be cut off in results.|Too short: add more detail.|No tool can guarantee rankings. Write a unique, honest title and description for every page, and test your page with the search engine’s own tools.",
+bn:"এসইও মেটা ট্যাগ জেনারেটর|পেজের শিরোনাম|মেটা বিবরণ|পেজের URL (ক্যানোনিক্যাল)|সাইটের নাম|শেয়ারের জন্য ছবির URL|ভাষা ও অঞ্চল কোড (যেমন bn_BD)|সার্চ ইঞ্জিনকে এই পেজ ইনডেক্স ও ফলো করতে দিন|সার্চ প্রিভিউ|তৈরি কোড|কপি|কপি হয়েছে|সার্চ ইঞ্জিন ভেরিফিকেশন কোড (ঐচ্ছিক)|অনেক বড়: ফলাফলে কেটে যেতে পারে।|অনেক ছোট: আরও বিবরণ যোগ করুন।|কোনো টুলই র‍্যাঙ্কিংয়ের নিশ্চয়তা দিতে পারে না। প্রতিটি পেজের জন্য আলাদা ও সৎ শিরোনাম-বিবরণ লিখুন এবং সার্চ ইঞ্জিনের নিজস্ব টুল দিয়ে পেজ পরীক্ষা করুন।",
+hi:"SEO मेटा टैग जनरेटर|पेज का शीर्षक|मेटा विवरण|पेज URL (कैनोनिकल)|साइट का नाम|शेयर के लिए इमेज URL|भाषा और क्षेत्र कोड (जैसे hi_IN)|सर्च इंजन को इस पेज को इंडेक्स और फ़ॉलो करने दें|सर्च प्रीव्यू|बना हुआ कोड|कॉपी|कॉपी हो गया|सर्च इंजन सत्यापन कोड (वैकल्पिक)|बहुत लंबा: नतीजों में कट सकता है।|बहुत छोटा: और विवरण जोड़ें।|कोई टूल रैंकिंग की गारंटी नहीं दे सकता। हर पेज के लिए अलग और ईमानदार शीर्षक व विवरण लिखें, और सर्च इंजन के अपने टूल से पेज जाँचें।",
+ur:"ایس ای او میٹا ٹیگ جنریٹر|صفحے کا عنوان|میٹا تفصیل|صفحے کا URL (کینونیکل)|سائٹ کا نام|شیئر کے لیے تصویر کا URL|زبان اور علاقے کا کوڈ (مثلاً ur_PK)|سرچ انجن کو اس صفحے کو انڈیکس اور فالو کرنے دیں|سرچ پیش منظر|تیار کوڈ|کاپی|کاپی ہو گیا|سرچ انجن تصدیقی کوڈ (اختیاری)|بہت لمبا: نتائج میں کٹ سکتا ہے۔|بہت چھوٹا: مزید تفصیل شامل کریں۔|کوئی ٹول رینکنگ کی ضمانت نہیں دے سکتا۔ ہر صفحے کے لیے منفرد اور ایماندار عنوان اور تفصیل لکھیں اور سرچ انجن کے اپنے ٹولز سے صفحہ جانچیں۔",
+ar:"منشئ وسوم SEO الوصفية|عنوان الصفحة|الوصف التعريفي|رابط الصفحة (الأساسي)|اسم الموقع|رابط الصورة للمشاركة|رمز اللغة والمنطقة (مثل ar_SA)|السماح لمحركات البحث بفهرسة هذه الصفحة وتتبع روابطها|معاينة البحث|الكود الناتج|نسخ|تم النسخ|رموز التحقق لمحركات البحث (اختياري)|طويل جدًا: قد يُقتطع في النتائج.|قصير جدًا: أضف مزيدًا من التفاصيل.|لا توجد أداة تضمن الترتيب. اكتب عنوانًا ووصفًا فريدين وصادقين لكل صفحة، واختبر صفحتك بأدوات محرك البحث نفسه.",
+fa:"ساخت متاتگ سئو|عنوان صفحه|توضیحات متا|نشانی صفحه (کنونیکال)|نام سایت|نشانی تصویر برای اشتراک‌گذاری|کد زبان و منطقه (مثلاً fa_IR)|اجازه به موتورهای جستجو برای ایندکس و دنبال کردن این صفحه|پیش‌نمایش جستجو|کد تولیدشده|کپی|کپی شد|کدهای تأیید موتور جستجو (اختیاری)|خیلی بلند: ممکن است در نتایج بریده شود.|خیلی کوتاه: جزئیات بیشتری اضافه کنید.|هیچ ابزاری رتبه را تضمین نمی‌کند. برای هر صفحه عنوان و توضیح منحصربه‌فرد و صادقانه بنویسید و صفحه را با ابزارهای خود موتور جستجو آزمایش کنید.",
+tr:"SEO Meta Etiketi Oluşturucu|Sayfa başlığı|Meta açıklama|Sayfa URL’si (canonical)|Site adı|Paylaşım için görsel URL’si|Dil ve bölge kodu (örn. tr_TR)|Arama motorlarının bu sayfayı dizinleyip izlemesine izin ver|Arama önizlemesi|Oluşturulan kod|Kopyala|Kopyalandı|Arama motoru doğrulama kodları (isteğe bağlı)|Çok uzun: sonuçlarda kesilebilir.|Çok kısa: daha fazla ayrıntı ekleyin.|Hiçbir araç sıralamayı garanti edemez. Her sayfa için benzersiz ve dürüst bir başlık ile açıklama yazın ve sayfanızı arama motorunun kendi araçlarıyla test edin.",
+zh:"SEO 元标签生成器|页面标题|元描述|页面 URL（规范链接）|网站名称|分享图片 URL|语言和地区代码（例如 zh_CN）|允许搜索引擎索引并跟踪此页面|搜索预览|生成的代码|复制|已复制|搜索引擎验证码（可选）|过长：可能在结果中被截断。|过短：请添加更多内容。|没有任何工具能保证排名。请为每个页面撰写独特且真实的标题和描述，并用搜索引擎自带的工具测试页面。",
+ja:"SEOメタタグ作成|ページタイトル|メタディスクリプション|ページURL（正規URL）|サイト名|共有用の画像URL|言語・地域コード（例：ja_JP）|検索エンジンにこのページのインデックスとリンクのたどりを許可する|検索プレビュー|生成されたコード|コピー|コピーしました|検索エンジンの確認コード（任意）|長すぎます：結果で切れる可能性があります。|短すぎます：もう少し詳しく書いてください。|順位を保証できるツールはありません。ページごとに独自で正直なタイトルと説明を書き、検索エンジン公式のツールでページを確認してください。",
+ko:"SEO 메타 태그 생성기|페이지 제목|메타 설명|페이지 URL(캐노니컬)|사이트 이름|공유용 이미지 URL|언어 및 지역 코드(예: ko_KR)|검색엔진이 이 페이지를 색인하고 링크를 따라가도록 허용|검색 미리보기|생성된 코드|복사|복사됨|검색엔진 인증 코드(선택)|너무 깁니다: 결과에서 잘릴 수 있습니다.|너무 짧습니다: 내용을 더 추가하세요.|순위를 보장하는 도구는 없습니다. 페이지마다 고유하고 정직한 제목과 설명을 쓰고, 검색엔진의 공식 도구로 페이지를 점검하세요.",
+ru:"Генератор мета-тегов SEO|Заголовок страницы|Мета-описание|URL страницы (canonical)|Название сайта|URL изображения для публикаций|Код языка и региона (например, ru_RU)|Разрешить поисковикам индексировать страницу и переходить по ссылкам|Предпросмотр в поиске|Готовый код|Копировать|Скопировано|Коды подтверждения для поисковых систем (необязательно)|Слишком длинно: в результатах может обрезаться.|Слишком коротко: добавьте деталей.|Ни один инструмент не гарантирует позиции. Пишите уникальные и честные заголовок и описание для каждой страницы и проверяйте страницу инструментами самих поисковиков.",
+es:"Generador de metaetiquetas SEO|Título de la página|Meta descripción|URL de la página (canónica)|Nombre del sitio|URL de imagen para compartir|Código de idioma y región (p. ej., es_ES)|Permitir que los buscadores indexen y sigan esta página|Vista previa en buscadores|Código generado|Copiar|Copiado|Códigos de verificación de buscadores (opcional)|Demasiado largo: puede cortarse en los resultados.|Demasiado corto: añade más detalle.|Ninguna herramienta puede garantizar posiciones. Escribe un título y una descripción únicos y honestos para cada página y prueba tu página con las herramientas del propio buscador.",
+fr:"Générateur de balises meta SEO|Titre de la page|Méta-description|URL de la page (canonique)|Nom du site|URL de l’image de partage|Code langue et région (p. ex. fr_FR)|Autoriser les moteurs de recherche à indexer et suivre cette page|Aperçu dans les résultats|Code généré|Copier|Copié|Codes de vérification des moteurs de recherche (facultatif)|Trop long : risque d’être tronqué dans les résultats.|Trop court : ajoutez des détails.|Aucun outil ne peut garantir un classement. Rédigez un titre et une description uniques et honnêtes pour chaque page, et testez votre page avec les outils du moteur de recherche.",
+de:"SEO-Meta-Tag-Generator|Seitentitel|Meta-Beschreibung|Seiten-URL (kanonisch)|Seitenname|Bild-URL zum Teilen|Sprach- und Regionscode (z. B. de_DE)|Suchmaschinen erlauben, diese Seite zu indexieren und ihren Links zu folgen|Suchvorschau|Erzeugter Code|Kopieren|Kopiert|Verifizierungscodes der Suchmaschinen (optional)|Zu lang: kann in den Ergebnissen abgeschnitten werden.|Zu kurz: Fügen Sie mehr Details hinzu.|Kein Tool kann Rankings garantieren. Schreiben Sie für jede Seite einen einzigartigen, ehrlichen Titel und eine Beschreibung und testen Sie die Seite mit den Tools der Suchmaschine.",
+pt:"Gerador de meta tags SEO|Título da página|Meta descrição|URL da página (canônica)|Nome do site|URL da imagem para compartilhamento|Código de idioma e região (ex.: pt_BR)|Permitir que mecanismos de busca indexem e sigam esta página|Prévia na busca|Código gerado|Copiar|Copiado|Códigos de verificação de buscadores (opcional)|Longo demais: pode ser cortado nos resultados.|Curto demais: adicione mais detalhes.|Nenhuma ferramenta garante posições. Escreva um título e uma descrição únicos e honestos para cada página e teste sua página com as ferramentas do próprio buscador.",
+it:"Generatore di meta tag SEO|Titolo della pagina|Meta descrizione|URL della pagina (canonico)|Nome del sito|URL dell’immagine per la condivisione|Codice lingua e regione (es. it_IT)|Consenti ai motori di ricerca di indicizzare e seguire questa pagina|Anteprima nei risultati|Codice generato|Copia|Copiato|Codici di verifica dei motori di ricerca (facoltativo)|Troppo lungo: potrebbe essere troncato nei risultati.|Troppo corto: aggiungi più dettagli.|Nessuno strumento può garantire il posizionamento. Scrivi un titolo e una descrizione unici e onesti per ogni pagina e verifica la pagina con gli strumenti del motore di ricerca.",
+nl:"SEO-metatag-generator|Paginatitel|Metabeschrijving|Pagina-URL (canoniek)|Sitenaam|Afbeeldings-URL om te delen|Taal- en regiocode (bijv. nl_NL)|Zoekmachines toestaan deze pagina te indexeren en te volgen|Zoekvoorbeeld|Gegenereerde code|Kopiëren|Gekopieerd|Verificatiecodes van zoekmachines (optioneel)|Te lang: kan in de resultaten worden afgekapt.|Te kort: voeg meer details toe.|Geen enkel hulpmiddel kan rankings garanderen. Schrijf voor elke pagina een unieke, eerlijke titel en beschrijving en test uw pagina met de tools van de zoekmachine zelf.",
+pl:"Generator metatagów SEO|Tytuł strony|Meta opis|URL strony (kanoniczny)|Nazwa witryny|URL obrazu do udostępniania|Kod języka i regionu (np. pl_PL)|Zezwól wyszukiwarkom na indeksowanie i śledzenie tej strony|Podgląd w wyszukiwarce|Wygenerowany kod|Kopiuj|Skopiowano|Kody weryfikacyjne wyszukiwarek (opcjonalnie)|Za długie: może zostać ucięte w wynikach.|Za krótkie: dodaj więcej szczegółów.|Żadne narzędzie nie gwarantuje pozycji. Pisz unikalny, uczciwy tytuł i opis dla każdej strony i testuj stronę narzędziami samej wyszukiwarki.",
+uk:"Генератор мета-тегів SEO|Заголовок сторінки|Мета-опис|URL сторінки (canonical)|Назва сайту|URL зображення для поширення|Код мови та регіону (наприклад, uk_UA)|Дозволити пошуковим системам індексувати сторінку й переходити за посиланнями|Попередній перегляд у пошуку|Згенерований код|Копіювати|Скопійовано|Коди підтвердження для пошукових систем (необов’язково)|Задовго: у результатах може обрізатися.|Закоротко: додайте подробиць.|Жоден інструмент не гарантує позицій. Пишіть унікальний і чесний заголовок та опис для кожної сторінки та перевіряйте сторінку інструментами самих пошуковиків.",
+id:"Pembuat Meta Tag SEO|Judul halaman|Meta deskripsi|URL halaman (kanonis)|Nama situs|URL gambar untuk berbagi|Kode bahasa dan wilayah (mis. id_ID)|Izinkan mesin pencari mengindeks dan mengikuti halaman ini|Pratinjau pencarian|Kode yang dihasilkan|Salin|Tersalin|Kode verifikasi mesin pencari (opsional)|Terlalu panjang: mungkin terpotong di hasil.|Terlalu pendek: tambahkan detail.|Tidak ada alat yang bisa menjamin peringkat. Tulis judul dan deskripsi yang unik dan jujur untuk setiap halaman, lalu uji halaman dengan alat dari mesin pencari itu sendiri.",
+ms:"Penjana Meta Tag SEO|Tajuk halaman|Meta perihalan|URL halaman (kanonik)|Nama tapak|URL imej untuk perkongsian|Kod bahasa dan wilayah (cth. ms_MY)|Benarkan enjin carian mengindeks dan mengikut halaman ini|Pratonton carian|Kod yang dijana|Salin|Disalin|Kod pengesahan enjin carian (pilihan)|Terlalu panjang: mungkin terpotong dalam hasil.|Terlalu pendek: tambah butiran.|Tiada alat yang boleh menjamin kedudukan. Tulis tajuk dan perihalan yang unik dan jujur untuk setiap halaman, dan uji halaman dengan alat enjin carian sendiri.",
+th:"ตัวสร้างเมตาแท็ก SEO|ชื่อหน้า|เมตาดิสคริปชัน|URL ของหน้า (canonical)|ชื่อเว็บไซต์|URL รูปภาพสำหรับแชร์|รหัสภาษาและภูมิภาค (เช่น th_TH)|อนุญาตให้เสิร์ชเอนจินทำดัชนีและตามลิงก์ของหน้านี้|ตัวอย่างในการค้นหา|โค้ดที่สร้าง|คัดลอก|คัดลอกแล้ว|รหัสยืนยันเสิร์ชเอนจิน (ไม่บังคับ)|ยาวเกินไป: อาจถูกตัดในผลการค้นหา|สั้นเกินไป: เพิ่มรายละเอียด|ไม่มีเครื่องมือใดรับประกันอันดับได้ เขียนชื่อและคำอธิบายที่ไม่ซ้ำและตรงไปตรงมาสำหรับทุกหน้า และทดสอบหน้าด้วยเครื่องมือของเสิร์ชเอนจินเอง",
+vi:"Trình tạo thẻ meta SEO|Tiêu đề trang|Mô tả meta|URL trang (canonical)|Tên trang web|URL hình ảnh để chia sẻ|Mã ngôn ngữ và khu vực (vd. vi_VN)|Cho phép công cụ tìm kiếm lập chỉ mục và theo dõi trang này|Xem trước tìm kiếm|Mã đã tạo|Sao chép|Đã sao chép|Mã xác minh công cụ tìm kiếm (tùy chọn)|Quá dài: có thể bị cắt trong kết quả.|Quá ngắn: hãy thêm chi tiết.|Không công cụ nào đảm bảo được thứ hạng. Hãy viết tiêu đề và mô tả độc đáo, trung thực cho từng trang, và kiểm tra trang bằng công cụ của chính công cụ tìm kiếm.",
+ta:"SEO மெட்டா குறிச்சொல் உருவாக்கி|பக்கத் தலைப்பு|மெட்டா விளக்கம்|பக்க URL (canonical)|தளத்தின் பெயர்|பகிர்வதற்கான பட URL|மொழி மற்றும் பிராந்தியக் குறியீடு (எ.கா. ta_IN)|இந்தப் பக்கத்தை அட்டவணையிடவும் பின்தொடரவும் தேடுபொறிகளை அனுமதி|தேடல் முன்னோட்டம்|உருவாக்கிய குறியீடு|நகலெடு|நகலெடுக்கப்பட்டது|தேடுபொறி சரிபார்ப்புக் குறியீடுகள் (விருப்பம்)|மிக நீளம்: முடிவுகளில் வெட்டப்படலாம்.|மிகச் சிறியது: மேலும் விவரம் சேர்க்கவும்.|எந்தக் கருவியும் தரவரிசையை உறுதிப்படுத்த முடியாது. ஒவ்வொரு பக்கத்திற்கும் தனித்துவமான, நேர்மையான தலைப்பும் விளக்கமும் எழுதி, தேடுபொறியின் சொந்தக் கருவிகளால் பக்கத்தைச் சோதிக்கவும்.",
+te:"SEO మెటా ట్యాగ్ జనరేటర్|పేజీ శీర్షిక|మెటా వివరణ|పేజీ URL (canonical)|సైట్ పేరు|షేరింగ్ కోసం చిత్రం URL|భాష మరియు ప్రాంత కోడ్ (ఉదా. te_IN)|ఈ పేజీని ఇండెక్స్ చేయడానికి, ఫాలో చేయడానికి సెర్చ్ ఇంజిన్‌లను అనుమతించండి|శోధన ప్రివ్యూ|రూపొందిన కోడ్|కాపీ|కాపీ అయింది|సెర్చ్ ఇంజిన్ ధృవీకరణ కోడ్‌లు (ఐచ్ఛికం)|చాలా పొడవు: ఫలితాల్లో కత్తిరించబడవచ్చు.|చాలా చిన్నది: మరిన్ని వివరాలు జోడించండి.|ఏ సాధనమూ ర్యాంకింగ్‌కు హామీ ఇవ్వలేదు. ప్రతి పేజీకి ప్రత్యేకమైన, నిజాయితీ గల శీర్షిక, వివరణ రాసి, సెర్చ్ ఇంజిన్ సొంత సాధనాలతో పేజీని పరీక్షించండి.",
+mr:"SEO मेटा टॅग जनरेटर|पानाचे शीर्षक|मेटा वर्णन|पानाचा URL (canonical)|साइटचे नाव|शेअरसाठी प्रतिमा URL|भाषा आणि प्रदेश कोड (उदा. mr_IN)|सर्च इंजिनला हे पान इंडेक्स आणि फॉलो करू द्या|सर्च प्रिव्ह्यू|तयार कोड|कॉपी|कॉपी झाले|सर्च इंजिन पडताळणी कोड (ऐच्छिक)|खूप मोठे: निकालांत कापले जाऊ शकते.|खूप लहान: अधिक तपशील जोडा.|कोणतेही साधन रँकिंगची हमी देऊ शकत नाही. प्रत्येक पानासाठी वेगळे आणि प्रामाणिक शीर्षक व वर्णन लिहा आणि सर्च इंजिनच्या स्वतःच्या साधनांनी पान तपासा.",
+ne:"SEO मेटा ट्याग जेनेरेटर|पृष्ठको शीर्षक|मेटा विवरण|पृष्ठको URL (canonical)|साइटको नाम|सेयरका लागि तस्बिर URL|भाषा र क्षेत्र कोड (जस्तै ne_NP)|खोज इन्जिनलाई यो पृष्ठ इन्डेक्स र फलो गर्न दिनुहोस्|खोज पूर्वावलोकन|तयार कोड|कपी|कपी भयो|खोज इन्जिन प्रमाणीकरण कोड (ऐच्छिक)|धेरै लामो: नतिजामा काटिन सक्छ।|धेरै छोटो: थप विवरण थप्नुहोस्।|कुनै उपकरणले रयाङ्किङको ग्यारेन्टी दिन सक्दैन। हरेक पृष्ठका लागि फरक र इमान्दार शीर्षक र विवरण लेख्नुहोस् र खोज इन्जिनकै आफ्नै उपकरणले पृष्ठ जाँच्नुहोस्।",
+si:"SEO මෙටා ටැග් උත්පාදකය|පිටුවේ මාතෘකාව|මෙටා විස්තරය|පිටුවේ URL (canonical)|අඩවියේ නම|බෙදාගැනීම සඳහා රූප URL|භාෂා සහ කලාප කේතය (උදා. si_LK)|මෙම පිටුව සුචිගත කිරීමට සහ අනුගමනය කිරීමට සෙවුම් යන්ත්‍රවලට ඉඩ දෙන්න|සෙවුම් පෙරදසුන|සාදන ලද කේතය|පිටපත් කරන්න|පිටපත් කළා|සෙවුම් යන්ත්‍ර සත්‍යාපන කේත (විකල්ප)|ඉතා දිගයි: ප්‍රතිඵලවල කැපී යා හැක.|ඉතා කෙටියි: තවත් විස්තර එක් කරන්න.|කිසිදු මෙවලමකට ශ්‍රේණිගත කිරීම සහතික කළ නොහැක. සෑම පිටුවකටම අද්විතීය, අවංක මාතෘකාවක් සහ විස්තරයක් ලියා, සෙවුම් යන්ත්‍රයේම මෙවලම්වලින් පිටුව පරීක්ෂා කරන්න.",
+sw:"Kitengeneza Meta Tag za SEO|Kichwa cha ukurasa|Maelezo ya meta|URL ya ukurasa (canonical)|Jina la tovuti|URL ya picha ya kushiriki|Msimbo wa lugha na eneo (mf. sw_KE)|Ruhusu injini tafuti kuorodhesha na kufuata ukurasa huu|Hakikisho la utafutaji|Msimbo uliotengenezwa|Nakili|Imenakiliwa|Misimbo ya uthibitisho wa injini tafuti (hiari)|Ni mrefu mno: inaweza kukatwa kwenye matokeo.|Ni mfupi mno: ongeza maelezo zaidi.|Hakuna zana inayoweza kuhakikisha nafasi ya juu. Andika kichwa na maelezo ya kipekee na ya kweli kwa kila ukurasa, na ujaribu ukurasa wako kwa zana za injini tafuti yenyewe.",
+he:"מחולל תגי מטא ל-SEO|כותרת העמוד|תיאור מטא|כתובת העמוד (קנונית)|שם האתר|כתובת תמונה לשיתוף|קוד שפה ואזור (למשל he_IL)|אפשרו למנועי חיפוש לאנדקס ולעקוב אחרי העמוד הזה|תצוגה מקדימה בחיפוש|הקוד שנוצר|העתק|הועתק|קודי אימות של מנועי חיפוש (אופציונלי)|ארוך מדי: עלול להיחתך בתוצאות.|קצר מדי: הוסיפו פרטים.|אין כלי שמבטיח דירוג. כתבו כותרת ותיאור ייחודיים ויושרים לכל עמוד, ובדקו את העמוד בכלים של מנוע החיפוש עצמו.",
+el:"Δημιουργός meta tags SEO|Τίτλος σελίδας|Meta περιγραφή|URL σελίδας (canonical)|Όνομα ιστότοπου|URL εικόνας για κοινοποίηση|Κωδικός γλώσσας και περιοχής (π.χ. el_GR)|Να επιτρέπεται στις μηχανές αναζήτησης να ευρετηριάζουν και να ακολουθούν τη σελίδα|Προεπισκόπηση αναζήτησης|Κώδικας που δημιουργήθηκε|Αντιγραφή|Αντιγράφηκε|Κωδικοί επαλήθευσης μηχανών αναζήτησης (προαιρετικά)|Πολύ μεγάλο: μπορεί να κοπεί στα αποτελέσματα.|Πολύ μικρό: προσθέστε λεπτομέρειες.|Κανένα εργαλείο δεν εγγυάται κατάταξη. Γράψτε μοναδικό και ειλικρινή τίτλο και περιγραφή για κάθε σελίδα και ελέγξτε τη σελίδα με τα εργαλεία της ίδιας της μηχανής αναζήτησης.",
+sv:"SEO-metataggenerator|Sidtitel|Metabeskrivning|Sidans URL (kanonisk)|Webbplatsens namn|Bild-URL för delning|Språk- och regionkod (t.ex. sv_SE)|Låt sökmotorer indexera och följa den här sidan|Sökförhandsvisning|Genererad kod|Kopiera|Kopierat|Verifieringskoder för sökmotorer (valfritt)|För långt: kan klippas i resultaten.|För kort: lägg till mer information.|Inget verktyg kan garantera placeringar. Skriv en unik och ärlig titel och beskrivning för varje sida och testa sidan med sökmotorns egna verktyg."};
+const S2={
+en:"Fill in the fields and copy the code into the head section of your page. Everything is made in your browser and nothing is uploaded. Replace any sample text with your own.",
+bn:"ঘরগুলো পূরণ করে কোডটি আপনার পেজের head অংশে বসান। সবকিছু আপনার ব্রাউজারেই হয়, কিছুই আপলোড হয় না। নমুনা লেখা নিজের লেখা দিয়ে বদলে নিন।",
+hi:"खाने भरें और कोड को अपने पेज के head हिस्से में चिपकाएँ। सब कुछ आपके ब्राउज़र में होता है, कुछ अपलोड नहीं होता। नमूना पाठ को अपने पाठ से बदलें।",
+ur:"خانے بھریں اور کوڈ اپنے صفحے کے head حصے میں لگائیں۔ سب کچھ آپ کے براؤزر میں ہوتا ہے، کچھ اپ لوڈ نہیں ہوتا۔ نمونے کا متن اپنے متن سے بدل دیں۔",
+ar:"املأ الحقول وانسخ الكود إلى قسم head في صفحتك. كل شيء يتم في متصفحك ولا يُرفع أي شيء. استبدل النص التجريبي بنصك.",
+fa:"فیلدها را پر کنید و کد را در بخش head صفحه‌تان بگذارید. همه‌چیز در مرورگر شما انجام می‌شود و چیزی آپلود نمی‌شود. متن نمونه را با متن خودتان عوض کنید.",
+tr:"Alanları doldurun ve kodu sayfanızın head bölümüne kopyalayın. Her şey tarayıcınızda yapılır, hiçbir şey yüklenmez. Örnek metinleri kendi metninizle değiştirin.",
+zh:"填写各项并将代码复制到页面的 head 部分。一切都在浏览器中完成，不会上传任何内容。请将示例文字替换为您自己的内容。",
+ja:"項目を入力し、コードをページのhead内にコピーします。すべてブラウザ内で処理され、何もアップロードされません。サンプルの文章はご自身の内容に置き換えてください。",
+ko:"항목을 채우고 코드를 페이지의 head 영역에 복사하세요. 모든 작업은 브라우저에서 이루어지며 아무것도 업로드되지 않습니다. 예시 문구는 직접 쓴 내용으로 바꾸세요.",
+ru:"Заполните поля и скопируйте код в раздел head вашей страницы. Всё происходит в вашем браузере, ничего не загружается. Замените образцы текста своим.",
+es:"Rellena los campos y copia el código en la sección head de tu página. Todo ocurre en tu navegador y no se sube nada. Sustituye el texto de ejemplo por el tuyo.",
+fr:"Remplissez les champs et copiez le code dans la section head de votre page. Tout se passe dans votre navigateur, rien n’est envoyé. Remplacez les textes d’exemple par les vôtres.",
+de:"Füllen Sie die Felder aus und kopieren Sie den Code in den head-Bereich Ihrer Seite. Alles passiert in Ihrem Browser, nichts wird hochgeladen. Ersetzen Sie Beispieltexte durch Ihre eigenen.",
+pt:"Preencha os campos e copie o código para a seção head da sua página. Tudo acontece no seu navegador e nada é enviado. Troque os textos de exemplo pelos seus.",
+it:"Compila i campi e copia il codice nella sezione head della tua pagina. Tutto avviene nel tuo browser e nulla viene caricato. Sostituisci i testi di esempio con i tuoi.",
+nl:"Vul de velden in en kopieer de code naar het head-gedeelte van uw pagina. Alles gebeurt in uw browser, er wordt niets geüpload. Vervang voorbeeldteksten door uw eigen tekst.",
+pl:"Wypełnij pola i skopiuj kod do sekcji head swojej strony. Wszystko dzieje się w przeglądarce, nic nie jest wysyłane. Zastąp przykładowe teksty własnymi.",
+uk:"Заповніть поля та скопіюйте код у розділ head вашої сторінки. Усе відбувається у вашому браузері, нічого не завантажується. Замініть зразки тексту власними.",
+id:"Isi kolom dan salin kode ke bagian head halaman Anda. Semua diproses di browser Anda dan tidak ada yang diunggah. Ganti teks contoh dengan teks Anda.",
+ms:"Isi ruangan dan salin kod ke bahagian head halaman anda. Semuanya dilakukan dalam pelayar anda dan tiada apa dimuat naik. Gantikan teks contoh dengan teks anda.",
+th:"กรอกช่องแล้วคัดลอกโค้ดไปไว้ในส่วน head ของหน้า ทุกอย่างทำในเบราว์เซอร์ของคุณ ไม่มีการอัปโหลดใดๆ แทนที่ข้อความตัวอย่างด้วยข้อความของคุณ",
+vi:"Điền các ô và sao chép mã vào phần head của trang. Mọi thứ diễn ra trong trình duyệt của bạn, không tải lên gì cả. Thay văn bản mẫu bằng nội dung của bạn.",
+ta:"புலங்களை நிரப்பி குறியீட்டை உங்கள் பக்கத்தின் head பகுதியில் ஒட்டவும். எல்லாம் உங்கள் உலாவியிலேயே நடக்கும், எதுவும் பதிவேற்றப்படாது. மாதிரி உரையை உங்கள் உரையால் மாற்றவும்.",
+te:"ఫీల్డ్‌లు నింపి కోడ్‌ను మీ పేజీ head భాగంలో అతికించండి. అంతా మీ బ్రౌజర్‌లోనే జరుగుతుంది, ఏదీ అప్‌లోడ్ కాదు. నమూనా టెక్స్ట్‌ను మీ సొంత టెక్స్ట్‌తో మార్చండి.",
+mr:"रकाने भरा आणि कोड तुमच्या पानाच्या head भागात चिकटवा. सर्व काही तुमच्या ब्राउझरमध्येच होते, काहीही अपलोड होत नाही. नमुना मजकूर तुमच्या मजकुराने बदला.",
+ne:"खाली ठाउँ भरेर कोडलाई आफ्नो पृष्ठको head भागमा राख्नुहोस्। सबै कुरा तपाईंको ब्राउजरमै हुन्छ, केही अपलोड हुँदैन। नमुना पाठलाई आफ्नै पाठले बदल्नुहोस्।",
+si:"ක්ෂේත්‍ර පුරවා කේතය ඔබේ පිටුවේ head කොටසට පිටපත් කරන්න. සියල්ල ඔබේ බ්‍රවුසරයේම සිදු වේ, කිසිවක් උඩුගත නොවේ. නියැදි පෙළ ඔබේම පෙළින් ප්‍රතිස්ථාපනය කරන්න.",
+sw:"Jaza sehemu na unakili msimbo kwenye sehemu ya head ya ukurasa wako. Kila kitu hufanyika kwenye kivinjari chako, hakuna kinachopakiwa. Badilisha maandishi ya mfano na yako.",
+he:"מלאו את השדות והעתיקו את הקוד לחלק head של העמוד. הכול מתבצע בדפדפן שלכם ושום דבר לא מועלה. החליפו את טקסט הדוגמה בטקסט שלכם.",
+el:"Συμπληρώστε τα πεδία και αντιγράψτε τον κώδικα στην ενότητα head της σελίδας σας. Όλα γίνονται στον browser σας και τίποτα δεν ανεβαίνει. Αντικαταστήστε τα δείγματα κειμένου με δικά σας.",
+sv:"Fyll i fälten och kopiera koden till head-delen på din sida. Allt sker i din webbläsare och inget laddas upp. Ersätt exempeltexterna med dina egna."};
+
+const $=id=>document.getElementById(id),T=k=>ET.t(k),KEY="et_seo";
+let D={ti:"",de:"",ur:"",sn:"",im:"",lc:"",idx:true,vg:"",vb:"",vy:"",vz:"",vn:"",ov:{}};
+try{const s=JSON.parse(sessionStorage.getItem(KEY)||"null");if(s)D=Object.assign(D,s)}catch(e){}
+const save=()=>{try{sessionStorage.setItem(KEY,JSON.stringify(D))}catch(e){}};
+/* search engines that matter in some countries (verification meta tags): y = Yandex, z = Baidu, n = Naver */
+const LOCAL={RU:"vy",KZ:"vy",CN:"vz",KR:"vn"};
+const VF={vg:["Google","google-site-verification"],vb:["Bing","msvalidate.01"],vy:["Yandex","yandex-verification"],vz:["Baidu","baidu-site-verification"],vn:["Naver","naver-site-verification"]};
+const defLoc=()=>{const c=ET.state.country,l=ET.state.lang;return c==="INT"?(l==="en"?"en_US":l):l+"_"+c};
+const numTxt=n=>{try{return new Intl.NumberFormat(ET.state.lang).format(n)}catch(e){return String(n)}};
+const esc=s=>String(s).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+/*GEN*/
+function gen(){
+const L=[],a=s=>L.push(s),m=(k,v)=>a('<meta '+k+' content="'+esc(v)+'">');
+a('<meta charset="utf-8">');a('<meta name="viewport" content="width=device-width, initial-scale=1">');
+if(D.ti)a("<title>"+esc(D.ti)+"</title>");
+if(D.de)m('name="description"',D.de);
+if(D.ur)a('<link rel="canonical" href="'+esc(D.ur)+'">');
+m('name="robots"',D.idx?"index, follow":"noindex, nofollow");
+a('<meta property="og:type" content="website">');
+if(D.ti)m('property="og:title"',D.ti);if(D.de)m('property="og:description"',D.de);
+if(D.ur)m('property="og:url"',D.ur);if(D.sn)m('property="og:site_name"',D.sn);if(D.im)m('property="og:image"',D.im);
+m('property="og:locale"',D.lc||defLoc());
+m('name="twitter:card"',D.im?"summary_large_image":"summary");
+if(D.ti)m('name="twitter:title"',D.ti);if(D.de)m('name="twitter:description"',D.de);if(D.im)m('name="twitter:image"',D.im);
+Object.keys(VF).forEach(k=>{if(D[k])m('name="'+VF[k][1]+'"',D[k])});
+return L.join("\n")}
+/*ENDGEN*/
+function draw(){
+const t=D.ti,d=D.de;let host=D.ur,path="";
+try{const x=new URL(D.ur);host=x.host;path=x.pathname.split("/").filter(Boolean).join(" › ")}catch(e){}
+$("pvt").textContent=t.length>60?t.slice(0,57)+"…":t;$("pvu").textContent=host+(path?" › "+path:"");$("pvd").textContent=d.length>160?d.slice(0,157)+"…":d;
+$("ct").textContent=numTxt(t.length)+" / "+numTxt(60);$("cd").textContent=numTxt(d.length)+" / "+numTxt(160);
+$("mt").textContent=t.length>60?T(13):(t.length&&t.length<30?T(14):"");
+$("md").textContent=d.length>160?T(13):(d.length&&d.length<70?T(14):"");
+const g=gen();$("out").value=g;$("out").rows=Math.min(24,g.split("\n").length+1)}
+const IDS=["ti","de","ur","sn","im","lc","vg","vb","vy","vz","vn"],LB={ti:1,de:2,ur:3,sn:4,im:5,lc:6};
+function vis(){Object.keys(VF).forEach(k=>{const rel=k==="vg"||k==="vb"||LOCAL[ET.state.country]===k;$("w_"+k).hidden=!(rel||D[k])})}
+function labels(){
+$("t").textContent=T(0);document.title=T(0)+" | Essential Tools";
+Object.keys(LB).forEach(k=>{$("l_"+k).textContent=T(LB[k])});
+$("lidx").textContent=T(7);$("h8").textContent=T(8);$("h9").textContent=T(9);$("cp").textContent=T(10);$("h12").textContent=T(12);
+Object.keys(VF).forEach(k=>{$("l_"+k).textContent=VF[k][0]});
+if(!D.ov.lc)$("lc").value=defLoc();else $("lc").value=D.lc;
+$("lc").placeholder=defLoc();$("idx").checked=D.idx;vis();draw()}
+IDS.forEach(k=>{const i=$(k);i.value=D[k]||"";i.addEventListener("input",()=>{D[k]=i.value;if(k==="lc")D.ov.lc=1;save();vis();draw()})});
+$("idx").onchange=e=>{D.idx=e.target.checked;save();draw()};
+$("cp").onclick=async()=>{const v=$("out").value;try{await navigator.clipboard.writeText(v)}catch(e){$("out").select();try{document.execCommand("copy")}catch(x){}}
+$("cp").textContent=T(11);setTimeout(()=>{$("cp").textContent=T(10)},1500);ET.logNow(T(0)+": "+(D.ti||"—"))};
+ET.start({id:"seo",file:"seo.html",S,S2,labels,guide:()=>ET.t2(0),warn:()=>T(15),currency:false});
+</script>
+</body>
+</html>
